@@ -1,0 +1,36 @@
+package com.tj720.dao;
+
+import com.tj720.model.EsaleIntercept;
+
+import java.util.List;
+import java.util.Map;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface EsaleInterceptMapper {
+    int deleteByPrimaryKey(Integer id);
+
+    int insert(EsaleIntercept record);
+
+    int insertSelective(EsaleIntercept record);
+
+    EsaleIntercept selectByPrimaryKey(Integer id);
+
+    int updateByPrimaryKeySelective(EsaleIntercept record);
+
+    int updateByPrimaryKey(EsaleIntercept record);
+
+    /**
+     * 铭感词查询
+     * @param map
+     * @return
+     */
+    List<EsaleIntercept> queryInterceptWords(Map<String, Object> map);
+
+    /**
+     * 总条数查询
+     * @param map
+     * @return
+     */
+    Integer countInterceptWords(Map<String, Object> map);
+}

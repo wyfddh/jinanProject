@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tj720.dao.ICreativeProductMapper">
+
+  <select id="getRecommendCreativeProductList" resultType="com.tj720.dto.CreativeProductDto" >
+    select t.id, t.product_name as name, t.pictureids as pictureUrl
+    from creative_product t
+    left join museum_base_info a on(t.create_org = a.id)
+    where t.data_state = '1'
+    and a.data_state = '2'
+    order by t.page_recommend desc, t.update_date desc
+    LIMIT ${size}
+  </select>
+
+  <select id="getCreativeProductList" resultType="com.tj720.dto.CreativeProductDto" >
+    select t.id, t.product_name as name, t.pictureids as pictureUrl, a.museum_name as museumName
+    from creative_product t
+    left join museum_base_info a on(t.create_org = a.id)
+    where t.data_state = '1'
+    and a.data_state = '2'
+    order by t.update_date desc, t.create_date DESC
+    <if test="start == 0">
+      LIMIT ${size}
+    </if>
+    <if test="start != 0">
+      LIMIT ${start}, ${size}
+    </if>
+  </select>
+
+  <select id="countCreativeProductList" resultType="java.lang.Integer" >
+    select count(*)
+    from creative_product t
+    left join museum_base_info a on(t.create_org = a.id)
+    where t.data_state = '1'
+    and a.data_state = '2'
+  </select>
+
+  <select id="getCreativeProduct" resultType="com.tj720.dto.CreativeProductDto" >
+    select t.id, t.product_name as name, t.pictureids as pictureUrl, a.museum_name as museumName,
+    t.type, t.develop_idea as developIdea, a.id as museumId
+    from creative_product t
+    left join museum_base_info a on(t.create_org = a.id)
+    where t.data_state = '1'
+    and a.data_state = '2'
+    and t.id = #{id}
+  </select>
+
+  <select id="getRelevantCreativeProduct" resultType="com.tj720.dto.CreativeProductDto" >
+    select t.id, t.product_name as name, t.pictureids as pictureUrl, a.museum_name as museumName
+    from creative_product t
+    left join museum_base_info a on(t.create_org = a.id)
+    where t.data_state = '1'
+    and a.data_state = '2'
+    and t.id not in (#{currentId})
+    order by if(t.create_org=#{currentMuseumId} and t.create_org is not null,1,0) desc,
+		if(t.type=#{type} and t.type is not null,1,0) desc,
+		t.update_date desc, t.create_date DESC
+	limit ${size}
+  </select>
+
+</mapper>

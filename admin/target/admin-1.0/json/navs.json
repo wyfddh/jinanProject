@@ -1,0 +1,203 @@
+{
+	"contentManagement": [
+		{
+			"title": "工作台",
+			"icon": "icon-text",
+			"href": "page/workBench/workbench.html",
+			"spread": false
+		},
+		{
+			"title": "资源管理",
+			"icon": "icon-text",
+			"spread": false,
+			"children":[
+				{
+					"title": "博物院管理",
+                      "icon": "icon-text",
+					"href": "page/esaleMuseum/esaleMuseumList.html",
+					"spread": false
+				},{
+					"title": "藏品 管理",
+					"icon": "icon-text",
+					"href": "page/esaleCollectionInfo/esaleCollectionInfoList.html",
+					"spread": false
+				},{
+					"title": "展览 管理",
+					"icon": "icon-text",
+					"href": "page/esaleShow/esaleShowList.html",
+					"spread": false
+				},{
+					"title": "数字展厅管理",
+					"icon": "icon-text",
+					"href": "page/esaleDigitalshow/esaleDigitalshowList.html",
+					"spread": false
+				},{
+					"title": "社教活动管理",
+					"icon": "icon-text",
+					"href": "page/esaleActivity/esaleActivityList.html",
+					"spread": false
+				},{
+					"title": "资讯 管理",
+					"icon": "icon-text",
+					"href": "page/esaleInfo/esaleInfoList.html",
+					"spread": false
+				},{
+					"title": "视频 管理",
+					"icon": "icon-text",
+					"href": "page/localIntroduce/introduceList.html",
+					"spread": false
+				}]
+		},
+		{
+			"title": "用户管理",
+			"icon": "icon-text",
+			"spread": false,
+			"children":[
+				{
+					"title": "公众用户管理",
+					"icon": "icon-text",
+					"href": "page/esaleUserManger/esaleUserList.html",
+					"spread": false
+				},
+				{
+					"title": "敏感词管理",
+					"icon": "icon-text",
+					"href": "page/esaleInterceptManager/interceptList.html",
+					"spread": false
+				},
+				{
+					"title": "黑名单管理",
+					"icon": "icon-text",
+					"href": "page/userBlackList/esaleUserBlacklistt.html",
+					"spread": false
+				}
+			]
+		},{
+			"title": "统计分析",
+			"icon": "icon-text",
+			"spread": false,
+			"children":[
+				{
+					"title": "用户统计",
+					"icon": "icon-text",
+					"href": "page/video/videoList.html",
+					"spread": false
+				},
+				{
+					"title": "藏品统计",
+					"icon": "icon-text",
+					"href": "",
+					"spread": false
+				},
+				{
+					"title": "社教活动统计",
+					"icon": "icon-text",
+					"href": "",
+					"spread": false
+				}
+			]
+		},{
+			"title": "资料管理",
+			"icon": "icon-text",
+			"spread": false,
+			"children":[
+				{
+					"title": "资料管理列表",
+					"icon": "icon-text",
+					"href": "page/video/videoList.html",
+					"spread": false
+				},
+				{
+					"title": "添加资料",
+					"icon": "icon-text",
+					"href": "page/video/videoDetail.html",
+					"spread": false
+				},
+				{
+					"title": "查看资料",
+					"icon": "icon-text",
+					"href": "page/video/videoShow.html",
+					"spread": false
+				}
+			]
+		},{
+			"title": "公开资料",
+			"icon": "icon-text",
+			"spread": false,
+			"children":[
+				{
+					"title": "公开资料列表",
+					"icon": "icon-text",
+					"href": "page/video/videoList.html",
+					"spread": false
+				},
+				{
+					"title": "查看公开资料（公开可下载）",
+					"icon": "icon-text",
+					"href": "",
+					"spread": false
+				},
+				{
+					"title": "查看公开资料（公开紧查询）",
+					"icon": "icon-text",
+					"href": "",
+					"spread": false
+				}
+			]
+		}/*,{
+			"title": "标签管理",
+			"icon": "icon-text",
+			"spread": false,
+			"children":[
+				{
+					"title": "标签管理列表",
+					"icon": "icon-text",
+					"href": "page/labelManager/labelsList.html",
+					"spread": false
+				}
+			]
+		}*/,{
+			"title": "我的日报",
+			"icon": "icon-text",
+			"spread": false,
+			"children":[
+				{
+					"title": "写日报",
+					"icon": "icon-text",
+					"href": "page/esalePersonDiary/diaryAdd.html",
+					"spread": false
+				},
+				{
+					"title": "个人日报统计",
+					"icon": "icon-text",
+					"href": "",
+					"spread": false
+				}
+			]
+		},{
+			"title": "日报列表",
+			"icon": "icon-text",
+			"spread": false,
+			"children":[
+				{
+					"title": "日报列表",
+					"icon": "icon-text",
+					"href": "page/esalePersonDiary/diaryList.html",
+					"spread": false
+				},
+				{
+					"title": "个人日报统计",
+					"icon": "icon-text",
+					"href": "",
+					"spread": false
+				}
+			]
+		},{
+			"title": "菜单管理",
+			"icon": "icon-text",
+			"href": "page/menu/menuList.html",
+			"spread": false
+		}
+	]
+}
+

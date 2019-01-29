@@ -1,0 +1,118 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="../../layui/css/layui.css" media="all" />
+    <!--样式-->
+    <style type="text/css">
+        .textHidden{max-width:70%; white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+    </style>
+</head>
+<body style="background:#fff;padding:10px;">
+<form class="layui-form" id="newForm">
+    <input type="hidden" id="id" name="id" value="">
+    <div class="layui-col-xs12" style="">
+        <div class="layui-form-item layui-row" style="text-align:left;width: 100%;">
+            <div class="layui-input-block" style="width: 100%;float: left;margin-left: 0px;">
+
+            </div>
+        </div>
+        <input type="text" hidden="true" value="${approvalTourId }" id = "tourId" name = "tourId">
+        <div class="layui-form-item layui-row layui-col-xs12" style="text-align:center">
+            <div class="">
+                <button class="layui-btn layui-btn-sm layui-btn-primary" id="close">取消</button>
+                <button lay-submit class="layui-btn layui-btn-sm" lay-filter="save">确认</button>
+            </div>
+        </div>
+    </div>
+</form>
+<script type="text/javascript" src="../../js/jquery.min.js"></script>
+<script type="text/javascript" src="../../layui/layui.js"></script>
+<script type="text/javascript">
+    var pathName = window.document.location.pathname;
+    var projectName = pathName.substring(0, pathName.substr(1).indexOf('/') + 1);
+    var index = parent.layer.getFrameIndex(window.name);
+    layui.use(['form','layer','laydate','upload'],function(){
+        var form = layui.form,
+        layer = parent.layer === undefined ? layui.layer : top.layer,
+            $ = layui.jquery;
+        laydate = layui.laydate;
+
+        var exist = JSON.parse(window.localStorage.getItem("menus"));
+        var existStr = "";
+        for (var i = 0;i<exist.length;i++){
+            existStr += exist[i].menuId+",";
+        }
+
+        $.ajax({
+            type: "post",
+            url: projectName + '/esaleWorkBenchData/getRoleMenu.do',
+            success: function (result) {
+                if (result.success == 1) {
+                    var menu = result.data;
+                    var menuStr = "";
+                    for (var j = 0;j<menu.length;j++){
+                        if(existStr.indexOf(menu[j].id)!=-1){
+                            menuStr += '<input type="checkbox"  name="menuId" value="'+menu[j].id+'" title="'+menu[j].title+'" checked>';
+                        }else{
+                            menuStr += '<input type="checkbox"  name="menuId" value="'+menu[j].id+'" title="'+menu[j].title+'">';
+                        }
+                    }
+                    $(".layui-input-block").append(menuStr);
+                    form.render();
+                } else {
+                    layer.open({
+                        type: 1,
+                        title: false, //不显示标题
+                        closeBtn: 0,
+                        shadeClose: true,
+                        skin: "msg",
+                        content: "<div class='msg errorMsg'><div class='msg-icon'></div><div class='msg-title'>查询失败</div><div class='msg-txt'>" + result.data + "</div></div>",
+                        end: function () {
+                        }
+                    });
+                }
+            }
+        });
+
+        form.on("submit(save)",function(data){
+            var checked = "";
+            $("input[name='menuId']:checked").each(function(){ //由于复选框一般选中的是多个,所以可以循环输出
+                checked += $(this).val()+",";
+            });
+            $.ajax({
+                url:projectName+"/esaleWorkBenchData/saveMenu.do",
+                data:{
+                    menuIds : checked
+                },
+                type:"POST",
+                success:function(msg){
+                    if(msg.success == 1){
+                        setTimeout(function(){
+                            close();
+                        },700);
+                        /* layer.msg('保存成功'); */
+                        parent.layer.close(index);
+                    }else{
+                        layer.msg(msg.data);
+                    }
+                }
+            });
+            return false;
+        });
+
+    });
+    //关闭
+    $("#close").click(function(){
+        parent.layer.close(index);
+    });
+
+    function close(){
+        var index=parent.layui.layer.getFrameIndex(window.name);
+        parent.layui.layer.close(index);
+    }
+
+</script>
+
+</body>
+</html>

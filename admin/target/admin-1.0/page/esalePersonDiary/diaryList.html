@@ -1,0 +1,88 @@
+
+<html>
+<head>
+    <script src="../../statics/libs/jquery-1.10.2.min.js"></script>
+    <link rel="stylesheet" href="../../statics/css/font-awesome.min.css">
+    <!--layui ztree样式-->
+    <link rel="stylesheet" href="../../statics/plugins/layui/css/layui.css" media="all">
+    <script src="../../statics/plugins/layer/layer.js"></script>
+    <script src="../../statics/plugins/layui/layui.js"></script>
+    <!--样式-->
+    <link rel="stylesheet" href="../../common/css/cyStyle.css">
+    <link rel="stylesheet" href="../../common/css/cyType.css">
+    <link rel="stylesheet" href="../../css/esalePersonDiary/diaryList.css">
+    <script src="../../statics/plugins/editgrid/plugin/My97DatePicker/WdatePicker.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body>
+<div class="layui-card">
+    <form class="layui-form" action="">
+        <div class="layui-card-header">
+            <div class="flexLeft">
+                <img src="../../statics/images/videoList/Group 6.png" alt="">
+                <span class="carFont">筛选查询</span>
+            </div>
+            <div class="layui-btn-group flexRight">
+                <button class="layui-btn layui-btn-green" lay-submit="" lay-filter="moreSearch">
+                    <i class="fa fa-chevron-down">&nbsp;</i>展开筛选
+                </button>
+                <button class="layui-btn search-btn myBtn"  lay-submit="" lay-filter="formDemo">搜索</button>
+                <button type="reset" class="layui-btn myBtn" lay-submit="" lay-filter="clear">重置</button>
+            </div>
+        </div>
+        <div class="layui-card-body">
+            <div class="layui-row more-search">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">输入搜索:</label>
+                    <div class="layui-input-block">
+                        <input type="text" id="creator" name="creatorName" placeholder="提交人" class="layui-input myinput">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">所属部门:</label>
+                    <div class="layui-input-block myinput">
+                        <select name="orgid" id="orgid" placeholder="全部">
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">提交时间:</label>
+                    <div class="layui-input-block">
+                        <input type="text" id="showDate" name="showDate" placeholder="请选择日期" class="layui-input myinput">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+
+<div class="layui-card">
+    <div class="layui-card-header">
+        <div class="flexLeft">
+            <img src="../../statics/images/videoList/Shape2.png" alt="">
+            <span class="carFont">数据列表</span>
+        </div>
+    </div>
+    <div class="layui-card-body">
+
+        <table class="layui-hide" id="test" lay-filter="test"></table>
+        <script type="text/html" id="toolbarDemo">
+            <div class="layui-btn-container">
+                <!--<button class="layui-btn layui-btn-sm" lay-event="batchAuthSetting">批量设置</button>-->
+            </div>
+        </script>
+        <script type="text/html" id="barDemo">
+            <a class="layui-btn layui-btn-xs cy-page" lay-event="edit" id="edit">编辑</a>
+            <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del" id="delete">删除</a>
+        </script>
+
+
+
+    </div>
+</div>
+<script src="../../statics/js/component.js"></script>
+<script src="../../statics/js/common.js"></script>
+<script src="../../js/esalePersonDiary/diaryList.js"></script>
+</body>
+</html>

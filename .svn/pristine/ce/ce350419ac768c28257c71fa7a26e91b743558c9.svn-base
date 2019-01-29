@@ -1,0 +1,268 @@
+package com.tj720.controller;
+
+import com.tj720.common.duanxin.HttpsRequest;
+import com.tj720.controller.framework.JsonResult;
+import com.tj720.controller.springbeans.Config;
+import com.tj720.dto.*;
+import com.tj720.service.PCEsalePubUserService;
+import com.tj720.service.PCesaleActivityService;
+import com.tj720.utils.Page;
+import com.tj720.utils.common.IdUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @Auther: chenshiya
+ * @Description:
+ */
+@RestController
+@RequestMapping("pc/activity")
+public class PCesaleActivityController {
+
+    @Autowired
+    private PCesaleActivityService esaleActivityService;
+    @Autowired
+    private PCEsalePubUserService esalePubUserService;
+
+    @Autowired
+    private Config config;
+
+    @RequestMapping(value="getActivityListByType", produces="application/json;charset=UTF-8")
+    @ResponseBody
+    public JsonResult getActivityListByType(String type, @RequestParam(defaultValue="1") Integer currentPage,
+                                        @RequestParam(defaultValue="15")Integer size) throws Exception{
+        //分页信息
+        Page page = new Page();
+        page.setCurrentPage(currentPage);
+        page.setSize(size);
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("start",page.getStart());
+        requestMap.put("end",page.getSize());
+        requestMap.put("type",type);
+        Integer count = esaleActivityService.countEsaleActivityList(requestMap);
+        page.setAllRow(count);
+        List<PCesaleActivity> activityList = esaleActivityService.getEsaleActivityList(requestMap);
+        for(PCesaleActivity info:activityList){
+            info.setPicUrl(config.getRootUrl()+info.getPicUrl());
+        }
+        return new JsonResult(1,activityList,page);
+    }
+
+    @RequestMapping(value="getActivityDetail", produces="application/json;charset=UTF-8")
+    @ResponseBody
+    public JsonResult getActivityDetail(String id,String userId) throws Exception{
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("id",id);
+        requestMap.put("userId",userId);
+        PCesaleActivity activityInfo = esaleActivityService.getActivityDetail(requestMap);
+        return new JsonResult(1,activityInfo);
+    }
+
+    @RequestMapping(value="cancelUserActivity", produces="application/json;charset=UTF-8")
+    @ResponseBody
+    public JsonResult cancelUserActivity(String userId,String activityId) throws Exception{
+        if(null == userId || userId.equals("") || null == activityId || activityId.equals("") ){
+            return new JsonResult(0,"参数错误");
+        }
+        int result = esaleActivityService.cancelUserActivity(userId,activityId);
+        if(result != 1){
+            return new JsonResult(0,"取消失败");
+        }
+        return new JsonResult(1);
+    }
+
+    @RequestMapping(value="getUserCommentList", produces="application/json;charset=UTF-8")
+    @ResponseBody
+    public JsonResult getUserCommentList(String activityId, @RequestParam(defaultValue="1") Integer currentPage,
+                                            @RequestParam(defaultValue="15")Integer size) throws Exception{
+        //分页信息
+        Page page = new Page();
+        page.setCurrentPage(currentPage);
+        page.setSize(size);
+        Map<String, Object> requestMap = new HashMap<>();
+        requestMap.put("start",page.getStart());
+        requestMap.put("end",page.getSize());
+        requestMap.put("activityId",activityId);
+        Integer count = esaleActivityService.countCommentList(requestMap);
+        page.setAllRow(count);
+        List<PCEsaleAssessActivity> commentList = esaleActivityService.getCommentList(requestMap);
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+            long nowms = System.currentTimeMillis();
+            long subms = 0;
+            for(PCEsaleAssessActivity assessActivity :commentList){
+                subms = nowms - sdf.parse(assessActivity.getCommentTime()).getTime();
+                subms /= (1000*60);
+                if(subms<60){
+                    assessActivity.setCommentTime(subms+"分钟前");
+                }else if(subms<1440){
+                    subms /= 60;
+                    assessActivity.setCommentTime(subms+"小时前");
+                }else if(subms<43200){
+                    subms /= (60*24);
+                    assessActivity.setCommentTime(subms+"天前");
+                }
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return new JsonResult(1,commentList,page);
+    }
+
+    @RequestMapping(value="sendComment", produces="application/json;charset=UTF-8")
+    @ResponseBody
+    public JsonResult sendComment(String activityId,String userId,String content) throws Exception{
+
+        return esaleActivityService.insertComment(activityId,userId,content);
+    }
+
+    @RequestMapping("/sendSecretCode")
+    @ResponseBody
+    public JsonResult sendSecretCode(String phone, HttpServletRequest request){
+        try {
+            //发送短信
+            String regCode = config.getRegCode();
+            String regPasswod = config.getRegPasswod();
+            HttpsRequest httpRequest = new HttpsRequest();
+            String sendSms = httpRequest.sendSms("POST", phone, regCode, regPasswod, request);
+            HttpSession session = request.getSession();
+            System.out.println("sendSms   ======= "+sendSms);
+            session.setAttribute("mobile_"+phone, ""+sendSms);
+            return new JsonResult(1,sendSms);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new JsonResult("2");
+        }
+    }
+
+    @RequestMapping(value="mobileCancelUserActivity", produces="application/json;charset=UTF-8")
+    @ResponseBody
+    public JsonResult mobileCancelUserActivity(String userId,String activityId,String phone,String smsCode,HttpServletRequest request) throws Exception{
+        HttpSession session = request.getSession();
+        String realCode = (String)session.getAttribute("mobile_"+phone);
+        if(smsCode.equals(realCode)){
+            int result = esaleActivityService.cancelUserActivity(userId,activityId);
+            if(result != 1){
+                return new JsonResult(0,"取消失败");
+            }
+        }else{
+            return new JsonResult(0,"验证码错误");
+        }
+        return new JsonResult(1);
+    }
+
+    @RequestMapping(value="mobileActivitySign", produces="application/json;charset=UTF-8")
+    @ResponseBody
+    public JsonResult mobileActivitySign(String enrollType,String userId,String realName,String activityId,String parentName,String phone,String email,String smsCode,HttpServletRequest request) throws Exception{
+        HttpSession session = request.getSession();
+        String realCode = (String)session.getAttribute("mobile_"+phone);
+        System.out.println(realCode);
+        if(StringUtils.isEmpty(smsCode)){
+            return new JsonResult(0,"验证码不能为空");
+        }
+        if(!smsCode.equals(realCode)){
+            return new JsonResult(0,"验证码错误");
+        }
+
+        //查询已报名人数，达到报名上限则拦截
+        String isCanSign =esalePubUserService.isCanSignActivity(activityId);
+        if("0".equals(isCanSign)){
+            return new JsonResult(0,"报名失败：报名人数已达上限");
+        }
+        List<PCEsalePubUserDto> listByPhone = esalePubUserService.getListByPhone(phone);
+        if(listByPhone.size()==1){
+            String uId = listByPhone.get(0).getId();
+            int i = esaleActivityService.checkUserActivitySign(activityId,uId);
+            if(i==1){
+                return new JsonResult(0,"已报名");
+            }else if(i==2){
+                return new JsonResult(0,"已取消");
+            }else if(i==3){
+                return new JsonResult(0,"数据错误");
+            }
+        }else if(listByPhone.size()==0){
+            PCEsalePubUserDto pcEsalePubUserDto = new PCEsalePubUserDto();
+            pcEsalePubUserDto.setUserName(realName);
+            pcEsalePubUserDto.setPhone(phone);
+            pcEsalePubUserDto.setRealName(realName);
+            pcEsalePubUserDto.setEmail(email);
+            pcEsalePubUserDto.setParentName(parentName);
+            pcEsalePubUserDto.setCreateBy("system");
+            pcEsalePubUserDto.setCreateDate(new Date());
+            pcEsalePubUserDto.setUpdateBy("system");
+            pcEsalePubUserDto.setUpdateDate(new Date());
+            pcEsalePubUserDto.setDataState("1");
+            pcEsalePubUserDto.setId(IdUtils.nextId(pcEsalePubUserDto));
+            boolean b = esalePubUserService.mobileUserSave(pcEsalePubUserDto);
+            if(!b){
+                return new JsonResult(0,"数据错误");
+            }
+        }
+        //通过phone查用户id，然后通过这个用户id来报名
+        PCEsalePubUserDto listByUserPhone = esalePubUserService.getListByUserPhone(phone);
+        String userNew = listByUserPhone.getId();
+        if(StringUtils.isEmpty(userNew)){
+            return new JsonResult(0,"数据错误");
+        }
+
+        //报名操作
+        PCEsaleUserActivityDto record = new PCEsaleUserActivityDto();
+        record.setActivityId(activityId);
+        record.setUserId(userNew);
+        record.setEnrollType(enrollType);
+        record.setEnrollTime(new Date());
+        record.setDataState("1");
+        record.setCreateBy("system");
+        record.setCreateDate(new Date());
+        record.setUpdateBy("system");
+        record.setUpdateDate(new Date());
+        record.setId(IdUtils.nextId(record));
+        record.setRealName(realName);
+        record.setParentName(parentName);
+        if(!userNew.equals(userId)){
+            if(StringUtils.isNotEmpty(userId)){
+                record.setLoginId(userId);
+            }
+        }
+        if(!esaleActivityService.SaveMobileActivitySign(record)){
+            return new JsonResult(0,"报名失败");
+        }
+        return new JsonResult(1,userNew);
+    }
+
+    @RequestMapping(value="creatInvitation", produces="application/json;charset=UTF-8")
+    @ResponseBody
+    public JsonResult creatInvitation(String activityId,String userId) throws Exception{
+        Map<String , Object> map = new HashMap<>();
+        String invitationCode = esaleActivityService.getUserActivityForId(userId,activityId);
+        if(StringUtils.isNotEmpty(invitationCode)){
+            PCesaleActivity esaleActivityDto = esaleActivityService.getActivityDetailById(activityId);
+            PCEsalePubUserDto esalePubUserDto = esaleActivityService.getPubUserDetail(userId, activityId);
+            map.put("activityName",esaleActivityDto.getActivityName());
+            map.put("activityTime",esaleActivityDto.getActivityTime());
+            map.put("activityAddr",esaleActivityDto.getActivityAddr());
+            map.put("cost",esaleActivityDto.getCost());
+            map.put("demand",esaleActivityDto.getDemand());
+            map.put("quota",esaleActivityDto.getQuota());
+            map.put("realName",esalePubUserDto.getRealName());
+            map.put("parentName",esalePubUserDto.getParentName());
+            map.put("phone",esalePubUserDto.getPhone());
+            map.put("invitationCode","HD"+invitationCode);
+        }
+        return new JsonResult(1,map);
+    }
+
+}

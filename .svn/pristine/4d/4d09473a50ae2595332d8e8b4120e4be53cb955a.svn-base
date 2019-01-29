@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.tj720.dao.EsaleInterfaceSyncTaskMapper">
+
+    <insert id="insertMunitInfoList" parameterType="java.util.List">
+        insert into esale_museum (id, museum_code, museum_name, museum_type, source_type, data_state, create_by, create_date, update_by, update_date) values
+        <foreach collection="list" separator="," item="item">
+            (#{item.id}, #{item.munitCode}, #{item.munitName}, 1, 1, 1, 'sysadmin', now(), 'sysadmin', now())
+        </foreach>
+    </insert>
+
+    <delete id="deleteAllRoleInfoBySync">
+        delete from sys_role where source_type = 1
+    </delete>
+
+    <insert id="insertRoleInfoList" parameterType="java.util.List">
+        insert into sys_role (id, role_code, name, source_type, status, creator, updater, create_time, update_time) values
+        <foreach collection="list" separator="," item="item">
+            (#{item.id}, #{item.roleCode}, #{item.roleName}, 1, 1, 'sysadmin', 'sysadmin', now(), now())
+        </foreach>
+    </insert>
+
+    <delete id="deleteAllRoleUserInfoBySync">
+        delete from sys_role_auth where source_type = 1
+    </delete>
+
+    <insert id="insertRoleUserInfoList" parameterType="java.util.List">
+        insert into sys_role_auth (id, role_id, party_id, party_type, source_type, creator, updater, create_time, update_time) values
+        <foreach collection="list" separator="," item="item">
+            (#{item.id}, #{item.roleId}, #{item.userId}, 'user', 1, 'sysadmin', 'sysadmin', now(), now())
+        </foreach>
+    </insert>
+
+    <delete id="deleteAllUserInfoBySync">
+        delete from sys_user where source_type = 1
+    </delete>
+
+    <insert id="insertUserInfoList" parameterType="java.util.List">
+        insert into sys_user (id, user_name, name, email, phone, office_phone, password, contacts, signature_file, browser, user_key, activiti_sync, depart_id, duty, munit_id, create_time, update_time, creator, updater, online_status, source_type, status) values
+        <foreach collection="list" separator="," item="item">
+            (#{item.id}, #{item.userName}, #{item.realName}, #{item.email}, #{item.mobilePhone}, #{item.officePhone}, #{item.password}, #{item.contacts}, #{item.signatureFile}, #{item.browser}, #{item.userKey}, #{item.activitiSync}, #{item.departid}, #{item.duty}, #{item.munitId}, now(), now(), 'sysadmin', 'sysadmin', #{item.status}, 1,
+            <choose>
+                <when test="item.dataStatus == 0">
+                    2
+                </when>
+                <when test="item.dataStatus == 1">
+                    1
+                </when>
+                <when test="item.dataStatus == 2">
+                    0
+                </when>
+            </choose>
+            )
+        </foreach>
+    </insert>
+
+    <delete id="deleteAllDepartInfoBySync">
+        delete from sys_department where source_type = 1
+    </delete>
+    
+    <insert id="insertDepartInfoList" parameterType="java.util.List">
+        insert into sys_department(department_id, parent_id, department_name, department_level, department_code, job_description, province, city, county, munit_id, source_type, status, create_time, creator, updater, update_time) values
+        <foreach collection="list" separator="," item="item">
+            (#{item.id}, #{item.parentdepartid}, #{item.departname}, #{item.servicelevel}, #{item.departcode}, #{item.description}, #{item.province}, #{item.city}, #{item.county}, #{item.munitId}, 1, #{item.status}, now(), 'sysadmin', 'sysadmin', now())
+        </foreach>
+    </insert>
+
+    <select id="selectMunitInfoById" parameterType="java.lang.String" resultType="com.tj720.model.EsaleInterfaceMunitInfo">
+        select
+          id                id,
+          museum_code       munitCode,
+          museum_name       munitName,
+          data_state        dataState
+        from esale_museum
+        where id = #{id} and museum_type = 1 and source_type = 1
+    </select>
+
+    <update id="updateMunitInfo" parameterType="com.tj720.model.EsaleInterfaceMunitInfo">
+        update esale_museum set museum_code = #{munitCode}, museum_name = #{munitName} where id = #{id}
+    </update>
+
+    <delete id="deleteMunitInfoNotInIds" parameterType="java.util.List">
+        delete from esale_museum where museum_type = 1 and source_type = 1 and id not in
+        <foreach collection="list" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </delete>
+
+    <delete id="deleteAllCollectBySync" parameterType="java.util.List">
+        delete from esale_collection_info where source_type = 1 and id not in
+        <foreach collection="list" open="(" separator="," close=")" item="item">
+            #{item}
+        </foreach>
+    </delete>
+
+    <insert id="insertCollectList" parameterType="java.util.List">
+        insert into esale_collection_info(id, collection_name, totalregistrationno, pic_url,
+        pictureids, collection_type_code, collection_type_des, museum_id,
+        source, source_name, collection_year_code, collection_year_name, collection_type_no,
+        concrete_length, three_url, code_guide_path, texture, enter_time,
+        gs_length, gs_width, gs_height, quality,
+        mass_unit_code, mass_unit_des, cul_level, cul_level_name,
+        version, collection_description, source_type,
+        create_by, create_date, update_by, update_date) values
+        <foreach collection="list" separator="," item="item">
+            (#{item.id}, #{item.culName}, #{item.totalregistrationno}, #{item.picUrl},
+            #{item.pictures}, #{item.culCategory}, #{item.culCategoryName}, #{item.munitId},
+            #{item.source}, #{item.sourceName}, #{item.gsYear}, #{item.gsYearName}, #{item.classificationno},
+            #{item.culSize}, #{item.threeDmodelPath}, #{item.codeGuidePath}, #{item.texture}, #{item.entrywarehousedate},
+            #{item.gsLength}, #{item.gsWidth}, #{item.gsHeight}, #{item.quality},
+            #{item.qualityunit}, #{item.qualityunitName}, #{item.culLevel}, #{item.culLevelName},
+            #{item.dataVer}, #{item.culremark}, 1,
+            'sysadmin', now(), 'sysadmin', now())
+        </foreach>
+    </insert>
+
+    <select id="selectCollectById" parameterType="java.lang.String" resultType="com.tj720.model.EsaleInterfaceCollect">
+        select
+            id,
+            version     dataVer
+        from esale_collection_info where id = #{id}
+    </select>
+
+    <update id="updateCollectById" parameterType="com.tj720.model.EsaleInterfaceCollect">
+        update esale_collection_info set collection_name = #{culName}, totalregistrationno = #{totalregistrationno}, pic_url = #{picUrl}, pictureids = #{pictures},
+        collection_type_code = #{culCategory}, collection_type_des = #{culCategoryName}, collection_type_no = #{classificationno}, museum_id = #{munitId}, source = #{source},
+        source_name = #{sourceName}, collection_year_code = #{gsYear}, collection_year_name = #{gsYearName}, concrete_length = #{culSize}, three_url = #{threeDmodelPath},
+        code_guide_path = #{codeGuidePath}, texture = #{texture}, enter_time = #{entrywarehousedate}, gs_length = #{gsLength}, gs_width = #{gsWidth}, gs_height = #{gsHeight},
+        quality = #{quality}, mass_unit_code = #{qualityunit}, mass_unit_des = #{qualityunitName}, cul_level = #{culLevel}, cul_level_name = #{culLevelName}, version = #{dataVer},
+        collection_description = #{culremark}, update_date = now() where id = #{id}
+    </update>
+</mapper>

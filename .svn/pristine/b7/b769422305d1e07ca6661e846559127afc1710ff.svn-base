@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tj720.dao.PCEsaleInfoMapper">
+
+  <select id="countEsaleInfo" resultType="java.lang.Integer" parameterType="java.util.Map">
+    select count(a.id)
+    from esale_info a
+    LEFT JOIN esale_museum b on (a.museum_id = b.id and b.data_state = '1')
+    where a.data_state ='1'
+    <if test="type != null and type != ''" >
+      and a.type = #{type}
+    </if>
+  </select>
+
+  <select id="getEsaleInfoListForPage" resultType="com.tj720.dto.PCEsaleInfoDto" parameterType="java.util.Map">
+    select
+    a.id,
+    a.info_topic as "infoTopic",
+    a.museum_id as "museumId",
+    b.museum_name as "museumName",
+    a.type as "type",
+    a.page_id as "pageId",
+    a.content as "content",
+    a.data_state as "dataState",
+    a.create_by as "createBy",
+    DATE_FORMAT(a.create_date,   '%Y-%m-%d %H:%i') as "createDate",
+    a.update_by as "updateBy",
+    DATE_FORMAT(a.update_date,   '%Y-%m-%d %H:%i') as "updateDate",
+    (select c.dict_name from sys_dict c where c.dict_type = 'info_type_es' and c.dict_code = a.type) as "typeDes",
+    d.att_path as "pageUrl"
+    from esale_info a
+    LEFT JOIN esale_museum b on (a.museum_id = b.id and b.data_state = '1')
+    left join mip_attachment d on(d.att_id = a.page_id and d.att_isJunk = 0)
+    where  a.data_state ='1'
+    <if test="type != null and type != ''" >
+      and a.type = #{type}
+    </if>
+    order by a.update_date desc
+    limit #{start},#{end}
+  </select>
+
+  <select id="getEsaleInfoById" resultType="com.tj720.dto.PCEsaleInfoDto" parameterType="java.lang.String">
+    select
+    a.id,
+    a.info_topic as "infoTopic",
+    a.museum_id as "museumId",
+    b.museum_name as "museumName",
+    a.type as "type",
+    a.page_id as "pageId",
+    a.content as "content",
+    a.data_state as "dataState",
+    a.create_by as "createBy",
+    DATE_FORMAT(a.create_date,   '%Y-%m-%d %H:%i') as "createDate",
+    a.update_by as "updateBy",
+    DATE_FORMAT(a.update_date,   '%Y-%m-%d %H:%i') as "updateDate",
+    (select c.dict_name from sys_dict c where c.dict_type = 'info_type_es' and c.dict_code = a.type) as "typeDes",
+    d.att_path as "pageUrl"
+    from esale_info a
+    LEFT JOIN esale_museum b on (a.museum_id = b.id and b.data_state = '1')
+    left join mip_attachment d on(d.att_id = a.page_id and d.att_isJunk = 0)
+    where  a.data_state ='1'
+    <if test="id != null and id != ''" >
+      and a.id = #{id}
+    </if>
+  </select>
+
+</mapper>

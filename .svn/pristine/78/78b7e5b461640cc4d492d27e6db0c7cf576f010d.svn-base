@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tj720.dao.EsaleLabelMapper">
+  <resultMap id="BaseResultMap" type="com.tj720.model.EsaleLabel">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="label_name" jdbcType="VARCHAR" property="labelName" />
+    <result column="create_by" jdbcType="VARCHAR" property="createBy" />
+    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="update_by" jdbcType="VARCHAR" property="updateBy" />
+    <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="data_state" jdbcType="VARCHAR" property="dataState" />
+    <result column="describes" jdbcType="VARCHAR" property="describes" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, label_name, create_by, create_date, update_by, update_date, data_state, describes
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from esale_label
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from esale_label
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.tj720.model.EsaleLabel">
+    insert into esale_label (id, label_name, create_by, 
+      create_date, update_by, update_date, 
+      data_state, describes)
+    values (#{id,jdbcType=VARCHAR}, #{labelName,jdbcType=VARCHAR}, #{createBy,jdbcType=VARCHAR}, 
+      #{createDate,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, #{updateDate,jdbcType=TIMESTAMP}, 
+      #{dataState,jdbcType=VARCHAR}, #{describes,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.tj720.model.EsaleLabel">
+    insert into esale_label
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="labelName != null">
+        label_name,
+      </if>
+      <if test="createBy != null">
+        create_by,
+      </if>
+      <if test="createDate != null">
+        create_date,
+      </if>
+      <if test="updateBy != null">
+        update_by,
+      </if>
+      <if test="updateDate != null">
+        update_date,
+      </if>
+      <if test="dataState != null">
+        data_state,
+      </if>
+      <if test="describes != null">
+        describes,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="labelName != null">
+        #{labelName,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null">
+        #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null">
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null">
+        #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateDate != null">
+        #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="dataState != null">
+        #{dataState,jdbcType=VARCHAR},
+      </if>
+      <if test="describes != null">
+        #{describes,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.tj720.model.EsaleLabel">
+    update esale_label
+    <set>
+      <if test="labelName != null">
+        label_name = #{labelName,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null">
+        create_by = #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null">
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null">
+        update_by = #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateDate != null">
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="dataState != null">
+        data_state = #{dataState,jdbcType=VARCHAR},
+      </if>
+      <if test="describes != null">
+        describes = #{describes,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.tj720.model.EsaleLabel">
+    update esale_label
+    set label_name = #{labelName,jdbcType=VARCHAR},
+      create_by = #{createBy,jdbcType=VARCHAR},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      update_by = #{updateBy,jdbcType=VARCHAR},
+      update_date = #{updateDate,jdbcType=TIMESTAMP},
+      data_state = #{dataState,jdbcType=VARCHAR},
+      describes = #{describes,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+
+  <select id="queryAllLabel" parameterType="java.util.Map" resultType="com.tj720.model.EsaleLabel">
+    select
+    id,label_name as labelName,create_date as createDate,describes
+    from esale_label where data_state = 1 limit #{start},#{end};
+  </select>
+
+  <select id="countAllLabel" resultType="java.lang.Integer">
+    select count(1) from esale_label where data_state = 1 ;
+  </select>
+
+  <select id="queryVideoByLid" parameterType="java.lang.String" resultType="java.lang.Integer">
+   select count(pv.id) as vidoeNum from esale_lable_video elv,post_video pv
+   where elv.video_id = pv.id and elv.data_state = 1
+   and elv.label_id = #{lid};
+  </select>
+  <!-- 修改中间表的状态  删除操作-->
+  <update id="updateLableVideo" parameterType="java.util.Map">
+   update esale_lable_video elv set elv.data_state = 2,update_date = #{updateDate}
+    where elv.label_id = #{id}
+  </update>
+
+  <select id="countInfo" parameterType="java.lang.String" resultType="com.tj720.model.EsaleLabel">
+   select pv.video_type as vidoeType,pv.video_name as videoName from esale_lable_video elv,post_video pv
+   where elv.video_id = pv.id and elv.data_state = 1
+   and elv.label_id = #{id};
+  </select>
+
+
+
+</mapper>

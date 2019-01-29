@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tj720.dao.EsaleCollectionInfoMapper">
+    <resultMap id="BaseResultMap" type="com.tj720.model.EsaleCollectionInfo">
+        <id column="id" jdbcType="VARCHAR" property="id"/>
+        <result column="collection_name" jdbcType="VARCHAR" property="collectionName"/>
+        <result column="totalregistrationno" jdbcType="VARCHAR" property="totalregistrationno"/>
+        <result column="pic_url" jdbcType="VARCHAR" property="picUrl"/>
+        <result column="pictureids" jdbcType="VARCHAR" property="pictureids"/>
+        <result column="collection_type_code" jdbcType="VARCHAR" property="collectionTypeCode"/>
+        <result column="collection_type_des" jdbcType="VARCHAR" property="collectionTypeDes"/>
+        <result column="museum_id" jdbcType="VARCHAR" property="museumId"/>
+        <result column="source" jdbcType="VARCHAR" property="source"/>
+        <result column="source_name" jdbcType="VARCHAR" property="sourceName"/>
+        <result column="collection_year_code" jdbcType="VARCHAR" property="collectionYearCode"/>
+        <result column="collection_year_name" jdbcType="VARCHAR" property="collectionYearName"/>
+        <result column="concrete_length" jdbcType="VARCHAR" property="concreteLength"/>
+        <result column="three_url" jdbcType="VARCHAR" property="threeUrl"/>
+        <result column="texture" jdbcType="VARCHAR" property="texture"/>
+        <result column="enter_time" jdbcType="VARCHAR" property="enterTime"/>
+        <result column="gs_length" jdbcType="VARCHAR" property="gsLength"/>
+        <result column="gs_width" jdbcType="VARCHAR" property="gsWidth"/>
+        <result column="gs_height" jdbcType="VARCHAR" property="gsHeight"/>
+        <result column="quality" jdbcType="VARCHAR" property="quality"/>
+        <result column="mass_unit_code" jdbcType="VARCHAR" property="massUnitCode"/>
+        <result column="mass_unit_des" jdbcType="VARCHAR" property="massUnitDes"/>
+        <result column="cul_level" jdbcType="VARCHAR" property="culLevel"/>
+        <result column="cul_level_name" jdbcType="VARCHAR" property="culLevelName"/>
+        <result column="version" jdbcType="VARCHAR" property="version"/>
+        <result column="source_type" jdbcType="BIT" property="sourceType"/>
+        <result column="hot_recommend" jdbcType="VARCHAR" property="hotRecommend"/>
+        <result column="click_num" jdbcType="BIGINT" property="clickNum"/>
+        <result column="collect_num" jdbcType="BIGINT" property="collectNum"/>
+        <result column="data_state" jdbcType="VARCHAR" property="dataState"/>
+        <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+        <result column="create_date" jdbcType="TIMESTAMP" property="createDate"/>
+        <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
+        <result column="update_date" jdbcType="TIMESTAMP" property="updateDate"/>
+    </resultMap>
+    <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.tj720.model.EsaleCollectionInfo">
+        <result column="collection_description" jdbcType="LONGVARCHAR" property="collectionDescription"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id
+        ,
+        collection_name,
+        totalregistrationno,
+        pic_url,
+        pictureids,
+        collection_type_code,
+        collection_type_des,
+        museum_id,
+        source,
+        source_name,
+        collection_year_code,
+        collection_year_name,
+        concrete_length,
+        three_url,
+        texture,
+        enter_time,
+        gs_length,
+        gs_width,
+        gs_height,
+        quality,
+        mass_unit_code,
+        mass_unit_des,
+        cul_level,
+        cul_level_name,
+        version,
+        source_type,
+        hot_recommend,
+        click_num,
+        collect_num,
+        data_state,
+        create_by,
+        create_date,
+        update_by,
+        update_date
+    </sql>
+    <sql id="Blob_Column_List">
+        collection_description
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="ResultMapWithBLOBs">
+        select
+        <include refid="Base_Column_List"/>
+        ,
+        <include refid="Blob_Column_List"/>
+        from esale_collection_info
+        where id = #{id,jdbcType=VARCHAR}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+        delete
+        from esale_collection_info
+        where id = #{id,jdbcType=VARCHAR}
+    </delete>
+    <insert id="insert" parameterType="com.tj720.model.EsaleCollectionInfo">
+        insert into esale_collection_info (id, collection_name, totalregistrationno,
+                                           pic_url, pictureids, collection_type_code,
+                                           collection_type_des, museum_id, source,
+                                           source_name, collection_year_code, collection_year_name,
+                                           concrete_length, three_url, texture,
+                                           enter_time, gs_length, gs_width,
+                                           gs_height, quality, mass_unit_code,
+                                           mass_unit_des, cul_level, cul_level_name,
+                                           version, source_type, hot_recommend, data_state, click_num, collect_num,
+                                           create_by, create_date, update_by,
+                                           update_date, collection_description)
+        values (#{id,jdbcType=VARCHAR}, #{collectionName,jdbcType=VARCHAR}, #{totalregistrationno,jdbcType=VARCHAR},
+                #{picUrl,jdbcType=VARCHAR}, #{pictureids,jdbcType=VARCHAR}, #{collectionTypeCode,jdbcType=VARCHAR},
+                #{collectionTypeDes,jdbcType=VARCHAR}, #{museumId,jdbcType=VARCHAR}, #{source,jdbcType=VARCHAR},
+                #{sourceName,jdbcType=VARCHAR}, #{collectionYearCode,jdbcType=VARCHAR},
+                #{collectionYearName,jdbcType=VARCHAR},
+                #{concreteLength,jdbcType=VARCHAR}, #{threeUrl,jdbcType=VARCHAR}, #{texture,jdbcType=VARCHAR},
+                #{enterTime,jdbcType=VARCHAR}, #{gsLength,jdbcType=VARCHAR}, #{gsWidth,jdbcType=VARCHAR},
+                #{gsHeight,jdbcType=VARCHAR}, #{quality,jdbcType=VARCHAR}, #{massUnitCode,jdbcType=VARCHAR},
+                #{massUnitDes,jdbcType=VARCHAR}, #{culLevel,jdbcType=VARCHAR}, #{culLevelName,jdbcType=VARCHAR},
+                #{version,jdbcType=VARCHAR}, #{sourceType,jdbcType=BIT}, #{hotRecommend,jdbcType=VARCHAR},
+                #{clickNum,jdbcType=BIGINT}, #{collectNum,jdbcType=BIGINT}, #{dataState,jdbcType=VARCHAR},
+                #{createBy,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR},
+                #{updateDate,jdbcType=TIMESTAMP}, #{collectionDescription,jdbcType=LONGVARCHAR})
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.tj720.model.EsaleCollectionInfo">
+        update esale_collection_info
+        <set>
+            <if test="collectionName != null">
+                collection_name = #{collectionName,jdbcType=VARCHAR},
+            </if>
+            <if test="totalregistrationno != null">
+                totalregistrationno = #{totalregistrationno,jdbcType=VARCHAR},
+            </if>
+            <if test="picUrl != null">
+                pic_url = #{picUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="pictureids != null">
+                pictureids = #{pictureids,jdbcType=VARCHAR},
+            </if>
+            <if test="collectionTypeCode != null">
+                collection_type_code = #{collectionTypeCode,jdbcType=VARCHAR},
+            </if>
+            <if test="collectionTypeDes != null">
+                collection_type_des = #{collectionTypeDes,jdbcType=VARCHAR},
+            </if>
+            <if test="museumId != null">
+                museum_id = #{museumId,jdbcType=VARCHAR},
+            </if>
+            <if test="source != null">
+                source = #{source,jdbcType=VARCHAR},
+            </if>
+            <if test="sourceName != null">
+                source_name = #{sourceName,jdbcType=VARCHAR},
+            </if>
+            <if test="collectionYearCode != null">
+                collection_year_code = #{collectionYearCode,jdbcType=VARCHAR},
+            </if>
+            <if test="collectionYearName != null">
+                collection_year_name = #{collectionYearName,jdbcType=VARCHAR},
+            </if>
+            <if test="concreteLength != null">
+                concrete_length = #{concreteLength,jdbcType=VARCHAR},
+            </if>
+            <if test="threeUrl != null">
+                three_url = #{threeUrl,jdbcType=VARCHAR},
+            </if>
+            <if test="texture != null">
+                texture = #{texture,jdbcType=VARCHAR},
+            </if>
+            <if test="enterTime != null">
+                enter_time = #{enterTime,jdbcType=VARCHAR},
+            </if>
+            <if test="gsLength != null">
+                gs_length = #{gsLength,jdbcType=VARCHAR},
+            </if>
+            <if test="gsWidth != null">
+                gs_width = #{gsWidth,jdbcType=VARCHAR},
+            </if>
+            <if test="gsHeight != null">
+                gs_height = #{gsHeight,jdbcType=VARCHAR},
+            </if>
+            <if test="quality != null">
+                quality = #{quality,jdbcType=VARCHAR},
+            </if>
+            <if test="massUnitCode != null">
+                mass_unit_code = #{massUnitCode,jdbcType=VARCHAR},
+            </if>
+            <if test="massUnitDes != null">
+                mass_unit_des = #{massUnitDes,jdbcType=VARCHAR},
+            </if>
+            <if test="culLevel != null">
+                cul_level = #{culLevel,jdbcType=VARCHAR},
+            </if>
+            <if test="culLevelName != null">
+                cul_level_name = #{culLevelName,jdbcType=VARCHAR},
+            </if>
+            <if test="version != null">
+                version = #{version,jdbcType=VARCHAR},
+            </if>
+            <if test="sourceType != null">
+                source_type = #{sourceType,jdbcType=BIT},
+            </if>
+            <if test="hotRecommend != null">
+                hot_recommend = #{hotRecommend,jdbcType=VARCHAR},
+            </if>
+            <if test="clickNum != null">
+                click_num = #{clickNum,jdbcType=BIGINT},
+            </if>
+            <if test="collectNum != null">
+                collect_num = #{collectNum,jdbcType=BIGINT},
+            </if>
+            <if test="dataState != null">
+                data_state = #{dataState,jdbcType=VARCHAR},
+            </if>
+            <if test="createBy != null">
+                create_by = #{createBy,jdbcType=VARCHAR},
+            </if>
+            <if test="createDate != null">
+                create_date = #{createDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy,jdbcType=VARCHAR},
+            </if>
+            <if test="updateDate != null">
+                update_date = #{updateDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="collectionDescription != null">
+                collection_description = #{collectionDescription,jdbcType=LONGVARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+
+
+    <select id="countCollectionByUid" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select count(eci.id)
+        from esale_collection_info eci
+        where eci.id in (
+            select eus.cid
+            from esale_user_store eus,
+                 esale_collection_info eci
+            where eus.uid = #{uid,jdbcType=VARCHAR}
+            GROUP BY eus.cid
+        );
+    </select>
+
+    <select id="queryCollectionsByUid" parameterType="java.util.Map" resultMap="ResultMapWithBLOBs">
+        select
+        <include refid="Base_Column_List"/>
+        ,
+        <include refid="Blob_Column_List"/>
+        from esale_collection_info eci where eci.id in (
+        select eus.cid from esale_user_store eus where eus.uid = #{uid}
+        ) and 1=1
+        <if test="key != null and key != ''">
+            and (eci.id like concat('%',#{key},'%')
+            or eci.collection_name like concat('%',#{key},'%'))
+        </if>
+        <if test="orderBy == 1">
+            order by eci.create_date desc
+        </if>
+        <if test="orderBy == 2">
+            order by eci.update_date desc
+        </if>
+        limit #{start},#{end}
+    </select>
+
+    <!--总条数-->
+    <select id="collectionNumByUid" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select
+        count(1)
+        from esale_collection_info eci where eci.id in (
+        select eus.cid from esale_user_store eus where eus.uid = #{uid}
+        ) and 1=1
+        <if test="key != null and key != ''">
+            and (eci.id like concat('%',#{key},'%')
+            or eci.collection_name like concat('%',#{key},'%'))
+        </if>
+        <if test="orderBy == 1">
+            order by eci.create_date desc
+        </if>
+        <if test="orderBy == 2">
+            order by eci.update_date desc
+        </if>
+    </select>
+
+    <select id="countCollectionInfoList" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select
+        count(1)
+        from esale_collection_info a
+        LEFT JOIN esale_museum b on (a.museum_id = b.id and b.data_state = '1')
+        where 1 = 1 and a.data_state ='2'
+        <if test="key != null and key != ''">
+            and (a.collection_name like concat('%',#{key},'%') or b.museum_name like concat('%',#{key},'%'))
+        </if>
+        <if test="collectionTypeCode != null and collectionTypeCode != ''">
+            and a.collection_type_code = #{collectionTypeCode}
+        </if>
+        <if test="collectionYearCode != null and collectionYearCode != ''">
+            and a.collection_year_code = #{collectionYearCode}
+        </if>
+    </select>
+
+    <select id="getCollectionInfoList" parameterType="java.lang.String"
+            resultType="com.tj720.model.EsaleCollectionInfo">
+        select
+        a.id,
+        a.collection_name as "collectionName",
+        a.totalregistrationno as "totalregistrationno",
+        a.pic_url as "picUrl",
+        a.pictureids as "pictureids",
+        a.collection_type_code as "collectionTypeCode",
+        a.collection_type_des as "collectionTypeDes",
+        a.museum_id as "museumId",
+        b.museum_name as "museumName",
+        a.source as "source",
+        a.source_name as "sourceName",
+        a.collection_year_code as "collectionYearCode",
+        a.collection_year_name as "collectionYearName",
+        a.concrete_length as "concreteLength",
+        a.three_url as "threeUrl",
+        a.texture as "texture",
+        a.enter_time as "enterTime",
+        a.gs_length as "gsLength",
+        a.gs_width as "gsWidth",
+        a.gs_height as "gsHeight",
+        a.quality as "quality",
+        a.mass_unit_code as "massUnitCode",
+        a.mass_unit_des as "massUnitDes",
+        a.cul_level as "culLevel",
+        a.cul_level_name as "culLevelName",
+        a.version as "version",
+        a.collection_description as "collectionDescription",
+        a.source_type as "sourceType",
+        a.hot_recommend as "hotRecommend",
+        a.click_num as "clickNum",
+        a.collect_num as "collectNum",
+        a.data_state as "dataState",
+        a.create_by as "createBy",
+        a.create_date as "createDate",
+        a.update_by as "updateBy",
+        a.update_date as "updateDate"
+        from esale_collection_info a
+        LEFT JOIN esale_museum b on (a.museum_id = b.id and b.data_state = '1')
+        where 1 = 1 and a.data_state !='0'
+        <if test="key != null and key != ''">
+            and (a.collection_name like concat('%',#{key},'%') or b.museum_name like concat('%',#{key},'%'))
+        </if>
+        <if test="collectionTypeCode != null and collectionTypeCode != ''">
+            and a.collection_type_code = #{collectionTypeCode}
+        </if>
+        <if test="collectionYearCode != null and collectionYearCode != ''">
+            and a.collection_year_code = #{collectionYearCode}
+        </if>
+        <if test="orderBy == 1">
+            order by a.update_date desc
+        </if>
+        <if test="orderBy == 2">
+            order by a.create_date desc
+        </if>
+        limit #{start},#{end}
+    </select>
+
+    <select id="selectHotCount" resultType="java.lang.Integer">
+        select count(1)
+        from esale_collection_info
+        where data_state = 2
+          and hot_recommend = 1
+    </select>
+
+    <select id="getCollectionListByType" parameterType="java.util.Map" resultType="java.util.Map">
+        select
+        eci.id as "culId",
+        eci.collection_name   as "culName"
+        from esale_collection_info eci where eci.data_state = 2
+        <if test="curName != null and curName != ''">
+            and eci.collection_name like concat('%',#{key},'%')
+        </if>
+        <if test="type != null and type != ''">
+            and eci.collection_type_code = #{type}
+        </if>
+        order by eci.create_date desc
+        limit 100
+    </select>
+</mapper>

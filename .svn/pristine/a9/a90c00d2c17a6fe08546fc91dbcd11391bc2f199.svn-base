@@ -1,0 +1,158 @@
+
+<html>
+<head>
+    <title>济南数字博物馆平台</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="Bookmark" href="images/favicon1.ico">
+    <link rel="Shortcut Icon" href="../../images/favicon1.ico">
+    <link rel="stylesheet" href="../../statics/css/font-awesome.min.css">
+    <!--layui ztree样式-->
+    <link rel="stylesheet" href="../../layui/css/layui.css" media="all" />
+    <!--样式-->
+    <link rel="stylesheet" href="../../common/css/cyStyle.css">
+    <link rel="stylesheet" href="../../common/css/cyType.css">
+    <link rel="stylesheet" href="../../css/workBench/workbench.css">
+</head>
+<body>
+<div class="header">
+    <img class="logo" src="../../statics/images/icon/logo.png" alt="">
+    <div class="top-right">
+        <!--<div class="input-box">-->
+            <!--<input type="text" class="layui-input-inline" autocomplete="off" placeholder="" />-->
+            <!--<img class="icon-search" src="../../statics/images/icon/icon-search.png" alt="">-->
+        <!--</div>-->
+        <img class="head-pic" src="../../statics/images/icon/head-pic.svg" alt="">
+        <span class="username">admin</span>
+        <a href="../../back/loginOut.do">
+        <img class="loginout" src="../../statics/images/icon/loginout.png" alt="">
+        </a>
+    </div>
+</div>
+
+<div class="wrap-content">
+    <div class="layui-card">
+        <div>
+            <img class="b1" src="../../statics/images/icon/head-pic.svg" alt="">
+            <div class="b2"><p id="userName" style="color: #333;"></p><p id="departInfo" style="color: #999;margin-top: 5px"></p></div>
+            <div class="b3"><span class="layui-btn" id = "upNews">发动态</span> <span class="layui-btn" id="writeLog">写日志</span></div>
+            <div class="b4">
+            <span>
+                <p>官网年度访问量</p>
+                <p>0</p>
+            </span>
+                <span>
+                 <p>社教年度参与数</p>
+                <p id="activityCount">0</p>
+            </span>
+                <span>
+                 <p>公开藏品数</p>
+                <p id="collectionCount">0</p>
+            </span>
+                <span>
+                 <p>公开资料数</p>
+                <p id="dataCount">0</p>
+            </span>
+            </div>
+        </div>
+    </div>
+    <div class="layui-card wrap-setting">
+        <div class="layui-card-header">
+            <img src="../../statics/images/icon/icon-setting.png" alt="">
+            <span class="carFont">系统版块</span>
+        </div>
+        <div class="c2 item-setting">
+            <a class="layui-btn layui-btn-primary icon-item icon-item-1" id="collectionUrl" target="_blank" style="margin-top: 34px;">藏品管理</a>
+            <a class="layui-btn layui-btn-primary icon-item icon-item-2" id="digitalAssetsUrl"  target="_blank"  style="margin-top: 34px;">数字资产</a>
+        </div>
+        <div class="c2 item-setting">
+            <a class="layui-btn layui-btn-primary icon-item icon-item-3" id="publicServerUrl"  target="_blank" style="margin-top: 34px;">公众服务</a>
+            <a class="layui-btn layui-btn-primary icon-item icon-item-4" id="syncJurisdictionUrl"  target="_blank" style="margin-top: 34px;">系统设置</a>
+        </div>
+    </div>
+    <div class="layui-card">
+        <div class="layui-card-header" style="border: none">
+            <img src="../../statics/images/main/Shape.png" alt="">
+            <span class="carFont">操作快捷入口</span>
+            <i class="layui-icon" style="float: right;font-size: 20px" id="setShortcutEntrance"></i>
+        </div>
+        <div class="layui-card-body">
+            <ul class="layui-nav">
+
+            </ul>
+        </div>
+    </div>
+
+    <div class="layui-card">
+        <div class="layui-card-header">
+            <img src="../../statics/images/icon/icon-shixiang.png" alt="">
+            <span class="carFont">事项</span>
+            <ul class="layui-tab-pic">
+                <li class="active">待办</li>
+                <li>已办</li>
+                <li>已完结</li>
+            </ul>
+        </div>
+        <div class="layui-card-body layui-tab-content">
+            <div class="layui-tab-item layui-show">
+                <table class="layui-table" id="undoTable"></table>
+            </div>
+            <div class="layui-tab-item">
+                <table class="layui-table" id="doneTable"></table>
+            </div>
+            <div class="layui-tab-item">
+                <table class="layui-table" id="finishTable">
+
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="layui-card">
+        <div class="layui-card-header">
+            <img src="../../statics/images/icon/icon-dongtai.png" alt="">
+            <span class="carFont">动态</span>
+        </div>
+        <div class="layui-card-body">
+            <ul class="tongzhiList" id="tongzhiList">
+
+            </ul>
+            <div id="loadMany" class style="margin-bottom:0px;text-align: center;">加载更多</div>
+        </div>
+    </div>
+
+    <div class="layui-card">
+        <div class="layui-card-header">
+            <img src="../../statics/images/icon/icon-cloack.png" alt="">
+            <span class="carFont">动态统计</span>
+        </div>
+        <div class="layui-card-body totalClan">
+        </div>
+    </div>
+
+    <div class="footer">
+        Copyright &#169 济南数字博物馆平台, All Rights Reserved.
+    </div>
+</div>
+
+<!--<div class="layui-card">
+    <div class="layui-card-header">
+        <img src="../../statics/images/main/cardFive.png" alt="">
+        <span class="carFont">文献借阅总览</span>
+    </div>
+    <div class="layui-card-body totalClan">
+        <div class="Total">
+            <div class="datumTotal"><p class="count" id="datum">1000</p><p class="totalName">公开文献</p></div>
+            <div class="applyTotal"><p class="count" id="apply">1000</p><p class="totalName">待审批</p></div>
+            <div class="downLoadTotal"><p class="count" id="downLoad">1000</p><p class="totalName">待归还</p></div>
+        </div>
+    </div>
+</div>-->
+
+<script type="text/javascript" src="../../js/jquery.min.js"></script>
+<script type="text/javascript" src="../../layui/layui.js"></script>
+<script src="../../statics/libs/countUp.min.js"></script>
+<script src="../../js/workBench/workbench.js"></script>
+
+</body>
+</html>

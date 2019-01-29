@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tj720.dao.PCEsaleShowMapper">
+
+  <select id="countEsaleShow" resultType="java.lang.Integer" parameterType="java.util.Map">
+    select count(a.id)
+    from esale_show a
+    where a.data_state ='1'
+    <if test="museumId != null and museumId != ''" >
+      and a.museum_id = #{museumId}
+    </if>
+    <if test="type != null and type != ''" >
+      and a.type = #{type}
+    </if>
+      order by a.update_date desc
+  </select>
+
+  <select id="getEsaleShowListForPage" resultType="com.tj720.dto.PCEsaleShowDto" parameterType="java.util.Map">
+    select
+    a.id,
+    a.show_name as "showName",
+    a.museum_id as "museumId",
+    b.museum_name as "museumName",
+    a.show_date as "showDate",
+    a.type,
+    a.address,
+    a.join_museum_id as "joinMuseumId",
+    c.museum_name as "joinMuseumName",
+    a.page_pictureid as "pagePictureid",
+    a.show_pictureids as "showPictureids",
+    a.show_description as "showDescription",
+    a.data_state  as "dataState",
+    a.create_by as "createBy",
+    a.create_date as "createDate",
+    a.update_by as "updateBy",
+    a.update_date as "updateDate",
+    d.att_path as "pageUrl"
+    from esale_show a
+    left join esale_museum b on(b.id = a.museum_id and b.data_state = 1)
+    left join esale_museum c on(c.id = a.join_museum_id and c.data_state = 1)
+    left join mip_attachment d on(d.att_id = a.page_pictureid and d.att_isJunk = 0)
+    where a.data_state ='1'
+    <if test="museumId != null and museumId != ''" >
+      and a.museum_id = #{museumId}
+    </if>
+    <if test="type != null and type != ''" >
+      and a.type = #{type}
+    </if>
+    order by a.update_date desc
+    limit #{start},#{end}
+  </select>
+
+  <select id="getEsaleShowById" resultType="com.tj720.dto.PCEsaleShowDto" parameterType="java.lang.String">
+    select
+    a.id,
+    a.show_name as "showName",
+    a.museum_id as "museumId",
+    b.museum_name as "museumName",
+    a.show_date as "showDate",
+    a.type,
+    a.address,
+    a.join_museum_id as "joinMuseumId",
+    c.museum_name as "joinMuseumName",
+    a.page_pictureid as "pagePictureid",
+    a.show_pictureids as "showPictureids",
+    a.show_description as "showDescription",
+    a.data_state  as "dataState",
+    a.create_by as "createBy",
+    a.create_date as "createDate",
+    a.update_by as "updateBy",
+    a.update_date as "updateDate",
+    d.att_path as "pageUrl"
+    from esale_show a
+    left join esale_museum b on(b.id = a.museum_id and b.data_state = 1)
+    left join esale_museum c on(c.id = a.join_museum_id and c.data_state = 1)
+    left join mip_attachment d on(d.att_id = a.page_pictureid and d.att_isJunk = 0)
+    where a.data_state ='1'
+    <if test="id != null and id != ''" >
+      and a.id = #{id}
+    </if>
+  </select>
+
+</mapper>

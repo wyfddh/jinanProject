@@ -1,0 +1,88 @@
+package com.tj720.dao;
+
+import com.tj720.model.EsaleSysMenu;
+import com.tj720.model.EsaleUserMenu;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 系统菜单mapper
+ * @author 杜昶
+ */
+@Repository
+public interface EsaleSysMenuMapper {
+    /**
+     * 根据用户id获取菜单
+     * @param userId
+     * @return
+     */
+    List<EsaleSysMenu> getMenuByUser(Map<String, Object> param);
+
+    /**
+     * 根据parentId获取菜单集合
+     * @param parentId
+     * @return
+     */
+    List<EsaleSysMenu> getMenuListByPid(String parentId);
+
+    /**
+     * 获取全部菜单信息
+     * @return
+     */
+    List<EsaleSysMenu> getMenuList();
+
+    /**
+     * 根据id查询菜单
+     * @param id
+     * @return
+     */
+    EsaleSysMenu getMenuById(String id);
+
+    /**
+     * 新增系统菜单
+     * @param esaleSysMenu
+     * @return
+     */
+    Integer insertSysMenu(EsaleSysMenu esaleSysMenu);
+
+    /**
+     * 修改系统菜单
+     * @param esaleSysMenu
+     * @return
+     */
+    Integer updateSysMenu(EsaleSysMenu esaleSysMenu);
+
+    /**
+     * 查询权限设置页面菜单
+     * @param param
+     * @return
+     */
+    List<EsaleUserMenu> getMenuPermissionList(Map<String, Object> param);
+
+    /**
+     * 删除角色菜单权限
+     * @param roleId
+     * @return
+     */
+    Integer deleteMenuRole(Map<String, Object> param);
+
+    /**
+     * 插入角色菜单权限
+     * @param param
+     * @return
+     */
+    Integer insertMenuRole(Map<String, Object> param);
+
+    /**
+     * 获取用户全部菜单
+     * @param param
+     * @return
+     */
+    List<EsaleSysMenu> getAllMenuByUser(Map<String, Object> param);
+
+    int deleteByPrimaryKey(String id);
+
+
+}

@@ -1,0 +1,204 @@
+
+<html>
+<head>
+    <script src="../../statics/libs/jquery-1.10.2.min.js"></script>
+    <link rel="stylesheet" href="../../statics/css/font-awesome.min.css">
+    <!--layui ztree样式-->
+    <link rel="stylesheet" href="../../statics/plugins/layui/css/layui.css" media="all">
+    <script src="../../statics/plugins/layer/layer.js"></script>
+    <script src="../../statics/plugins/layui/layui.js"></script>
+    <!--样式-->
+    <link rel="stylesheet" href="../../common/css/cyStyle.css">
+    <link rel="stylesheet" href="../../common/css/cyType.css">
+    <link rel="stylesheet" href="../../css/esaleUsers/esaleUpdate.css">
+    <link rel="stylesheet" href="../../common/css/formSelects-v4.css">
+    <script src="../../statics/plugins/editgrid/plugin/My97DatePicker/WdatePicker.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../../statics/plugins/echarts/echarts.js"></script>
+</head>
+<body>
+<div class="layui-card">
+    <form action="" id="videoForm"  class="layui-form">
+        <div class="layui-card-body">
+
+            <div class="cardOne mt24">
+                <div class="layui-header"><img src="" alt=""><span>基本信息</span></div>
+
+                <div class="OneBody mt24">
+                  <div class="oneHeard">
+                       <div class="oneLeft">
+                          <!-- <span>操作人：</span>
+                           <span id="userName">admin</span>
+                           <span >|</span>
+                           <span id="orgName">系统管理员</span>-->
+                       </div>
+                      <!-- <div class="oneRight">
+                           <span>日期：</span>
+                           <span id="nowDate">2018-8-21</span>
+                       </div>-->
+                     <!-- required  lay-verify="required"-->
+                   </div>
+                    <div class="oneBody">
+                        <ul class="myTable">
+                           <li class="layui-row">
+                               <div class="layui-inline layui-col-md2 layui-col-sm2 tableTR">*用户ID</div>
+                               <div class="layui-form-item m0 layui-col-md6 layui-col-sm6">
+                                  <!-- <input type="text" name="uploadOrg" id="uploadOrg"   autocomplete="off" class="layui-hide">
+                                   <input type="text" name="other1" id="other1"   autocomplete="off" class="layui-hide">-->
+                                   <!--<input type="text" name="id" id="id"   autocomplete="off" class="layui-hide">-->
+                                       <input type="text" name="id" id="id"   placeholder=""
+                                              autocomplete="off" class="layui-input">
+                               </div>
+                           </li>
+                            <li class="layui-row">
+                                <div class="layui-inline layui-col-md2 layui-col-sm2 tableTR">*用户名</div>
+                                <div class="layui-form-item m0 layui-col-md6 layui-col-sm6">
+                                    <input type="text" name="userName"  id="userName"  placeholder="" autocomplete="off"
+                                           class="layui-input">
+                                </div>
+                            </li>
+
+                            <li class="layui-row">
+                                <div class="layui-inline layui-col-md2 layui-col-sm2 tableTR">性别</div>
+                                <div class="layui-form-item m0 layui-col-md6 layui-col-sm6">
+                                    <input type="text" name="sex"  id="sex"  placeholder="" autocomplete="off"
+                                           class="layui-input">
+                                </div>
+                            </li>
+                          <!--  <li class="layui-row">
+                                <div class="layui-inline layui-col-md2 layui-col-sm2 tableTR">关键词</div>
+                                <div class="layui-form-item m0 layui-col-md6 layui-col-sm6">
+                                    <input type="text" name="keywords"  placeholder="请输入关键词" autocomplete="off" class="layui-input">
+                                </div>
+                                <div class="layui-inline layui-col-md4 layui-col-sm4 pdl60 g-text-aux">多个关键词,以;分隔</div>
+                            </li>-->
+                            <li class="layui-row">
+                                <div class="layui-inline layui-col-md2 layui-col-sm2 tableTR">*手机号码</div>
+                                <div class="layui-form-item m0 layui-col-md6 layui-col-sm6">
+                                    <input type="text" name="phone" id="phone"    placeholder="" autocomplete="off"
+                                           class="layui-input">
+                                </div>
+                            </li>
+                           <!-- <li class="layui-row">
+                                <div class="layui-inline layui-col-md2 layui-col-sm2 tableTR">*存储格式</div>
+                                <div class="layui-form-item m0 layui-col-md6 layui-col-sm6">
+                                    <select name="saveType" id="saveType" lay-verify="required">
+
+                                    </select>
+                                </div>
+                            </li>-->
+                           <!-- <li class="layui-row">
+                                <div class="layui-inline layui-col-md2 layui-col-sm2 tableTR">时长</div>
+                                <div class="layui-form-item m0 layui-col-md6 layui-col-sm6">
+                                    <input type="text" name="videoTime"  placeholder="请输入时长" autocomplete="off" class="layui-input">
+                                </div>
+                            </li>-->
+                           <!-- <li class="layui-row">
+                                <div class="layui-inline layui-col-md2 layui-col-sm2 tableTR">资料大小</div>
+                                <div class="layui-form-item m0 layui-col-md6 layui-col-sm6">
+                                    <input type="text" name="videoSize"    placeholder="请输入资料大小" autocomplete="off" class="layui-input">
+                                </div>
+                            </li>-->
+                         <!--   <li class="layui-row">
+                                <div class="layui-inline layui-col-md2 layui-col-sm2 tableTR">*资料来源</div>
+                                <div class="layui-form-item m0 layui-col-md6 layui-col-sm6">
+                                    <select name="source" id="source" lay-verify="required">
+
+                                    </select>
+                                </div>
+                            </li>-->
+                           <li class="layui-row">
+                                <div class="layui-inline layui-col-md2 layui-col-sm2 tableTR">生日</div>
+                                <div class="layui-form-item m0 layui-col-md6 layui-col-sm6">
+                                    <input type="text" name="MyBirthday" id="MyBirthday"    placeholder=""
+                                           autocomplete="off" class="layui-input">
+                                </div>
+
+                            </li>
+                            <li class="layui-row">
+                                <div class="layui-inline layui-col-md2 layui-col-sm2 tableTR">常用邮箱</div>
+                                <div class="layui-form-item m0 layui-col-md6 layui-col-sm6">
+                                    <input type="text" name="email" id="email"  placeholder="" autocomplete="off" class="layui-input">
+                                </div>
+                            </li>
+                            <li class="layui-row">
+                                <div class="layui-inline layui-col-md2 layui-col-sm2 tableTR">个人介绍</div>
+                                <div class="layui-form-item m0 layui-col-md6 layui-col-sm6">
+                                    <input type="text" name="description" id="description"   placeholder="" autocomplete="off" class="layui-input">
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="cardOne mt24">
+                <div class="layui-header"><img src="" alt=""><span>青少年用户信息</span></div>
+
+                <div class="OneBody mt24">
+
+                    <div class="oneBody">
+                        <ul class="myTable">
+                            <li class="layui-row">
+                                <div class="layui-inline layui-col-md2 layui-col-sm2 tableTR">真实姓名</div>
+                                <div class="layui-form-item m0 layui-col-md6 layui-col-sm6">
+                                    <input type="text" name="realName" id="realName"  placeholder="" autocomplete="off"
+                                           class="layui-input">
+                                </div>
+                            </li>
+                            <li class="layui-row">
+                                <div class="layui-inline layui-col-md2 layui-col-sm2 tableTR">身份证</div>
+                                <div class="layui-form-item m0 layui-col-md6 layui-col-sm6">
+                                    <input type="text" name="idCard" id="idCard"  placeholder="" autocomplete="off"
+                                           class="layui-input">
+                                </div>
+                            </li>
+
+                            <li class="layui-row">
+                                <div class="layui-inline layui-col-md2 layui-col-sm2 tableTR">学校名称</div>
+                                <div class="layui-form-item m0 layui-col-md6 layui-col-sm6">
+                                    <input type="text" name="schoolName" id="schoolName"  placeholder="" autocomplete="off"
+                                           class="layui-input">
+                                </div>
+                            </li>
+
+                            <li class="layui-row">
+                                <div class="layui-inline layui-col-md2 layui-col-sm2 tableTR">家长名称</div>
+                                <div class="layui-form-item m0 layui-col-md6 layui-col-sm6">
+                                    <input type="text" name="parentName" id="parentName"  placeholder="" autocomplete="off"
+                                           class="layui-input">
+                                </div>
+                            </li>
+
+                            <li class="layui-row">
+                                <div class="layui-inline layui-col-md2 layui-col-sm2 tableTR">家长电话</div>
+                                <div class="layui-form-item m0 layui-col-md6 layui-col-sm6">
+                                    <input type="text" name="parentTelphone" id="parentTelphone"    placeholder=""
+                                           autocomplete="off" class="layui-input">
+                                </div>
+
+                            </li>
+
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="layui-form-item mt34">
+                <div class="layui-input-block bodyBtn">
+                   <!-- <button class="layui-btn" lay-submit lay-filter="saveAndSubmit" id="saveAndSubmit">保存并提交</button>
+                    <button class="layui-btn" lay-submit lay-filter="saveAndPublish" id="saveAndPublish">保存并发布</button>-->
+                    <button class="layui-btn" lay-submit lay-filter="saveUser" id="saveUser">保存</button>
+                    <button id="cancel" class="layui-btn layui-btn-primary">取消</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<script src="../../statics/js/component.js"></script>
+<script src="../../statics/js/common.js"></script>
+<script src="../../js/esaleUser/esaleUpdate.js"></script>
+<script src="../../common/js/formSelects-v4.js"></script>
+</body>
+</html>

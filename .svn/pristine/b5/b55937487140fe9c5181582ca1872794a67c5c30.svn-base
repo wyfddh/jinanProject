@@ -1,0 +1,169 @@
+package com.tj720.controller;
+
+import com.tj720.controller.framework.JsonResult;
+import com.tj720.controller.framework.auth.AuthPassport;
+import com.tj720.model.EsaleMuseum;
+import com.tj720.model.EsaleMuseumWithBLOBs;
+import com.tj720.model.common.MipArea;
+import com.tj720.service.*;
+import net.sf.json.JSONObject;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
+
+/**
+ * Created by Administrator on 2018/9/20.
+ */
+@RestController
+@RequestMapping("/esaleMuseum")
+public class EsaleMuseumController {
+
+    @Autowired
+    private SysDictSevice sysDictSevice;
+
+    @Autowired
+    private EsaleMuseumService esaleMuseumService;
+
+    @Autowired
+    private MipAttachmentService mipAttachmentService;
+    @Autowired
+    private PictureService pictureService;
+
+    @Autowired
+    private MipAreaService mipAreaService;
+
+
+    private static Pattern NUMBER_PATTERN = Pattern.compile("^-?[0-9]+");
+
+    /**
+     * @return com.tj720.controller.framework.JsonResult
+     * @Author 刘修
+     * @Description 从字典表取下拉框数据
+     * @Param arr 请求的参数数组
+     **/
+    @RequestMapping("getSelectData")
+    @AuthPassport
+    public JsonResult getListHeadData(@RequestParam(value = "arr[]") String[] arr) {
+        if (arr == null || arr.length <= 0) {
+            return new JsonResult(0);
+        }
+        Map<String, Object> map = sysDictSevice.getDictListByArr(arr);
+        List<EsaleMuseum> museumList =  esaleMuseumService.getList();
+        map.put("museumList", museumList);
+
+        return new JsonResult(1, map);
+    }
+
+
+    @RequestMapping("getMuseumData")
+    public JsonResult getMuseumData() {
+        List<EsaleMuseum> museumList =  esaleMuseumService.getList();
+        return new JsonResult(1, museumList);
+    }
+
+    /**
+     * @param orderBy
+     * @param currentPage
+     * @param size
+     * @return net.sf.json.JSONObject
+     * @Author 刘修
+     * @Description 获取列表数据
+     * @Param key
+     **/
+    @RequestMapping("museumBaseInfoList")
+    @AuthPassport
+    public JSONObject museumBaseInfoList(String key, String museumType, String orderBy,
+            @RequestParam(defaultValue = "1") Integer currentPage, @RequestParam(defaultValue = "10") Integer size) {
+        return esaleMuseumService.getBaseInfoList(key,museumType, orderBy, size, currentPage);
+    }
+
+    @RequestMapping("museumBaseInfoAllList")
+    @AuthPassport
+    public JSONObject museumBaseInfoAllList(String key, String museumType) {
+        return esaleMuseumService.getBaseInfoAllList(key,museumType);
+    }
+
+    /**
+     * @return com.tj720.controller.framework.JsonResult
+     * @author 刘修
+     * @Description 根据pid获取地区
+     * @param pid
+     */
+    @RequestMapping("getAreaByPid")
+    @AuthPassport
+    public JsonResult getAreaByPid(String pid) {
+        if (StringUtils.isNotBlank(pid) && isNum(pid)) {
+            List<MipArea> list = mipAreaService.getAreaByPid(Integer.parseInt(pid));
+            return new JsonResult(1, list);
+        } else {
+            List<MipArea> list = new ArrayList<MipArea>();
+            return new JsonResult(1,list);
+        }
+    }
+
+    /**
+     * @author 刘修
+     * @description  根据博物馆id获取区域
+     * @param  id 博物馆id
+     * @return com.tj720.controller.framework.JsonResult
+     */
+    @RequestMapping("getAreaByMuseumId")
+    @AuthPassport
+    public JsonResult getAreaByMuseumId(String id) {
+        return esaleMuseumService.getAreaByMuseumId(id);
+    }
+
+    /**
+     * @return boolean
+     * @Author 刘修
+     * @Description 判断是否是数字
+     * @Param str
+     **/
+    public static boolean isNum(String str) {
+        if (NUMBER_PATTERN.matcher(str).matches()) {
+            //数字
+            return true;
+        } else {
+            //非数字
+            return false;
+        }
+    }
+
+    /**
+     * @author 刘修
+     * @Description  
+     * @Param museumBaseInfo
+     * @param isMain 主图id
+     * @param picids 需保存的ids
+     * @param delpicids 需删除的ids
+     * @return com.tj720.controller.framework.JsonResult
+     */
+    @RequestMapping("museumBaseInfoSave")
+    @AuthPassport
+    public JsonResult museumBaseInfoSave(EsaleMuseumWithBLOBs esaleMuseumWithBLOBs, String isMain, String picids, String delpicids) {
+
+        return esaleMuseumService.museumBaseInfoSave(esaleMuseumWithBLOBs,isMain,picids,delpicids);
+    }
+
+    /**
+     * @Author 刘修
+     * @Description  
+     * @param id
+     * @param dataState
+     * @return com.tj720.controller.framework.JsonResult
+     */
+    @RequestMapping("deleteDataState")
+    @AuthPassport
+    public JsonResult deleteDataState(String id, String dataState) {
+        return esaleMuseumService.museumBaseInfoDelete( id,  dataState);
+    }
+
+
+}

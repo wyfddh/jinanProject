@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tj720.dao.PCesaleActivityMapper">
+
+  <select id="countEsaleActivityList" resultType="java.lang.Integer" parameterType="java.util.Map">
+    SELECT  count(1)
+    FROM esale_activity a
+    WHERE a.data_state = 1
+    <if test="type != null and type != ''">
+      AND a.type = #{type}
+    </if>
+    ORDER BY  a.update_date DESC
+  </select>
+
+  <select id="getEsaleActivityList" resultType="com.tj720.dto.PCesaleActivity" parameterType="java.util.Map">
+    SELECT a.id,a.activity_name as "activityName",
+    a.activity_addr as "activityAddr",
+    DATE_FORMAT(a.activity_time,   '%Y-%m-%d %H:%i') as "activityTime",
+    (select s.dict_name from sys_dict s where s.dict_type = 'activity_type_es' and s.dict_code = a.type) as "typeDes",
+    case when a.activity_time>now() then "1"
+    else "2" end as "status",
+    (select count(1) from esale_user_activity b where b.activity_id = a.id and b.data_state=1) as "signCount",
+    (a.quota - (select count(*) from esale_user_activity b where b.activity_id = a.id and b.data_state=1)) as "leftNum",
+    (select m.att_path from mip_attachment m where m.att_id = a.picture_id) as "picUrl"
+    FROM esale_activity a
+    WHERE a.data_state = 1
+    <if test="type != null and type != ''">
+      AND a.type = #{type}
+    </if>
+    ORDER BY  a.update_date DESC
+    limit #{start},#{end}
+  </select>
+
+
+  <select id="getActivityDetail" resultType="com.tj720.dto.PCesaleActivity" parameterType="java.util.Map">
+    SELECT a.id,a.activity_name as "activityName",
+    a.activity_addr as "activityAddr",
+    DATE_FORMAT(a.activity_time,   '%Y-%m-%d %H:%i') as "activityTime",
+    (select s.dict_name from sys_dict s where s.dict_type = 'activity_type_es' and s.dict_code = a.type) as "typeDes",
+    case when a.activity_time>now() then "1"
+    else "2" end as "status",
+    a.quota,a.demand,a.cost,a.description,
+    (select m.att_path from mip_attachment m where m.att_id = a.picture_id) as "picUrl",
+    (select count(1) from esale_user_activity b where b.activity_id = a.id and b.data_state=1) as "enterNum",
+    sum(a.quota - (select count(1) from esale_user_activity b where b.activity_id = a.id and b.data_state=1 and b.enroll_type in('0','1') )) as "leftNum",
+    case when count(u.id) =0 then '0' else '1' end as "joinState"
+    FROM esale_activity a
+    left join esale_user_activity u on (u.user_id=#{userId} and u.activity_id=a.id and u.data_state=1)
+    WHERE a.id=#{id}
+  </select>
+
+  <select id="getJoinUserList" resultType="com.tj720.dto.PCEsalePubUser" parameterType="java.util.Map">
+    select  b.id,c.real_name as userName,
+    b.avatar_url  as avatarUrl,
+    DATE_FORMAT(c.enroll_time, '%Y-%m-%d %H:%i') as enrollTime
+    from esale_activity a,esale_pub_user b,esale_user_activity c
+    where a.id = c.activity_id and c.user_id = b.id
+    and a.data_state =1 and c.data_state=1 and b.data_state=1
+    /*sjq  只查询pc和移动*/
+    and (c.enroll_type='0' or c.enroll_type='1')
+    and a.id = #{id}
+    order by c.enroll_time desc
+  </select>
+
+  <update id="updateByTwoId" parameterType="com.tj720.dto.PCEsaleUserActivityDto">
+    update esale_user_activity
+    <set>
+      <if test="joinState != null and joinState != ''">
+        join_state = #{joinState,jdbcType=VARCHAR},
+      </if>
+      <if test="dataState != null and dataState != ''">
+        data_state = #{dataState,jdbcType=VARCHAR},
+      </if>
+      <if test="updateBy != null and updateBy != ''">
+        update_by = #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateDate != null and updateDate != ''">
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where 1=1
+    <if test="userId != null and userId != ''">
+          and user_id = #{userId,jdbcType=VARCHAR}
+    </if>
+    <if test="activityId != null and activityId != ''">
+          and activity_id = #{activityId,jdbcType=VARCHAR}
+  </if>
+  </update>
+
+  <select id="countCommentList" resultType="java.lang.Integer" parameterType="java.util.Map">
+    SELECT
+      count(a.id)
+    FROM
+    esale_assess_activity a,
+    esale_pub_user b
+    WHERE a.user_id = b.id
+    AND a.data_state = 1
+    AND b.data_state = 1
+    AND a.activity_id = #{activityId}
+  </select>
+
+  <select id="getCommentList" resultType="com.tj720.dto.PCEsaleAssessActivity" parameterType="java.util.Map">
+    SELECT
+    a.content,
+    DATE_FORMAT(a.create_date, '%Y-%m-%d %H:%i')  as "commentTime",
+    b.real_name as "realName",
+    b.id as userId,
+	b.user_name as userName,
+    b.avatar_url as userPicUrl
+    FROM
+    esale_assess_activity a,
+    esale_pub_user b
+    WHERE a.user_id = b.id
+    AND a.data_state = 1
+    AND b.data_state = 1
+    AND a.activity_id = #{activityId}
+    order by a.create_date desc
+    limit #{start},#{end}
+  </select>
+
+  <insert id="insertComment" parameterType="com.tj720.dto.PCEsaleAssessActivity">
+    insert into esale_assess_activity (id,activity_id, user_id, data_state,
+    create_by, create_date, update_by,
+    update_date, content)
+    values (#{id},#{activityId}, #{userId}, #{dataState},
+    #{createBy}, #{createDate}, #{updateBy},
+    #{updateDate}, #{content})
+  </insert>
+
+  <insert id="insertMobileSign" parameterType="com.tj720.dto.PCEsaleUserActivityDto">
+    insert into esale_user_activity (id,user_id, activity_id, enroll_type,
+                                     enroll_time, join_state, data_state,
+                                     create_by, create_date, update_by,
+                                     update_date, real_name, parent_name)
+    values (#{id,jdbcType=VARCHAR}, #{userId,jdbcType=VARCHAR}, #{activityId,jdbcType=VARCHAR}, #{enrollType,jdbcType=VARCHAR},
+            #{enrollTime,jdbcType=TIMESTAMP}, #{joinState,jdbcType=VARCHAR}, #{dataState,jdbcType=VARCHAR},
+            #{createBy,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR},
+            #{updateDate,jdbcType=TIMESTAMP}, #{realName,jdbcType=VARCHAR}, #{parentName,jdbcType=VARCHAR})
+  </insert>
+
+  <select id="getUserActivityList" parameterType="java.util.Map" resultType="com.tj720.dto.PCEsaleUserActivityDto">
+    select id,user_id as "userId", activity_id as "activityId",  join_state as "joinState", data_state as "dataState"
+    from esale_user_activity
+    where user_id = #{userId} and activity_id = #{activityId}
+  </select>
+
+  <select id="selectActivityDetailById" resultType="com.tj720.dto.PCesaleActivity" parameterType="java.lang.String">
+  SELECT a.id,a.activity_name as "activityName",
+         a.activity_addr as "activityAddr",
+         DATE_FORMAT(a.activity_time,   '%Y-%m-%d %H:%i') as "activityTime",
+         a.demand,a.cost,a.quota
+  FROM esale_activity a
+  WHERE a.id=#{id}
+</select>
+
+  <select id="selectUserActivityOfTwoId" resultType="java.lang.String" parameterType="java.util.Map">
+    SELECT a.id
+    FROM esale_user_activity a
+    WHERE a.user_id=#{userId} and a.activity_id = #{activityId}
+  </select>
+
+  <select id="getPubUserDetailByActityId" resultType="com.tj720.dto.PCEsalePubUserDto">
+      select b.real_name as realName, b.parent_name as parentName, a.phone from esale_pub_user a
+      left join esale_user_activity b on(a.id = b.user_id)
+      where a.id = #{userId}
+      and b.activity_id = #{activityId}
+      and b.data_state = '1'
+  </select>
+</mapper>

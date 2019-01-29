@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="admin" />
+        <module name="asset" />
+        <module name="common" />
+        <module name="content" />
+        <module name="interface" />
+        <module name="model" />
+        <module name="publicService" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="admin" target="1.8" />
+      <module name="asset" target="1.8" />
+      <module name="common" target="1.8" />
+      <module name="content" target="1.8" />
+      <module name="interface" target="1.8" />
+      <module name="model" target="1.8" />
+      <module name="museum" target="1.8" />
+      <module name="publicService" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="admin" options="-extdirs src\main\webapp\WEB-INF\lib" />
+      <module name="asset" options="-extdirs src\main\webapp\WEB-INF\lib" />
+      <module name="common" options="-extdirs src\main\webapp\WEB-INF\lib" />
+      <module name="content" options="-extdirs src\main\webapp\WEB-INF\lib" />
+      <module name="interface" options="-extdirs src\main\webapp\WEB-INF\lib" />
+      <module name="model" options="-extdirs src\main\webapp\WEB-INF\lib" />
+      <module name="publicService" options="-extdirs src\main\webapp\WEB-INF\lib" />
+    </option>
+  </component>
+</project>

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tj720.dao.EsaleDigitalshowMapper">
+  <resultMap id="BaseResultMap" type="com.tj720.model.EsaleDigitalshow">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="digital_name" jdbcType="VARCHAR" property="digitalName" />
+    <result column="museum_id" jdbcType="VARCHAR" property="museumId" />
+    <result column="digital_link" jdbcType="VARCHAR" property="digitalLink" />
+    <result column="remarks" jdbcType="VARCHAR" property="remarks" />
+    <result column="page_id" jdbcType="VARCHAR" property="pageId" />
+	<result column="browse_num" jdbcType="BIGINT" property="browseNum" />
+    <result column="data_state" jdbcType="VARCHAR" property="dataState" />
+    <result column="create_by" jdbcType="VARCHAR" property="createBy" />
+    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="update_by" jdbcType="VARCHAR" property="updateBy" />
+    <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.tj720.model.EsaleDigitalshow">
+    <result column="description" jdbcType="LONGVARCHAR" property="description" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, digital_name, museum_id, digital_link, remarks, page_id, browse_num, data_state, create_by, 
+    create_date, update_by, update_date
+  </sql>
+  <sql id="Blob_Column_List">
+    description
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from esale_digitalshow
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from esale_digitalshow
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.tj720.model.EsaleDigitalshow">
+    insert into esale_digitalshow (id,digital_name, museum_id, digital_link, 
+      remarks, page_id, browse_num, data_state, 
+      create_by, create_date, update_by, 
+      update_date, description)
+    values (#{id,jdbcType=VARCHAR},#{digitalName,jdbcType=VARCHAR}, #{museumId,jdbcType=VARCHAR}, #{digitalLink,jdbcType=VARCHAR}, 
+      #{remarks,jdbcType=VARCHAR}, #{pageId,jdbcType=VARCHAR}, #{browseNum,jdbcType=BIGINT}, #{dataState,jdbcType=VARCHAR}, 
+      #{createBy,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, 
+      #{updateDate,jdbcType=TIMESTAMP}, #{description,jdbcType=LONGVARCHAR})
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.tj720.model.EsaleDigitalshow">
+    update esale_digitalshow
+    <set>
+      <if test="digitalName != null">
+        digital_name = #{digitalName,jdbcType=VARCHAR},
+      </if>
+      <if test="museumId != null">
+        museum_id = #{museumId,jdbcType=VARCHAR},
+      </if>
+      <if test="digitalLink != null">
+        digital_link = #{digitalLink,jdbcType=VARCHAR},
+      </if>
+      <if test="remarks != null">
+        remarks = #{remarks,jdbcType=VARCHAR},
+      </if>
+      <if test="pageId != null">
+        page_id = #{pageId,jdbcType=VARCHAR},
+      </if>
+	  <if test="browseNum != null">
+        browse_num = #{browseNum,jdbcType=BIGINT},
+      </if>
+      <if test="dataState != null">
+        data_state = #{dataState,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null">
+        create_by = #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null">
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null">
+        update_by = #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateDate != null">
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="description != null">
+        description = #{description,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+    <select id="countDigitalshow" resultType="java.lang.Integer" parameterType="java.util.Map">
+    select count(a.id)
+    from esale_digitalshow a
+    where 1 = 1 and a.data_state ='1'
+    <if test="key != null and key != ''" >
+      and a.digital_name like concat('%',#{key},'%')
+    </if>
+    <if test="museumId != null and museumId != ''" >
+      and a.museum_id = #{museumId}
+    </if>
+    <if test="orderBy == 1" >
+      order by a.update_date desc
+    </if>
+    <if test="orderBy == 2" >
+      order by a.create_date desc
+    </if>
+  </select>
+  <select id="selectDigitalshowList" resultType="com.tj720.model.EsaleDigitalshow" parameterType="java.util.Map">
+    select
+    a.id,
+    a.digital_name as "digitalName",
+    a.museum_id as "museumId",
+    b.museum_name as "museumName",
+    a.digital_link as "digitalLink",
+    a.remarks,
+    a.page_id as "pageId",
+    a.browse_num as "browseNum",
+    a.data_state as "dataState",
+    a.create_by as "createBy",
+    a.create_date as "createDate",
+    a.update_by as "updateBy",
+    a.update_date as "updateDate",
+    a.description
+    from esale_digitalshow a
+    LEFT JOIN esale_museum b on (a.museum_id = b.id and b.data_state = '1')
+    where 1 = 1 and a.data_state ='1'
+    <if test="key != null and key != ''" >
+      and a.digital_name like concat('%',#{key},'%')
+    </if>
+    <if test="museumId != null and museumId != ''" >
+      and a.museum_id = #{museumId}
+    </if>
+    <if test="orderBy == 1" >
+      order by a.update_date desc
+    </if>
+    <if test="orderBy == 2" >
+      order by a.create_date desc
+    </if>
+    limit #{start},#{end}
+  </select>
+</mapper>

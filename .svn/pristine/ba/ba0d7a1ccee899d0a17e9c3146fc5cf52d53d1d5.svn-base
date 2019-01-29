@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tj720.dao.EsaleStatisticsMapper">
+
+    <select id="collectTableStatistics" resultType="java.util.Map">
+        SELECT
+          COUNT(1)                      `value`,
+          collection_type_des           `name`
+        FROM esale_collection_info
+        WHERE data_state &lt;&gt; 0
+        GROUP BY collection_type_code
+    </select>
+
+    <select id="collectCount" resultType="java.lang.Integer">
+        select count(1) from esale_collection_info
+        WHERE data_state &lt;&gt; 0
+    </select>
+
+    <select id="getCollectCountByType" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select
+          COUNT(1)
+        from esale_collection_info
+        where data_state &lt;&gt; 0 and collection_type_code = #{typecode}
+    </select>
+
+    <select id="collectViewStatistics" resultType="java.util.Map">
+        SELECT
+            COUNT(1)			        `value`,
+            b.collection_type_des       `name`
+        FROM esale_collection_view a
+        INNER JOIN esale_collection_info b ON (b.data_state &lt;&gt; 0 AND a.collect_id = b.id)
+        where #{startTime} &lt; a.create_date and a.create_date &lt; concat(#{endTime}, " 23:59:59")
+        GROUP BY b.collection_type_code
+    </select>
+
+    <select id="collectViewHistogramStatistics" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+            COUNT(1)			        `value`,
+            b.collection_name           `name`
+        FROM esale_collection_view a
+        INNER JOIN esale_collection_info b ON (b.data_state &lt;&gt; 0 AND a.collect_id = b.id)
+        where #{startTime} &lt; a.create_date and a.create_date &lt; concat(#{endTime}, " 23:59:59")
+        GROUP BY b.collection_name
+        order by `value` desc limit 10
+    </select>
+
+    <select id="colectionCollectStatistics" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+            COUNT(1)			        `value`,
+            b.collection_type_des       `name`
+        FROM esale_user_store a
+        INNER JOIN esale_collection_info b ON (b.data_state &lt;&gt; 0 AND a.cid = b.id)
+        where #{startTime} &lt; a.create_date and a.create_date &lt; concat(#{endTime}, " 23:59:59")
+        GROUP BY b.collection_type_code
+    </select>
+
+    <select id="colectionCollectHistogramStatistics" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+            COUNT(1)			        `value`,
+            b.collection_name           `name`
+        FROM esale_user_store a
+        INNER JOIN esale_collection_info b ON (b.data_state &lt;&gt; 0 AND a.cid = b.id)
+        where #{startTime} &lt; a.create_date and a.create_date &lt; concat(#{endTime}, " 23:59:59")
+        GROUP BY b.collection_name
+        order by `value` desc limit 10
+    </select>
+
+    <select id="getActivityCount" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select
+          count(1)
+        from esale_activity
+        where #{startTime} &lt; activity_time and activity_time &lt; concat(#{endTime}, " 23:59:59") and data_state = 1
+        <if test="null != type and type != ''">
+            and type = #{type}
+        </if>
+    </select>
+
+    <select id="signCount" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select
+          count(1)
+        from esale_user_activity a
+        inner join esale_activity b on (#{startTime} &lt; b.activity_time and b.activity_time &lt; concat(#{endTime}, " 23:59:59") and b.data_state = 1 and a.activity_id = b.id
+        <if test="null != type and type != ''">
+            and b.type = #{type}
+        </if>
+        )
+        where a.data_state = 1
+    </select>
+
+    <select id="realJoin" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select
+          count(1)
+        from esale_user_activity a
+        inner join esale_activity b on (#{startTime} &lt; b.activity_time and b.activity_time &lt; concat(#{endTime}, " 23:59:59") and b.data_state = 1 and a.activity_id = b.id
+        <if test="null != type and type != ''">
+            and b.type = #{type}
+        </if>
+        )
+        where a.data_state = 1 and a.join_state = 1
+    </select>
+
+    <select id="commentCount" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select
+          count(1)
+        from esale_assess_activity a
+        inner join esale_activity b on (#{startTime} &lt; b.activity_time and b.activity_time &lt; concat(#{endTime}, " 23:59:59") and b.data_state = 1 and a.activity_id = b.id)
+        where a.data_state = 1
+    </select>
+
+    <select id="getActivityTypePie" parameterType="java.util.Map" resultType="java.util.Map">
+        select
+          count(1)      `value`,
+          b.dict_name   `name`
+        from esale_activity a
+        inner join sys_dict b on (b.dict_type = "activity_type_es" and a.type = b.dict_code)
+        where #{startTime} &lt; a.activity_time and a.activity_time &lt; concat(#{endTime}, " 23:59:59") and data_state = 1
+        group by a.type
+    </select>
+
+    <select id="getActivityTypeLine" parameterType="java.util.Map" resultType="java.util.Map">
+        select c.date as updateTime,
+        count(case when p.enroll_type = '0'
+        then 1
+        else null
+        end)
+        as 'PC端报名',
+        count(case when p.enroll_type = '1'
+        then 1
+        else null
+        end)
+        as '移动端报名'
+        from
+        esale_user_activity p
+        inner join esale_activity a on (p.activity_id = a.id and a.data_state = 1 and a.activity_time between #{startTime} and concat(#{endTime}, " 23:59:59"))
+        RIGHT JOIN calendar c
+        on(
+        c.date = left(a.activity_time,10)
+        )
+         where
+            c.date between #{startTime} and concat(#{endTime}, " 23:59:59")
+        group by c.date
+    </select>
+
+    <select id="getUserStatisticsLine" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+            c.date AS updateTime,
+            count( CASE WHEN p.type = '1' THEN 1 ELSE NULL END ) AS 'PC浏览次数(PV)',
+            count( DISTINCT p.ip_address ) AS '独立访客(UV)',
+            count( CASE WHEN p.type = '2' THEN 1 ELSE NULL END ) AS '注册用户数'
+        FROM
+            esale_user_statistics p
+            RIGHT JOIN calendar c ON ( c.date = LEFT ( p.create_date, 10 ) AND p.create_date BETWEEN #{startTime} AND concat(#{endTime}, " 23:59:59"))
+        WHERE
+            c.date BETWEEN #{startTime} AND concat(#{endTime}, " 23:59:59")
+        GROUP BY
+            c.date
+    </select>
+
+    <select id="userDiaryCount" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+            count(DISTINCT c.date)		`value`,
+            u.user_name					`name`
+        FROM sys_user u
+        LEFT JOIN esale_person_diary d ON (u.id = d.creator and  d.creatTime BETWEEN #{startTime} AND concat(#{endTime}, " 23:59:59"))
+        LEFT JOIN calendar c ON (c.date = LEFT(d.creatTime,10))
+        GROUP BY u.id ORDER BY `value` DESC
+    </select>
+
+    <select id="diaryStatisticsGroupByDate" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+            COUNT(DISTINCT u.id)			'正常',
+            c.date							updateTime
+        FROM calendar c
+        LEFT JOIN esale_person_diary d ON (c.date = LEFT(d.creatTime,10))
+        LEFT JOIN sys_user u ON (d.creator = u.id AND u.status = 1 and u.isdelete = 0)
+        WHERE c.date BETWEEN #{startTime} AND concat(#{endTime}, " 23:59:59")
+        GROUP BY c.date
+    </select>
+
+    <select id="diaryStatisticsGroupByPerson" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+            count(DISTINCT c.date)		            '正常',
+            u.user_name								'用户名'
+        FROM sys_user u
+        LEFT JOIN esale_person_diary d ON (u.id = d.creator and  d.creatTime BETWEEN #{startTime} AND concat(#{endTime}, " 23:59:59"))
+        LEFT JOIN calendar c ON (c.date = LEFT(d.creatTime,10))
+        GROUP BY u.id
+    </select>
+
+    <select id="diaryStatisticsGroupByDept" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+            COUNT(DISTINCT c.date)					        '正常',
+            p.department_name								'部门',
+            p.department_id                                  departmentId
+        FROM sys_department p
+        RIGHT JOIN sys_user u ON (p.department_id = u.depart_id AND u.`status` = 1 AND u.isdelete = 0 AND p.department_id &lt;&gt; 1)
+        LEFT JOIN esale_person_diary d ON (u.id = d.creator AND d.creatTime BETWEEN #{startTime} AND concat(#{endTime}, " 23:59:59"))
+        LEFT JOIN calendar c ON (c.date = LEFT(d.creatTime,10))
+        GROUP BY u.id,p.department_id
+    </select>
+
+    <select id="personLoopStatistics" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select count(1) from esale_person_diary where creator = #{creator} and creatTime between #{startTime} and concat(#{endTime}, " 23:59:59")
+    </select>
+</mapper>

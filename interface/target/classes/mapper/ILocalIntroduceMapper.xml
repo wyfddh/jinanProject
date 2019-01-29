@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tj720.dao.ILocalIntroduceMapper">
+
+  <select id="getLocalIntroduceList" resultType="com.tj720.dto.LocalIntroduceDto">
+    select t.id, t.video_name as videoName, a.att_path as videoUrl
+    from local_introduce t
+    left join mip_attachment a on(a.att_id = t.video_id)
+    where t.data_state = '1'
+    and t.page_recommend = '1'
+    order by t.update_date desc, t.create_date DESC
+    LIMIT ${size}
+  </select>
+
+
+</mapper>

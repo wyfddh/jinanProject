@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tj720.dao.EsaleWorkBenchDataMapper">
+    <select id="countActivity" resultType="java.lang.Integer">
+        select count(1)
+        from esale_user_activity
+        where data_state = "1"
+          and join_state = "1"
+    </select>
+    <select id="countCollection" resultType="java.lang.Integer">
+        select count(1)
+        from esale_collection_info
+        where data_state = "2"
+    </select>
+    <select id="countData" resultType="java.lang.Integer">
+        select count(1)
+        from post_video
+        where auth_setting != "1"
+    </select>
+    <select id="selectNotDo" resultType="com.tj720.model.EsaleLocalTask">
+        select id,video_name as "dataName",create_time as "createTime"
+        from post_video
+        where status = "2"
+           or status = "3"
+    </select>
+    <select id="selectAlready" resultType="com.tj720.model.EsaleLocalTask">
+        select id,video_name as "dataName",create_time as "createTime"
+        from post_video
+        where status = "4"
+    </select>
+    <select id="selectEnd" resultType="com.tj720.model.EsaleLocalTask">
+        select id,video_name as "dataName",create_time as "createTime"
+        from post_video
+        where status = "4"
+    </select>
+    <select id="selectMenuByUser" resultType="com.tj720.model.EsaleSysUserMenu">
+        select a.id,
+               a.user_id     as "userId",
+               a.menu_id     as "menuId",
+               c.title,
+               c.href,
+               c.quick_icon  as "quickIcon",
+               c.page_type   as "pageType"
+        from sys_user_menu a
+                 left join sys_user b on a.user_id = b.id
+                 left join sys_menu c on a.menu_id = c.id
+        where a.user_id = #{userId}
+    </select>
+
+    <delete id="deleteUserMenu" parameterType="java.lang.String">
+        delete
+        from sys_user_menu
+        where user_id = #{userId}
+    </delete>
+
+    <insert id="insertUserMenu" parameterType="java.util.List">
+        insert into sys_user_menu(id,user_id,menu_id) values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id,jdbcType=VARCHAR},#{item.userId,jdbcType=VARCHAR},#{item.menuId,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+</mapper>

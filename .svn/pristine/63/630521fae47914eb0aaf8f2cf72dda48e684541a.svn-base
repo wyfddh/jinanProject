@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tj720.dao.EsaleMuseumMapper">
+  <resultMap id="BaseResultMap" type="com.tj720.model.EsaleMuseum">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="up_id" jdbcType="VARCHAR" property="upId" />
+    <result column="museum_name" jdbcType="VARCHAR" property="museumName" />
+    <result column="museum_type" jdbcType="VARCHAR" property="museumType" />
+    <result column="ticket" jdbcType="VARCHAR" property="ticket" />
+    <result column="open_time" jdbcType="VARCHAR" property="openTime" />
+    <result column="province" jdbcType="VARCHAR" property="province" />
+    <result column="city" jdbcType="VARCHAR" property="city" />
+    <result column="area" jdbcType="VARCHAR" property="area" />
+    <result column="address" jdbcType="VARCHAR" property="address" />
+    <result column="view_address" jdbcType="VARCHAR" property="viewAddress" />
+    <result column="pictureids" jdbcType="VARCHAR" property="pictureids" />
+    <result column="data_state" jdbcType="VARCHAR" property="dataState" />
+    <result column="create_by" jdbcType="VARCHAR" property="createBy" />
+    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="update_by" jdbcType="VARCHAR" property="updateBy" />
+    <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.tj720.model.EsaleMuseumWithBLOBs">
+    <result column="introduct" jdbcType="LONGVARCHAR" property="introduct" />
+    <result column="guide" jdbcType="LONGVARCHAR" property="guide" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, up_id, museum_name,museum_type, ticket, open_time, province, city, area, address, view_address,
+    pictureids, data_state, create_by, create_date, update_by, update_date
+  </sql>
+  <sql id="Blob_Column_List">
+    introduct, guide
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from esale_museum
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from esale_museum
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.tj720.model.EsaleMuseumWithBLOBs">
+    insert into esale_museum (id,up_id, museum_name, museum_type,ticket,
+      open_time, province, city, 
+      area, address, view_address, 
+      pictureids, data_state, create_by, 
+      create_date, update_by, update_date, 
+      introduct, guide)
+    values (#{id,jdbcType=VARCHAR},#{upId,jdbcType=VARCHAR}, #{museumName,jdbcType=VARCHAR},  #{museumType,jdbcType=VARCHAR},#{ticket,jdbcType=VARCHAR},
+      #{openTime,jdbcType=VARCHAR}, #{province,jdbcType=VARCHAR}, #{city,jdbcType=VARCHAR}, 
+      #{area,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, #{viewAddress,jdbcType=VARCHAR}, 
+      #{pictureids,jdbcType=VARCHAR}, #{dataState,jdbcType=VARCHAR}, #{createBy,jdbcType=VARCHAR}, 
+      #{createDate,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, #{updateDate,jdbcType=TIMESTAMP}, 
+      #{introduct,jdbcType=LONGVARCHAR}, #{guide,jdbcType=LONGVARCHAR})
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.tj720.model.EsaleMuseumWithBLOBs">
+    update esale_museum
+    <set>
+      <if test="upId != null">
+        up_id = #{upId,jdbcType=VARCHAR},
+      </if>
+      <if test="museumName != null">
+        museum_name = #{museumName,jdbcType=VARCHAR},
+      </if>
+      <if test="museumType != null">
+        museum_type = #{museumType,jdbcType=VARCHAR},
+      </if>
+      <if test="ticket != null">
+        ticket = #{ticket,jdbcType=VARCHAR},
+      </if>
+      <if test="openTime != null">
+        open_time = #{openTime,jdbcType=VARCHAR},
+      </if>
+      <if test="province != null">
+        province = #{province,jdbcType=VARCHAR},
+      </if>
+      <if test="city != null">
+        city = #{city,jdbcType=VARCHAR},
+      </if>
+      <if test="area != null">
+        area = #{area,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null">
+        address = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="viewAddress != null">
+        view_address = #{viewAddress,jdbcType=VARCHAR},
+      </if>
+      <if test="pictureids != null">
+        pictureids = #{pictureids,jdbcType=VARCHAR},
+      </if>
+      <if test="dataState != null">
+        data_state = #{dataState,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null">
+        create_by = #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null">
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null">
+        update_by = #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateDate != null">
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="introduct != null">
+        introduct = #{introduct,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="guide != null">
+        guide = #{guide,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.tj720.model.EsaleMuseumWithBLOBs">
+    update esale_museum
+    set up_id = #{upId,jdbcType=VARCHAR},
+      museum_name = #{museumName,jdbcType=VARCHAR},
+      museum_type = #{museumType,jdbcType=VARCHAR},
+      ticket = #{ticket,jdbcType=VARCHAR},
+      open_time = #{openTime,jdbcType=VARCHAR},
+      province = #{province,jdbcType=VARCHAR},
+      city = #{city,jdbcType=VARCHAR},
+      area = #{area,jdbcType=VARCHAR},
+      address = #{address,jdbcType=VARCHAR},
+      view_address = #{viewAddress,jdbcType=VARCHAR},
+      pictureids = #{pictureids,jdbcType=VARCHAR},
+      data_state = #{dataState,jdbcType=VARCHAR},
+      create_by = #{createBy,jdbcType=VARCHAR},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      update_by = #{updateBy,jdbcType=VARCHAR},
+      update_date = #{updateDate,jdbcType=TIMESTAMP},
+      introduct = #{introduct,jdbcType=LONGVARCHAR},
+      guide = #{guide,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+
+  <select id="getBaseInfoList" resultMap="ResultMapWithBLOBs" parameterType="java.util.Map">
+    select
+    a.id,a.up_id upId, a.museum_name museumName, a.museum_type museumType,a.ticket,
+    a.open_time openTime, a.province, a.city,
+    a.area, a.address, a.view_address viewAddress,
+    a.pictureids, a.data_state dataState, a.create_by createBy,
+    a.create_date createDate, a.update_by updateBy, a.update_date updateDate,
+    a.introduct, a.guide
+    from esale_museum a
+    left join mip_area b on a.province = b.id
+    where 1 = 1
+    <if test="key != null and key != ''" >
+      and a.museum_name like concat('%',#{key},'%')
+    </if>
+    <if test="museumType != null and museumType != ''">
+      and a.museum_type = #{museumType}
+    </if>
+    and a.data_state = 1
+    <if test="orderBy == 1" >
+      order by a.update_date desc
+    </if>
+    <if test="orderBy == 2" >
+      order by a.create_date desc
+    </if>
+    limit #{start},#{end}
+  </select>
+
+  <select id="countBaseInfoList" resultType="java.lang.Integer" parameterType="java.util.Map">
+    select count(1)
+    from esale_museum
+    where 1 = 1
+    <if test="key != null and key != ''" >
+      and museum_name like concat('%',#{key},'%')
+    </if>
+    <if test="museumType != null and museumType != ''">
+      and museum_type = #{museumType}
+    </if>
+    and data_state &gt; 0
+    <if test="orderBy == 1" >
+      order by update_date desc
+    </if>
+    <if test="orderBy == 2" >
+      order by create_date desc
+    </if>
+  </select>
+  <select id="getList" resultMap="BaseResultMap">
+    select id,museum_name
+    from esale_museum
+    where data_state = '1'
+    and  museum_type = '1'
+    order by update_date desc
+  </select>
+</mapper>

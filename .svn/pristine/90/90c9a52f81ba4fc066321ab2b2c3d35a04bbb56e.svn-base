@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title></title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="format-detection" content="telephone=no">
+	<link rel="stylesheet" href="../../layui/css/layui.css" media="all" />
+	<link rel="stylesheet" href="../../css/public.css" media="all" />
+	<link rel="stylesheet" href="../../css/esaleMuseum/esaleMuseumAdd.css" media="all" />
+</head>
+<body class="childrenBody">
+<form class="layui-form layui-row layui-col-space10" id="form">
+	<div class="layui-col-md12 layui-col-xs12">
+
+		<div class="layui-row module-border">
+			<div class="layui-header title">基础信息</div>
+			<div class="layui-col-md12 layui-col-xs12 layui-center floatClear">
+				<div class="layui-form-item layui-col-md5 layui-col-xs5 mt15">
+					<label class="layui-form-label "><span style="color:red;">*</span>博物馆名称：</label>
+					<div class="layui-input-block layui-col-md6 layui-col-xs6">
+						<input type="text" name="museumName" id="museumName" placeholder="请输入博物馆名称" lay-verify ="required" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-form-item layui-col-md5 layui-col-xs5 mt15">
+					<label class="layui-form-label "><span style="color:red;">*</span>所属博物馆：</label>
+					<div class="layui-input-block layui-col-md6 layui-col-xs6">
+						<select name="upId" id="upId" lay-filter="upId">
+							<option value="">无</option>
+						</select>
+					</div>
+				</div>
+				<div class="layui-form-item layui-col-md5 layui-col-xs5">
+					<label class="layui-form-label "><span style="color:red;">*</span>门票：</label>
+					<div class="layui-input-block layui-col-md6 layui-col-xs6">
+						<input type="text" name="ticket" id="ticket" placeholder="请输入门票" lay-verify ="required" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-form-item layui-col-md5 layui-col-xs5">
+					<label class="layui-form-label "><span style="color:red;">*</span>开放时间：</label>
+					<div class="layui-input-block layui-col-md6 layui-col-xs6">
+						<input type="text" name="openTime" id="openTime" class="layui-input" lay-verify ="required" >
+					</div>
+				</div>
+				<div class="layui-form-item layui-col-md12 layui-col-xs12">
+					<label class="layui-form-label"><span style="color:red;">*</span>地址：</label>
+					<div class="layui-input-block">
+						<div class=" layui-col-md2 layui-col-xs1 ">
+							<select name="province" id="province" lay-verify ="required" ms-duplex="@city_code" lay-filter="province">
+								<option value="">省份</option>
+							</select>
+						</div>
+						<div class=" layui-col-md2 layui-col-xs1 ml10">
+							<select name="city" id="city" lay-verify ="required" ms-duplex="@city_code" lay-filter="city">
+								<option value="">城市</option>
+							</select>
+						</div>
+						<div class=" layui-col-md2 layui-col-xs1 ml10">
+							<select name="area" id="area"  lay-verify ="required" ms-duplex="@county_code" lay-filter="area">
+								<option value="">区域</option>
+							</select>
+						</div>
+						<div class=" layui-col-md5 layui-col-xs4 ml10">
+							<input type="text" name="address" id="address" placeholder="详细地址" autocomplete="off" class="layui-input">
+						</div>
+					</div>
+				</div>
+				<div class="layui-form-item layui-col-md5 layui-col-xs5">
+					<label class="layui-form-label ">全景地址：</label>
+					<div class="layui-input-block layui-col-md6 layui-col-xs6">
+						<input type="text" name="viewAddress" id="viewAddress" placeholder="http://" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+			</div>
+
+			</div>
+
+		<div class="layui-row module-border mt40">
+			<div class="layui-header"><span style="color:red;">*</span>图片设置</div>
+			<div class="layui-col-md12 layui-col-xs12 mt30 pad aaa" id="picUpload">
+				<div class="picDiv"></div>
+				<a class="uploadBtn">
+					<span class="uploadIcon"></span>
+					<span class="uploadTxt">上传图片</span>
+					<span class="uploadTip">图片建议尺寸为 400*300px</span>
+				</a>
+			</div>
+		</div>
+
+		<div class="layui-row module-border mt40 pb27 mm1">
+			<div class="layui-header">博物馆介绍</div>
+			<div class="mt30 pad">
+				<div class="layui-input-block">
+					<textarea class="layui-textarea layui-hide" name="introduct" lay-verify="" id="introduct"></textarea>
+				</div>
+			</div>
+		</div>
+
+
+		<div class="layui-row module-border mt40 pb27">
+			<div class="layui-header">参观需知</div>
+			<div class="mt30 pad">
+				<div class="layui-input-block">
+					<textarea class="layui-textarea layui-hide" name="guide" lay-verify="" id="guide"></textarea>
+				</div>
+			</div>
+		</div>
+		<div class="ml48 mt20">
+			<div class="layui-input-block editStatus">
+				<button class="layui-btn" lay-submit lay-filter="saveMuseum">保存</button>
+				<button class="layui-btn layui-btn-primary cancelBtn">取消</button>
+			</div>
+			<div class="layui-input-block showStatus">
+				<button class="layui-btn layui-btn-primary cancelBtn">返回</button>
+			</div>
+		</div>
+
+
+    <div class="layui-hide">
+      <input type="text" name="id" id="id">
+      <input type="text" id="type" value="1">
+      <input type="text" id="picids" name="picids">
+			<input type="text" id="isMain" name="isMain">
+			<input type="text" id="delpicids" name="delpicids">
+		</div>
+	</div>
+</form>
+<script type="text/javascript" src="../../js/jquery.min.js"></script>
+<script type="text/javascript" src="../../layui/layui.js"></script>
+<script type="text/javascript" src="../../js/upload/uploadImg.js"></script>
+<!--<script type="text/javascript" src="../../js/upload/uploadSingleImg.js"></script>-->
+<script type="text/javascript" src="../../js/common.js"></script>
+<script type="text/javascript" src="../../js/esaleMuseum/esaleMuseumAdd.js"></script>
+</body>
+</html>

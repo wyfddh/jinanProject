@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tj720.dao.EsaleFiledataActivityMapper">
+  <resultMap id="BaseResultMap" type="com.tj720.model.EsaleFiledataActivity">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="file_type" jdbcType="VARCHAR" property="fileType" />
+    <result column="file_name" jdbcType="VARCHAR" property="fileName" />
+    <result column="file_realname" jdbcType="VARCHAR" property="fileRealname" />
+    <result column="file_format" jdbcType="VARCHAR" property="fileFormat" />
+    <result column="file_size" jdbcType="BIGINT" property="fileSize" />
+    <result column="file_path" jdbcType="VARCHAR" property="filePath" />
+    <result column="activity_id" jdbcType="VARCHAR" property="activityId" />
+    <result column="file_public" jdbcType="VARCHAR" property="filePublic" />
+    <result column="file_down_count" jdbcType="INTEGER" property="fileDownCount" />
+    <result column="data_state" jdbcType="VARCHAR" property="dataState" />
+    <result column="create_by" jdbcType="VARCHAR" property="createBy" />
+    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="update_by" jdbcType="VARCHAR" property="updateBy" />
+    <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, file_type, file_name, file_realname,file_format, file_size, file_path, activity_id, file_public,
+    file_down_count, data_state, create_by, create_date, update_by, update_date
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from esale_filedata_activity
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from esale_filedata_activity
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.tj720.model.EsaleFiledataActivity">
+      insert into esale_filedata_activity (id,file_type, file_name,file_realname, file_format,
+      file_size, file_path, activity_id,
+      file_public, file_down_count, data_state, 
+      create_by, create_date, update_by, 
+      update_date)
+    values (#{id,jdbcType=VARCHAR}, #{fileType,jdbcType=VARCHAR}, #{fileName,jdbcType=VARCHAR},  #{fileRealname,jdbcType=VARCHAR},#{fileFormat,jdbcType=VARCHAR},
+      #{fileSize,jdbcType=BIGINT}, #{filePath,jdbcType=VARCHAR}, #{activityId,jdbcType=VARCHAR}, 
+      #{filePublic,jdbcType=VARCHAR}, #{fileDownCount,jdbcType=INTEGER}, #{dataState,jdbcType=VARCHAR}, 
+      #{createBy,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, 
+      #{updateDate,jdbcType=TIMESTAMP})
+  </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.tj720.model.EsaleFiledataActivity">
+    update esale_filedata_activity
+    <set>
+      <if test="fileType != null">
+        file_type = #{fileType,jdbcType=VARCHAR},
+      </if>
+      <if test="fileName != null">
+        file_name = #{fileName,jdbcType=VARCHAR},
+      </if>
+      <if test="fileRealname != null">
+        file_realname = #{fileRealname,jdbcType=VARCHAR},
+      </if>
+      <if test="fileFormat != null">
+        file_format = #{fileFormat,jdbcType=VARCHAR},
+      </if>
+      <if test="fileSize != null">
+        file_size = #{fileSize,jdbcType=BIGINT},
+      </if>
+      <if test="filePath != null">
+        file_path = #{filePath,jdbcType=VARCHAR},
+      </if>
+      <if test="activityId != null">
+        activity_id = #{activityId,jdbcType=VARCHAR},
+      </if>
+      <if test="filePublic != null">
+        file_public = #{filePublic,jdbcType=VARCHAR},
+      </if>
+      <if test="fileDownCount != null">
+        file_down_count = #{fileDownCount,jdbcType=INTEGER},
+      </if>
+      <if test="dataState != null">
+        data_state = #{dataState,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null">
+        create_by = #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null">
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null">
+        update_by = #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateDate != null">
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <select id="countFile" resultType="java.lang.Integer" parameterType="java.util.Map">
+    select count(a.id)
+    from esale_filedata_activity a
+    where 1 = 1 and a.data_state ='1'
+    <if test="key != null and key != ''" >
+      and a.activity_id = #{key}
+    </if>
+      order by a.update_date desc
+  </select>
+  <select id="getFileListById" resultType="com.tj720.model.EsaleFiledataActivity" parameterType="java.util.Map">
+    select
+    a.id,
+    a.file_type as "fileType",
+    a.file_name as "fileName",
+    a.file_realname as "fileRealname",
+    a.file_format as "fileFormat",
+    a.file_size as "fileSize",
+    a.file_path as "filePath",
+    a.activity_id as "activityId",
+    a.file_public as "filePublic",
+    a.file_down_count as "fileDownCount",
+    a.data_state  as "dataState",
+    a.create_by as "createBy",
+    a.create_date as "createDate",
+    a.update_by as "updateBy",
+    a.update_date as "updateDate"
+    from esale_filedata_activity a
+    where 1 = 1 and a.data_state ='1'
+    <if test="key != null and key != ''" >
+      and a.activity_id = #{key}
+    </if>
+    order by a.update_date desc
+    limit #{start},#{end}
+  </select>
+</mapper>

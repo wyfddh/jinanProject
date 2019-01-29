@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.tj720.dao.IMuseumBaseInfoMapper" >
+
+  <select id="countOnline" resultType="java.lang.Integer">
+    select count(*)
+    from museum_base_info t
+    where t.data_state = '2'
+  </select>
+
+  <select id="getMuseumPoorList" resultType="com.tj720.dto.MuseumBaseInfoDto">
+    select t.id, t.museum_name as museumName, t.pictureids as pictureUrl
+    from museum_base_info t
+    where t.data_state = '2'
+    and t.whzx = '1'
+    order by t.update_date desc, t.create_date desc
+    LIMIT ${size}
+  </select>
+
+  <select id="getRecommendMuseumList" resultType="com.tj720.dto.MuseumBaseInfoDto">
+    select t.id, t.museum_name as museumName, t.pictureids as pictureUrl
+    from museum_base_info t
+    left join mip_area a on(a.id = t.province)
+    where t.data_state = '2'
+    and a.pinyin = #{province}
+    order by t.update_date desc, t.create_date desc
+    LIMIT ${size}
+  </select>
+
+  <select id="countOnlineByProvice" resultType="java.lang.Integer">
+    select count(*)
+    from museum_base_info t
+    left join mip_area a on(a.id = t.province)
+    where t.data_state = '2'
+    and a.pinyin = #{province}
+  </select>
+
+  <select id="getIndexSearchList" resultType="com.tj720.dto.IndexSearchDto">
+    <if test="type != '2'">
+      select a.id, a.shortname as name, '1' as type, a.pinyin
+      from mip_area a
+      where a.`level` = '1'
+      and a.shortname like '%${key}%'
+      and a.id not in(3749)
+      union ALL
+    </if>
+    select a.id, a.museum_name as name, '2' as type, '' as pyinyin
+    from museum_base_info a
+    where a.data_state = '2'
+    and a.museum_name like '%${key}%'
+  </select>
+
+  <select id="getJxtjMuseumList" resultType="com.tj720.dto.MuseumBaseInfoDto">
+    select t.id, t.museum_name as museumName, t.pictureids as pictureUrl, t.recommend as recommend,
+    t.site_introduct as siteIntroduct
+    from museum_base_info t
+    left join mip_area a on(a.id = t.province)
+    where t.data_state = '2'
+    and a.pinyin = #{province}
+    order by t.jctj desc, t.update_date desc
+    LIMIT ${size}
+  </select>
+
+  <select id="getRecommendMuseumPageByProviceOrCity" resultType="com.tj720.dto.MuseumBaseInfoDto">
+    select t.id, t.museum_name as museumName, t.pictureids as pictureUrl, a1.`name` as name1, a2.name as name2
+    from museum_base_info t
+    left join mip_area a on(a.id = t.province)
+    left join mip_area a1 on(a1.id = t.city)
+    left join mip_area a2 on(a2.id = t.area)
+    where t.data_state = '2'
+    and a.pinyin = #{province}
+    order by t.update_date desc, t.create_date desc
+    <if test="startRow == 0">
+        LIMIT ${size}
+    </if>
+    <if test="startRow != 0">
+        LIMIT #{startRow},#{size}
+    </if>
+  </select>
+
+  <select id="countRecommendMuseumPageByProviceOrCity" resultType="java.lang.Integer">
+    select count(*)
+    from museum_base_info t
+    left join mip_area a on(a.id = t.province)
+    where t.data_state = '2'
+    and a.pinyin = #{province}
+  </select>
+
+  <select id="getMuseumInfo" resultType="com.tj720.dto.MuseumBaseInfoDto">
+    select t.id, t.museum_name as museumName, t.pictureids as pictureUrl,
+    CONCAT(IFNULL(a.`name`,''),IFNULL(b.`name`,''),IFNULL(c.`name`,'')) as region,
+    t.open_time as openTime, t.address, t.site_introduct as siteIntroduct, t.history,
+    t.show_view as showView, t.collection, t.guide, t.latitude, t.longitude, d.att_path as localIntroduceVideo,
+    t.cultural_promote as culturalPromote, a.`name` as proviceName, a.pinyin as provicePinyin
+    from museum_base_info t
+    left join mip_area a on(a.id = t.province)
+    left join mip_area b on(b.id = t.city)
+    left join mip_area c on(c.id = t.area)
+    left join mip_attachment d on(d.att_id = t.local_introduce_video)
+    where t.data_state = '2'
+    and t.id = #{museumId}
+  </select>
+
+  <select id="getProviceData" resultType="com.tj720.dto.AreaDto">
+    select a.id, a.name, a.pinyin, IFNULL(a.museumCount,0) as museumCount,
+    IFNULL(b.collectionCount,0) as collectionCount
+    from
+    (SELECT t.id, max(t.shortname) AS NAME, max(t.pinyin) AS pinyin,
+        count(DISTINCT a.id) AS museumCount
+    FROM
+        mip_area t
+    LEFT JOIN museum_base_info a ON (t.id = a.province)
+    WHERE t.pid = '0'
+    AND a.data_state = '2'
+    GROUP BY	t.id) a
+    left join (SELECT a.province AS id, count(b.id) AS collectionCount
+    FROM museum_base_info a
+    LEFT JOIN collection_info b ON (a.id = b.museum_id)
+    WHERE a.data_state = '2'
+    AND b.data_state = '1'
+    GROUP BY a.province) b on(a.id = b.id)
+  </select>
+
+  <select id="getLocalIntroduceVideo" resultType="java.lang.String">
+    select c.att_path from (
+    select b.create_date,b.video_id
+    from museum_base_info a
+    left join local_introduce b on(a.province = b.province and a.city=b.city and a.area=b.area)
+    where a.data_state = '2'
+    and b.data_state = '1'
+    and a.id = #{museumId}) t
+    left join mip_attachment c on(t.video_id = c.att_id)
+    order by t.create_date desc
+    LIMIT 1
+  </select>
+
+  <select id="getCulturalPromote" resultType="java.lang.String">
+    select b.museum_introduce
+    from museum_base_info a
+    left join poor_country_museum b on(a.id = b.museum_id)
+    left join poor_country c on(b.country_id = c.id)
+    where a.data_state = '2'
+    and c.data_state = '1'
+    and a.id = #{museumId}
+    order by b.create_date desc
+    LIMIT 1
+  </select>
+
+  <select id="getProvinceIdByPinying" resultType="java.lang.String">
+    select t.id from mip_area t
+    where t.pinyin = #{pinyin}
+    and t.level = '1'
+  </select>
+
+</mapper>

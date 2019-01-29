@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>数字展厅管理</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="stylesheet" href="../../css/esaleActivity/esaleActivityFile.css" media="all" />
+    <link rel="stylesheet" href="../../layui/2.4.5/css/layui.css" media="all" />
+    <link rel="stylesheet" href="../../css/public.css" media="all" />
+    <link rel="stylesheet" href="../../css/commonList.css" media="all" />
+    <link rel="stylesheet" href="../../lib/lightbox2/2.8.1/css/lightbox.css" type="text/css">
+    <style>
+
+    </style>
+</head>
+<body class="childrenBody">
+
+    <div class="cont">
+        <table id="esaleFileActivity" lay-filter="esaleFileActivity"></table>
+    </div>
+
+
+    <script type="text/html" id="fileToolbar">
+        <div class="layui-btn-container g-tab_line" style="float: left;">
+            <img class="tab-top-icon" src="../../statics/images/videoList/Shape2.png" alt="">
+            <span class="g-table-title">&nbsp;数据列表</span>
+            <!-- <i class="layui-icon">&#xe62d;</i><span style="font-size: 14px;">数据列表</span> -->
+        </div>
+        <div class="layui-btn-container" style="float: right;">
+            <button class="layui-btn layui-btn-sm" id="download" lay-event="download">下载</button>
+            <button class="layui-btn layui-btn-sm" id="upload" lay-event="upload">上传</button>
+        </div>
+    </script>
+
+    <!--操作-->
+    <script type="text/html" id="esaleFileActivityBar">
+        {{# if(d.fileType == 1){
+        }}
+            <a class="layui-btn layui-btn-xs" lay-event="show" href="{{d.filePath}}" data-lightbox="gallery">查看</a>
+        {{# } }}
+            <a class="layui-btn layui-btn-xs" lay-event="down">下载</a>
+            <a class="layui-btn layui-btn-xs" lay-event="rename">重命名</a>
+            <a class="layui-btn layui-btn-xs" lay-event="del">删除</a>
+    </script>
+
+<script type="text/javascript" src="../../lib/lightbox2/2.8.1/js/lightbox-plus-jquery.min.js"></script>
+<script type="text/javascript" src="../../js/jquery.min.js"></script>
+<script type="text/javascript" src="../../js/common.js"></script>
+<script type="text/javascript" src="../../layui/2.4.5/layui.js"></script>
+<script type="text/javascript" src="../../js/esaleActivity/esaleActivityFile.js"></script>
+
+</body>
+</html>

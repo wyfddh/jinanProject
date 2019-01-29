@@ -1,0 +1,374 @@
+package com.tj720.service.impl;
+
+import com.alibaba.fastjson.JSON;
+import com.tj720.controller.framework.JsonResult;
+import com.tj720.dao.EsalePubUserMapper;
+import com.tj720.dao.EsaleUserActivityMapper;
+import com.tj720.model.EsalePubUser;
+import com.tj720.model.EsaleUserActivity;
+import com.tj720.service.EsaleUserActivityService;
+import com.tj720.utils.Page;
+import com.tj720.utils.Tools;
+import com.tj720.utils.common.IdUtils;
+import net.sf.json.JSONObject;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.hssf.usermodel.*;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@Service
+public class EsaleUserActivityServiceImpl implements EsaleUserActivityService {
+    @Autowired
+    private EsaleUserActivityMapper esaleUserActivityMapper;
+
+    @Autowired
+    private EsalePubUserMapper esalePubUserMapper;
+
+    @Override
+    public JSONObject getSignListById(String key, String activityStates, Integer currentPage, Integer size) {
+        JSONObject jsonObject = new JSONObject();
+
+        try {
+            if (StringUtils.isBlank(Tools.getUserId())) {
+                throw new Exception("登录异常");
+            }
+            if (StringUtils.isBlank(key) || StringUtils.isBlank(activityStates)) {
+                throw new Exception("参数异常");
+            }
+            Page page = new Page();
+            page.setSize(size);
+            page.setCurrentPage(currentPage);
+
+            Map<String, Object> map = new HashMap<String, Object>();
+            if (StringUtils.isNotBlank(key)) {
+                map.put("key", key);
+            }
+            if (StringUtils.isNotBlank(activityStates)) {
+                map.put("activityStates", activityStates);
+            }
+            //符合条件总数
+            Integer count = esaleUserActivityMapper.countSignActiviyt(map);
+            page.setAllRow(count);
+            map.put("start", page.getStart());
+            map.put("end", page.getSize());
+            //查询分页数据
+            List<EsaleUserActivity> list = esaleUserActivityMapper.getSignListByActiviytId(map);
+            for (EsaleUserActivity esaleUserActivity:list){
+                if (esaleUserActivity!=null&&esaleUserActivity.getEnrollType()!=null){
+                    if(esaleUserActivity.getEnrollType().equals("0")){
+                        esaleUserActivity.setEnrollType("PC端");
+                    }
+                    if(esaleUserActivity.getEnrollType().equals("1")){
+                        esaleUserActivity.setEnrollType("移动端");
+                    }
+                    if(esaleUserActivity.getEnrollType().equals("2")){
+                        esaleUserActivity.setEnrollType("后台");
+                    }
+                }
+
+                if (esaleUserActivity!=null&&esaleUserActivity.getDataState()!=null){
+                    if(esaleUserActivity.getDataState().equals("0")){
+                        esaleUserActivity.setStatusFlag("0");
+                        esaleUserActivity.setDataState("已取消");
+                    }else {
+                        esaleUserActivity.setStatusFlag("1");
+                        esaleUserActivity.setDataState("已报名");
+                    }
+                }
+
+
+            }
+
+
+            String jsonString = JSON.toJSONString(list);
+            jsonObject.put("code", 0);
+            jsonObject.put("msg", "");
+            jsonObject.put("count", page.getAllRow());
+            jsonObject.put("data", jsonString);
+        } catch (Exception e) {
+            jsonObject.put("code", 1);
+            jsonObject.put("msg", e.getMessage());
+            jsonObject.put("count", 0);
+            jsonObject.put("data", null);
+        }
+        return jsonObject;
+    }
+
+    @Override
+    public JsonResult operationUserActivity(String id, int operate) throws Exception {
+
+        try {
+            if (StringUtils.isBlank(id)) {
+                return new JsonResult(0, "参数错误");
+            }
+            if (operate != 1 && operate != 2 && operate != 3) {
+                return new JsonResult(0, "参数错误");
+            }
+            String userId = Tools.getUserId();
+            if (StringUtils.isBlank(userId)) {
+                return new JsonResult(0, "未登录");
+            }
+            EsaleUserActivity info = new EsaleUserActivity();
+            info.setId(id);
+            if (operate == 1) {
+                info.setDataState("0");
+            } else if (operate == 2) {
+                info.setJoinState("1");
+            } else if (operate == 3) {
+                info.setJoinState("0");
+            }
+            info.setUpdateBy(userId);
+            info.setUpdateDate(new Date());
+            int num = esaleUserActivityMapper.updateByPrimaryKeySelective(info);
+            if (num == 0) {
+                return new JsonResult(0, "删除失败");
+            }
+            return new JsonResult(1, "删除成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new JsonResult(0, "系统异常");
+        }
+    }
+
+    /**
+     * 用户详情界面查询我的活动记录
+     *
+     * @param userId
+     * @param currentPage
+     * @param size
+     * @return
+     */
+    @Override
+    public JSONObject getActivityRecordByUserId(String userId, Integer currentPage, Integer size) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            if (StringUtils.isBlank(Tools.getUserId())) {
+                jsonObject.put("code", 1);
+                jsonObject.put("msg", "系统异常");
+                jsonObject.put("count", 0);
+                jsonObject.put("data", null);
+                return jsonObject;
+            }
+
+            Page page = new Page();
+            page.setSize(size);
+            page.setCurrentPage(currentPage);
+
+            Map<String, Object> map = new HashMap<String, Object>();
+            if (StringUtils.isNotBlank(userId)) {
+                map.put("userId", userId);
+            } else {
+                jsonObject.put("code", 1);
+                jsonObject.put("msg", "系统异常");
+                jsonObject.put("count", 0);
+                jsonObject.put("data", null);
+                return jsonObject;
+            }
+            //符合条件总数
+            Integer count = esaleUserActivityMapper.countActivityRecordByUserId(map);
+            page.setAllRow(count);
+            map.put("start", page.getStart());
+            map.put("end", page.getSize());
+            List<EsaleUserActivity> list = esaleUserActivityMapper.getActivityRecordByUserId(map);
+            if(list!=null&&list.size()!=0){
+                for (EsaleUserActivity activity:list){
+                    if(activity.getJoinState()!=null&&activity.getJoinState().equals(0)){
+                        activity.setUserJoinStatus("未参加");
+
+                    }else {
+                        activity.setUserJoinStatus("已参加");
+                    }
+
+                    if(activity.getDataState()!=null&&activity.getDataState().equals(0)){
+                        activity.setDataState("未报名");
+
+                    }else {
+                        activity.setDataState("已报名");
+                    }
+                }
+            }
+
+            String jsonString = JSON.toJSONString(list);
+            jsonObject.put("code", 0);
+            jsonObject.put("msg", "");
+            jsonObject.put("count", page.getAllRow());
+            jsonObject.put("data", jsonString);
+            return jsonObject;
+        } catch (Exception e) {
+            e.printStackTrace();
+            jsonObject.put("code", 1);
+            jsonObject.put("msg", "系统异常");
+            jsonObject.put("count", 0);
+            jsonObject.put("data", null);
+            return jsonObject;
+        }
+    }
+
+    public JsonResult adminActivitySign(Map<String, String> map) {
+        String userId = Tools.getUserId();
+        String userB = "";
+        List<EsalePubUser> listByPhone = esaleUserActivityMapper.selectUserByPhones(map.get("phone"));
+        if (listByPhone.size() == 1) {
+            userB = listByPhone.get(0).getId();
+            int i = checkUserActivitySign(map.get("activityId"), userB);
+            if (i == 1) {
+                return new JsonResult(0, "已报名");
+            } else if (i == 2) {
+                return new JsonResult(0, "该用户已取消过此活动不能再次报名");
+            } else if (i == 3) {
+                return new JsonResult(0, "数据错误");
+            }
+        } else if (listByPhone.size() == 0) {
+            EsalePubUser esalePubUser = new EsalePubUser();
+            esalePubUser.setUserName(map.get("realName"));
+            esalePubUser.setPhone(map.get("phone"));
+            esalePubUser.setRealName(map.get("realName"));
+            esalePubUser.setParentName(map.get("parentName"));
+            esalePubUser.setCreateBy("system");
+            esalePubUser.setCreateDate(new Date());
+            esalePubUser.setUpdateBy("system");
+            esalePubUser.setUpdateDate(new Date());
+            esalePubUser.setDataState("1");
+            esalePubUser.setId(IdUtils.nextId(esalePubUser));
+            int b = esalePubUserMapper.insert(esalePubUser);
+            if (b != 1) {
+                return new JsonResult(0, "数据错误");
+            }
+            userB = esalePubUser.getId();
+        }
+
+        if (StringUtils.isNotEmpty(userB)) {
+            EsaleUserActivity record = new EsaleUserActivity();
+            record.setActivityId(map.get("activityId"));
+            record.setUserId(userB);
+            record.setEnrollType("2");
+            record.setEnrollTime(new Date());
+            record.setDataState("1");
+            record.setCreateBy("system");
+            record.setCreateDate(new Date());
+            record.setUpdateBy("system");
+            record.setUpdateDate(new Date());
+            record.setId(IdUtils.nextId(record));
+            if (esaleUserActivityMapper.insert(record) != 1) {
+                return new JsonResult(0, "报名失败");
+            }
+            return new JsonResult(1);
+        }
+        return new JsonResult(0, "系统错误");
+    }
+
+    public int checkUserActivitySign(String activityId, String userId) {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("userId", userId);
+        map.put("activityId", activityId);
+        List<EsaleUserActivity> userActivityDtoList = esaleUserActivityMapper.getUserActivityList(map);
+        if (userActivityDtoList.size() == 1) {
+            if (("1").equals(userActivityDtoList.get(0).getDataState())) {
+                //已报名
+                return 1;
+            } else {
+                //已取消
+                return 2;
+            }
+        } else if (userActivityDtoList.size() == 0) {
+            //未报名
+            return 0;
+        } else {
+            return 3;
+        }
+    }
+
+    /**
+     * 数据导出
+     *
+     * @param
+     * @return
+     */
+    @Override
+    public Workbook export(String key, String activityStates) throws Exception {
+        if (StringUtils.isBlank(Tools.getUserId())) {
+            throw new Exception("登录异常");
+        }
+        if (StringUtils.isBlank(key) || StringUtils.isBlank(activityStates)) {
+            throw new Exception("参数异常");
+        }
+        Map<String, Object> map = new HashMap<String, Object>();
+        if (StringUtils.isNotBlank(key)) {
+            map.put("key", key);
+        }
+        if (StringUtils.isNotBlank(activityStates)) {
+            map.put("activityStates", activityStates);
+        }
+        List<EsaleUserActivity> list = esaleUserActivityMapper.getSignListByActivityId(map);
+        HSSFWorkbook wb = null;
+        if (list != null && list.size() > 0) {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            //根据studentList生成excel文件
+            wb = new HSSFWorkbook();
+            HSSFCellStyle style1 = wb.createCellStyle();
+            HSSFFont font = wb.createFont();//创建字体样式
+            font.setFontName("宋体");//使用宋体
+            font.setFontHeightInPoints((short) 12);//字体大小
+
+            style1.setFont(font);//将字体注入
+//            style1.setAlignment(CellStyle.ALIGN_CENTER);//水平居中  
+//            style1.setVerticalAlignment(CellStyle.VERTICAL_CENTER);//垂直居中 
+            HSSFSheet sheet = wb.createSheet("活动报名列表");
+            HSSFRow row = sheet.createRow(0);
+            HSSFCell cell = row.createCell(0);
+            cell.setCellValue("序号");
+            cell = row.createCell(1);
+            cell.setCellValue("报名时间");
+            cell = row.createCell(2);
+            cell.setCellValue("姓名");
+            cell = row.createCell(3);
+            cell.setCellValue("手机");
+            cell = row.createCell(4);
+            cell.setCellValue("报名方式");
+            cell = row.createCell(5);
+            cell.setCellValue("报名状态");
+            cell = row.createCell(6);
+            cell.setCellValue("累计缺席次数");
+
+            EsaleUserActivity info = null;
+            for (int i = 0; i < list.size(); i++) {
+                info = list.get(i);
+                row = sheet.createRow(i + 1);
+                cell = row.createCell(0);
+                cell.setCellValue(i + 1);
+                cell = row.createCell(1);
+                cell.setCellValue(sdf.format(info.getEnrollTime()));
+                cell = row.createCell(2);
+                cell.setCellValue(info.getUserName());
+                cell = row.createCell(3);
+                cell.setCellValue(info.getUserPhone());
+                cell = row.createCell(4);
+                if (info.getEnrollType().equals("0")) {
+                    cell.setCellValue("PC端");
+                } else if (info.getEnrollType().equals("1")){
+                    cell.setCellValue("移动端");
+                } else if (info.getEnrollType().equals("2")) {
+                    cell.setCellValue("后台");
+                }
+                cell = row.createCell(5);
+                if (info.getDataState().equals("1")) {
+                    cell.setCellValue("已报名");
+                } else {
+                    cell.setCellValue("取消报名");
+                }
+                cell = row.createCell(6);
+                cell.setCellValue(info.getAbsentCount());
+//                sheet.autoSizeColumn(i,true);
+            }
+        }
+        return wb;
+    }
+
+}

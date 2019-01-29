@@ -1,0 +1,139 @@
+package com.tj720.controller.menu;
+
+import com.tj720.controller.framework.JsonResult;
+import com.tj720.model.EsaleSysMenu;
+import com.tj720.service.EsaleSysMenuService;
+import com.tj720.utils.Tools;
+import com.tj720.utils.common.IdUtils;
+import com.tj720.video.LayUiTableJson;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 系统菜单controller
+ * @author 杜昶
+ */
+@RestController
+@RequestMapping("/esaleSysMenu")
+public class EsaleSysMenuController {
+
+    @Autowired
+    private EsaleSysMenuService esaleSysMenuService;
+
+    @RequestMapping("/getMenuByUser")
+    public Map<String, Object> getMenuByUser(String pageType) {
+        Map<String, Object> map = new HashMap<>(1);
+        try {
+            List<EsaleSysMenu> contentManagement = esaleSysMenuService.getMenuByUser(pageType);
+            map.put("contentManagement", contentManagement);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return map;
+    }
+
+    @RequestMapping("/getMenuList")
+    public Map<String, Object> getMenuList() {
+        try {
+            return esaleSysMenuService.getMenuList();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Map<String, Object> map = new HashMap<String, Object>(2);
+        map.put("code", 1);
+        map.put("count", 0);
+        map.put("message", "数据异常,请与管理员联系");
+        return map;
+    }
+
+    @RequestMapping("/getSuperiorMenuList")
+    public LayUiTableJson getSuperiorMenuList() {
+        List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
+        Map<String, Object> map = new HashMap<String, Object>();
+        try {
+            List<EsaleSysMenu> data = (List<EsaleSysMenu>) esaleSysMenuService.getMenuList().get("data");
+            for (EsaleSysMenu sysMenu : data) {
+                map = new HashMap<String, Object>();
+                map.put("id",sysMenu.getId());
+                map.put("name",sysMenu.getTitle());
+                map.put("pId",sysMenu.getParentId());
+                map.put("open",null);
+                map.put("chkDisabled","false");
+                list.add(map);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new LayUiTableJson(0,null,list.size(),list);
+    }
+
+    @RequestMapping("/getMenuById")
+    public JsonResult getMenuById(String id) {
+        try {
+            return esaleSysMenuService.getMenuById(id);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new JsonResult("111116");
+    }
+
+    @RequestMapping("/addMenu")
+    public JsonResult addMenu(EsaleSysMenu esaleSysMenu) {
+        try {
+            esaleSysMenu.setId(IdUtils.nextId(esaleSysMenu));
+            esaleSysMenu.setCreator(Tools.getUserId());
+            esaleSysMenu.setUpdater(Tools.getUserId());
+            return esaleSysMenuService.addMenu(esaleSysMenu);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new JsonResult("111116");
+    }
+
+    @RequestMapping("/updateMenu")
+    public JsonResult updateMenu(EsaleSysMenu esaleSysMenu) {
+        try {
+            return esaleSysMenuService.updateMenu(esaleSysMenu);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new JsonResult("111116");
+    }
+
+    @RequestMapping("/queryResListTreeByRole")
+    public JsonResult queryResListTreeByRole(@RequestParam String roleId, String parentId, String pageType) {
+        try {
+            return esaleSysMenuService.queryResListTreeByRole(roleId, parentId, pageType);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new JsonResult("111116");
+    }
+
+    @RequestMapping("/batchUpdateResAuth")
+    public JsonResult batchUpdateResAuth(@RequestBody Map<String, Object> map) {
+        try {
+            return esaleSysMenuService.batchUpdateResAuth((List<String>) map.get("menuIds"), (String) map.get("roleId"), (String) map.get("pageType"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new JsonResult("111116");
+    }
+
+    /**
+     * 删除功能
+     * @param functionId 功能ID
+     * @return
+     */
+    @RequestMapping("/deleteMenu")
+    public JsonResult deleteFunction(@RequestParam String functionId){
+        JsonResult jsonResult = esaleSysMenuService.deleteFunctionById(functionId);
+        return jsonResult;
+    }
+}

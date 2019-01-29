@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tj720.dao.EsaleUserActivityMapper">
+  <resultMap id="BaseResultMap" type="com.tj720.model.EsaleUserActivity">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="user_id" jdbcType="VARCHAR" property="userId" />
+    <result column="activity_id" jdbcType="VARCHAR" property="activityId" />
+    <result column="enroll_type" jdbcType="VARCHAR" property="enrollType" />
+    <result column="enroll_time" jdbcType="TIMESTAMP" property="enrollTime" />
+    <result column="join_state" jdbcType="VARCHAR" property="joinState" />
+    <result column="data_state" jdbcType="VARCHAR" property="dataState" />
+    <result column="create_by" jdbcType="VARCHAR" property="createBy" />
+    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="update_by" jdbcType="VARCHAR" property="updateBy" />
+    <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, user_id, activity_id, enroll_type, enroll_time, join_state, data_state, create_by, 
+    create_date, update_by, update_date
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from esale_user_activity
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from esale_user_activity
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.tj720.model.EsaleUserActivity">
+    insert into esale_user_activity (id,user_id, activity_id, enroll_type,
+      enroll_time, join_state, data_state, 
+      create_by, create_date, update_by, 
+      update_date)
+    values (#{id,jdbcType=VARCHAR}, #{userId,jdbcType=VARCHAR}, #{activityId,jdbcType=VARCHAR}, #{enrollType,jdbcType=VARCHAR},
+      #{enrollTime,jdbcType=TIMESTAMP}, #{joinState,jdbcType=VARCHAR}, #{dataState,jdbcType=VARCHAR},
+      #{createBy,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, 
+      #{updateDate,jdbcType=TIMESTAMP})
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.tj720.model.EsaleUserActivity">
+    update esale_user_activity
+    <set>
+      <if test="userId != null">
+        user_id = #{userId,jdbcType=VARCHAR},
+      </if>
+      <if test="activityId != null">
+        activity_id = #{activityId,jdbcType=VARCHAR},
+      </if>
+      <if test="enrollType != null">
+        enroll_type = #{enrollType,jdbcType=VARCHAR},
+      </if>
+      <if test="enrollTime != null">
+        enroll_time = #{enrollTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="joinState != null">
+        join_state = #{joinState,jdbcType=VARCHAR},
+      </if>
+      <if test="dataState != null">
+        data_state = #{dataState,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null">
+        create_by = #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null">
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null">
+        update_by = #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateDate != null">
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <select id="countSign" resultType="java.lang.Integer" parameterType="java.util.Map">
+    select count(a.id)
+    from esale_user_activity a
+    where a.activity_id = #{key} and a.data_state = '1'
+  </select>
+  <select id="getSignListById" resultType="com.tj720.model.EsaleUserActivity" parameterType="java.util.Map">
+    SELECT a.id as "id",
+    a.user_id as "userId",
+    a.activity_id as "activityId",
+    a.enroll_type as "enrollType",
+    a.enroll_time as "enrollTime",
+    a.join_state as "joinState",
+    b.user_name as "userName",
+    b.phone as "userPhone",
+    a.data_state as "dataState",
+    a.create_by as "createBy",
+    a.create_date as "createDate",
+    a.update_by as "updateBy",
+    a.update_date as "updateDate",
+    (select count(*) from esale_user_activity c where c.user_id = b.id AND c.data_state = '1' AND c.join_state = '0') as "absentCount",
+    #{activityStates} as "activityStates"
+    from esale_user_activity a
+    LEFT JOIN esale_pub_user b on a.user_id = b.id
+    where a.activity_id = #{key} and a.data_state = '1'
+    limit #{start},#{end}
+  </select>
+  <select id="countActivityByUid" parameterType="java.lang.String" resultType="com.tj720.model.EsaleUserActivity">
+    select
+      activity_id as activityId,
+      data_state as dataState,
+      join_state as joinState
+    from esale_user_activity
+    where user_id =  #{userId,jdbcType=VARCHAR}
+  </select>
+
+  <select id="countActivityRecordByUserId" parameterType="java.util.Map" resultType="java.lang.Integer">
+    select
+      count(1)
+    from esale_user_activity a
+           left join esale_pub_user b on a.user_id = b.id
+           left join esale_activity c on a.activity_id = c.id
+    where user_id =  #{userId}
+  </select>
+
+  <select id="getActivityRecordByUserId" parameterType="java.util.Map" resultType="com.tj720.model.EsaleUserActivity">
+    select
+           a.id,
+           DATE_FORMAT(a.enroll_time,   '%Y-%m-%d %H:%i:%S') as "enrollTimeStr",
+           b.user_name as "userName",
+           c.activity_name as "activityName",
+           DATE_FORMAT(c.activity_time,   '%Y-%m-%d') as "activityTime",
+           c.activity_addr as "activityAddr",
+           a.enroll_type as "enrollType",
+           a.data_state as "dataState",
+           a.join_state as "joinState"
+    from esale_user_activity a
+    left join esale_pub_user b on a.user_id = b.id
+    left join esale_activity c on a.activity_id = c.id
+    where a.user_id =  #{userId}
+          order by a.update_date desc
+      limit #{start},#{end}
+  </select>
+
+  <select id="selectUserByPhones" parameterType="java.lang.String" resultType="com.tj720.model.EsalePubUser">
+    select
+    id, user_name as 'userName', sex,
+      birthday, phone, email,
+      real_name as "realName", id_card as "idCard", school_name as "schoolName",
+      parent_name as "parentName", parent_telphone as "parentTelphone", avatar_url as "avatarUrl",
+      password, operation_date as "operationDate", is_young as "isYoung",
+      freez_time as "freezTime", data_state as "dataState", create_by as "createBy",
+      create_date as "createDate", update_by as "updateBy", update_date as "updateDate",
+      description
+    from esale_pub_user
+    where phone = #{phone}
+    and data_state in('1','2')
+  </select>
+
+  <select id="getUserActivityList" parameterType="java.util.Map" resultType="com.tj720.model.EsaleUserActivity">
+    select id,user_id as "userId", activity_id as "activityId",  join_state as "joinState", data_state as "dataState"
+    from esale_user_activity
+    where user_id = #{userId} and activity_id = #{activityId}
+  </select>
+
+  <select id="getSignListByActivityId" resultType="com.tj720.model.EsaleUserActivity" parameterType="java.util.Map">
+    SELECT a.id as "id",
+    a.user_id as "userId",
+    a.activity_id as "activityId",
+    a.enroll_type as "enrollType",
+    a.enroll_time as "enrollTime",
+    a.join_state as "joinState",
+    b.user_name as "userName",
+    b.phone as "userPhone",
+    a.data_state as "dataState",
+    a.create_by as "createBy",
+    a.create_date as "createDate",
+    a.update_by as "updateBy",
+    a.update_date as "updateDate",
+    (select count(*) from esale_user_activity c where c.user_id = b.id AND c.data_state = '1' AND c.join_state = '0') as "absentCount",
+    #{activityStates} as "activityStates"
+    from esale_user_activity a
+    LEFT JOIN esale_pub_user b on a.user_id = b.id
+    where a.activity_id = #{key} and a.data_state = '1'
+  </select>
+</mapper>

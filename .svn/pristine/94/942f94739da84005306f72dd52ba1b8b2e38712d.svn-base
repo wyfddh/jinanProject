@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        @font-face
+        {
+            font-family: pingfang;
+            src: url('login/img/pingfang.ttf')
+        }
+        html,body{
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: pingfang;
+        }
+        body{
+            background: url("login/img/background.png") no-repeat center;
+            background-size: 100% 100%;
+        }
+        .lg_main{
+            width: 1110px;
+            height: 800px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%,-50%);
+        }
+        .lg_left{
+            padding-top: 50px;
+            position: relative;
+        }
+        .lg_right{
+            position: absolute;
+            top: 0;
+            right: -35px;
+            background: url("login/img/lg_right.png") no-repeat 1px 1px;
+            width:558px;
+            height: 700px;
+            padding-top: 140px;
+        }
+        .lg_name{
+            font-size: 20px;
+            color: #333333;
+            margin-left: 190px;
+        }
+        .lg_user{
+            display: block;
+            position: absolute;
+            top: 100px;
+            left: 60px;
+        }
+        .lg_num{
+            margin-left: 72px;
+            font-size: 18px;
+            color: #aaaaaa;
+            margin-top: 12px;
+        }
+        .lg_num1{
+            height: 40px;
+            line-height: 40px;
+            margin-left: 72px;
+            margin-top: 12px;
+            width: 382px;
+            position: relative;
+            border-bottom: 2px solid #ececec;
+        }
+        .lg_psd{
+            margin-top: 42px;
+            margin-left: 72px;
+            font-size: 18px;
+            color: #aaaaaa;
+        }
+        .lg_yzm img{
+            display: block;
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            cursor: pointer;
+        }
+        .lg_yzm{
+            width: 140px;
+            height: 40px;
+            background-color: #ececec;
+            display: inline-block;
+            float: right;
+        }
+        .lg_time{
+            color: #fff;
+            font-size: 14px;
+            top: 244px;
+            left: 52px;
+            position: absolute;
+        }
+        input{
+            border: 0px;outline:none;
+            height: 36px;
+            line-height: 36px;
+            font-size: 18px;
+            color: #0099ff;
+            font-family: pingfang;
+        }
+        .lg_dl{
+            margin-top: 80px;
+            margin-left: 140px;
+            cursor: pointer;
+        }
+        .lg_cw{
+            margin-top: 62px;
+            margin-left: 72px;
+            color: red;
+            font-size: 14px;
+            height: 20px;
+        }
+        .lg_cw1{
+            float: left;
+            background: url("login/img/lg_fa.png") no-repeat;
+            width: 20px;
+            height: 20px;
+            margin-left: 8px;
+        }
+        .lg_cw0{
+            float: left;
+            height: 20px;
+            line-height: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div class="lg_main">
+    <div class="lg_left">
+        <img src="login/img/left_pic.png" alt="">
+    </div>
+    <form id="loginForm" class="layui-form"  method="post">
+        <div class="lg_right">
+            <img class="lg_user" src="login/img/lg_user.png" alt="">
+            <div class="lg_name">管理员，您好！</div>
+            <div class="lg_cw"><div class="lg_cw0"  id="err_msg" style="display: none;" >用户名或者密码错误</div><div class="lg_cw1"  style="display: none;" ></div></div>
+            <div class="lg_num" >用户名</div>
+            <div class="lg_num1"><input type="text" placeholder="请输入您的帐户"  id="phone" name="phone" value="10000000001"></div>
+            <div class="lg_psd">密码</div>
+            <div class="lg_num1"><input type="password"  placeholder="请输入您的密码" id="password" name="password" value="12345678"></div>
+            <div class="lg_dl" id="login" lay-filter="login" lay-submit><img src="login/img/login_pic.png" alt=""></div>
+        </div>
+    </form>
+</div>
+
+<script type="text/javascript" src="layui/layui.js"></script>
+<script type="text/javascript" src="js/login.js"></script>
+</body>
+</html>

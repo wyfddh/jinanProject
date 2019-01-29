@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tj720.dao.PostVideoStatisticsMapper">
+
+    <select id="newVideoCount" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select
+          count(1)
+        from post_video
+        where #{startTime} &lt; create_time and create_time &lt; concat(#{endTime}, " 23:59:59") and status = 4
+    </select>
+
+    <select id="videoTotle" resultType="java.lang.Integer">
+        select
+          count(1)
+        from post_video
+        where status = 4
+    </select>
+
+    <select id="videoCountByPermissions" parameterType="java.lang.String" resultType="java.lang.Integer">
+        select
+          count(1)
+        from post_video
+        where status = 4 and auth_setting = #{authSetting}
+    </select>
+
+    <select id="newVideoStatisticsLine" parameterType="java.util.Map" resultType="java.util.Map">
+        select
+          count(case when create_time between #{startTime} and concat(#{endTime}, " 23:59:59")
+              then 1
+              else null
+              end)                                                    `new`,
+          count(1)                                                    `count`,
+          count(case when auth_setting = 1 then 1 else null end )     `undisclosed`,
+          count(case when auth_setting = 2 then 1 else null end )     `query`,
+          count(case when auth_setting = 3 then 1 else null end )     `download`
+        from post_video
+        where status = 4 and video_type = #{videoType}
+    </select>
+
+    <select id="newVideoStatisticsPie" parameterType="java.util.Map" resultType="java.util.Map">
+        select
+          count(1)      `value`,
+          b.dict_name   `name`
+        from post_video a
+        inner join sys_dict b on (b.dict_type = "video_type" and a.video_type = b.dict_code)
+        where a.create_time between #{startTime} and concat(#{endTime}, " 23:59:59") and a.status = 4
+        group by a.video_type
+    </select>
+
+    <select id="videoStatisticsLine" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+            c.date AS updateTime,
+            count(p.id) AS '新增资料'
+        FROM
+            post_video p
+            RIGHT JOIN calendar c ON ( c.date = LEFT ( p.create_time, 10 ) AND p.create_time BETWEEN #{startTime} AND concat(#{endTime}, " 23:59:59") and p.status = 4 )
+        WHERE
+            c.date BETWEEN #{startTime} AND concat(#{endTime}, " 23:59:59")
+        GROUP BY
+            c.date
+    </select>
+
+    <select id="videoUseStatistics" parameterType="java.util.Map" resultType="java.util.Map">
+        select
+        count(p.xid)
+        as '申请',
+        count(case when p.apply_status = '2'
+        then 1
+        else null
+        end)
+        as '下载'
+        from
+        wf_action p
+        inner join post_video v on (p.party_id = v.id and v.video_type = #{videoType} and v.status = 4)
+        inner join sys_dict d on (d.dict_type = "video_type" and v.video_type = d.dict_code)
+        where p.apply_time between #{startTime} and concat(#{endTime}, " 23:59:59")
+    </select>
+
+    <select id="videoStatistics" parameterType="java.util.Map" resultType="java.util.Map">
+        select
+        count(p.xid)
+        as '申请',
+        count(case when p.apply_status = '2'
+        then 1
+        else null
+        end)
+        as '下载',
+        v. video_name       videoName
+        from
+        wf_action p
+        right join post_video v on (p.party_id = v.id and v.status = 4)
+        left join sys_dict d on (d.dict_type = "video_type" and v.video_type = d.dict_code)
+        where p.apply_time between #{startTime} and concat(#{endTime}, " 23:59:59")
+        group by v.video_name order by count(p.xid) desc limit 10
+    </select>
+</mapper>

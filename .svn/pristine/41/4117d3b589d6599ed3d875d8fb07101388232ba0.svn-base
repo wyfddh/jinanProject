@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tj720.dao.ICollectionInfoMapper">
+
+  <select id="countCollection" resultType="java.lang.Integer">
+    select count(*)
+    from collection_info t, museum_base_info a
+    where a.data_state = '2'
+    and t.museum_id = a.id
+    and t.data_state = '1'
+  </select>
+
+  <select id="countCollectionByProvice" resultType="java.lang.Integer">
+    select count(*)
+    from collection_info t, museum_base_info a
+    where a.data_state = '2'
+    and t.museum_id = a.id
+    and t.data_state = '1'
+    and a.province = #{province}
+  </select>
+
+  <select id="getCollectionInfoListByProvice" resultType="com.tj720.dto.CollectionInfoDto">
+    select t.id, t.collection_name as name, t.collection_description as description, t.pictureids as pictureUrl
+    from collection_info t, museum_base_info a, mip_area b
+    where a.data_state = '2'
+    and t.museum_id = a.id
+    and t.data_state = '1'
+    and b.id = a.province
+    and b.pinyin = #{province}
+    order by t.country_recommend desc, t.collect_level, t.update_date desc
+    LIMIT ${size}
+  </select>
+
+  <select id="getCollectionInfoListByMuseumId" resultType="com.tj720.dto.CollectionInfoDto">
+    select t.id, t.collection_name as name, t.collection_description as description, t.pictureids as pictureUrl,
+    a.museum_name as museumName, b.`name` as typeName, c.`name` as yearName
+    from collection_info t
+    left join museum_base_info a on(t.museum_id = a.id)
+    left join mip_collection_category b on(b.id = t.collection_type)
+    left join mip_year_type c on(c.id = t.collection_year)
+    where a.data_state = '2'
+    and t.data_state = '1'
+    and t.museum_id = #{museumId}
+    order by t.museum_recommend desc, t.update_date desc
+    <if test="start == 0">
+        LIMIT ${size}
+    </if>
+    <if test="start != 0">
+        LIMIT ${start}, ${size}
+    </if>
+  </select>
+
+  <select id="countCollectionInfoListByMuseumId" resultType="java.lang.Integer">
+    select count(*)
+    from collection_info t, museum_base_info a
+    where a.data_state = '2'
+    and t.museum_id = a.id
+    and t.data_state = '1'
+    and t.museum_recommend = '1'
+    and t.museum_id = #{museumId}
+  </select>
+
+  <select id="getCollectionInfoListBySearch" resultType="com.tj720.dto.CollectionInfoDto">
+    select t.id, t.collection_name as name, t.collection_description as description, t.pictureids as pictureUrl,
+    a.museum_name as museumName, b.name as typeName,c1.`name` as yearName
+    from collection_info t
+    left join museum_base_info a on(t.museum_id = a.id)
+    left join mip_collection_category b on(t.collection_type = b.id)
+    left join mip_year_type c1 on(t.collection_year = c1.id)
+    where a.data_state = '2'
+    and t.data_state = '1'
+    <if test="museumId != null and museumId != ''">
+      and t.museum_id = #{museumId}
+    </if>
+    <if test="collectionType != null and collectionType != ''">
+      and t.collection_type = #{collectionType}
+    </if>
+    <if test="collectionYear != null and collectionYear != ''">
+      and t.collection_year = #{collectionYear}
+    </if>
+    <if test="key != null and key != ''">
+      and (t.collection_name like concat('%',#{key},'%')
+      or a.museum_name like concat('%',#{key},'%'))
+    </if>
+    <if test="level != null and level != ''">
+      and t.collect_level = #{level}
+    </if>
+    <if test="textures != null and textures != ''">
+      and substring(t.textures_three, 3, 3) = #{textures}
+    </if>
+    <if test="province != null and province != ''">
+      and a.province = #{province}
+    </if>
+    <if test="city != null and city != ''">
+      and (a.city = #{city}
+      or a.area = #{city})
+    </if>
+    order by t.collect_level desc, t.create_date desc
+    <if test="start == 0">
+      LIMIT ${size}
+    </if>
+    <if test="start != 0">
+      LIMIT ${start}, ${size}
+    </if>
+  </select>
+
+  <select id="countCollectionInfoListBySearch" resultType="java.lang.Integer">
+    select count(*)
+    from collection_info t, museum_base_info a
+    where a.data_state = '2'
+    and t.museum_id = a.id
+    and t.data_state = '1'
+    <if test="museumId != null and museumId != ''">
+      and t.museum_id = #{museumId}
+    </if>
+    <if test="collectionType != null and collectionType != ''">
+      and t.collection_type = #{collectionType}
+    </if>
+    <if test="collectionYear != null and collectionYear != ''">
+      and (t.collection_year = #{collectionYear}
+      or t.collection_year2 = #{collectionYear})
+    </if>
+    <if test="key != null and key != ''">
+      and (t.collection_name like concat('%',#{key},'%')
+      or a.museum_name like concat('%',#{key},'%'))
+    </if>
+    <if test="level != null and level != ''">
+      and t.collect_level = #{level}
+    </if>
+    <if test="textures != null and textures != ''">
+      and substring(t.textures_three, 3, 3) = #{textures}
+    </if>
+    <if test="province != null and province != ''">
+      and a.province = #{province}
+    </if>
+    <if test="city != null and city != ''">
+      and (a.city = #{city}
+      or a.area = #{city})
+    </if>
+  </select>
+
+  <select id="getCollectionTypeList" resultType="com.tj720.dto.SelectDto">
+      select t.id, t.short_name as name
+      from mip_collection_category t
+      where t.`status` = '1'
+      ORDER BY t.sequence
+  </select>
+
+  <select id="getCollectionYearList" resultType="com.tj720.dto.SelectDto">
+      select * from mip_year_type a
+      where (a.parentId in(43,46, 143, 142)
+      or a.id in(143, 142))
+      and a.`status` = '1'
+      order by a.sequence;
+  </select>
+
+  <select id="getDictData" resultType="com.tj720.dto.ISysDictDto">
+      select t.dict_code as code, t.dict_name as name from sys_dict t
+      where t.dict_type = #{type}
+      order by t.dict_code
+  </select>
+
+  <select id="getCityDataByParent" resultType="com.tj720.dto.AreaDto">
+      select t.id, t.`name`, t.pinyin from mip_area t
+      where t.pid = #{parent}
+      ORDER BY t.sequence
+  </select>
+
+  <select id="getCollectionDetail" resultType="com.tj720.dto.CollectionInfoDto">
+      select t.id, t.collection_name as name, t.collection_description as description, t.pictureids as pictureUrl,
+      a.museum_name as museumName, b.name as typeName,c1.`name` as yearName
+      from collection_info t
+      left join museum_base_info a on(t.museum_id = a.id)
+      left join mip_collection_category b on(t.collection_type = b.id)
+      left join mip_year_type c1 on(t.collection_year = c1.id)
+      where a.data_state = '2'
+      and t.data_state = '1'
+      and t.id = #{id}
+  </select>
+
+
+</mapper>

@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tj720.dao.LocalIntroduceMapper">
+
+  <insert id="insert" parameterType="com.tj720.model.IntroduceManager.LocalIntroduce">
+    insert into local_introduce (id, video_name, introduce_place, 
+      video_id, page_recommend, data_state,
+      province,city,area,address,
+      create_by, create_date, update_by, 
+      update_date, content,museum_id)
+    values (#{id,jdbcType=VARCHAR}, #{videoName,jdbcType=VARCHAR}, #{introducePlace,jdbcType=VARCHAR}, 
+      #{videoId,jdbcType=VARCHAR}, #{pageRecommend,jdbcType=VARCHAR}, #{dataState,jdbcType=VARCHAR},
+      #{province,jdbcType=VARCHAR},#{city,jdbcType=VARCHAR},#{area,jdbcType=VARCHAR},#{address,jdbcType=VARCHAR},
+      #{createBy,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, 
+      #{updateDate,jdbcType=TIMESTAMP}, #{content,jdbcType=LONGVARCHAR},#{museumId})
+  </insert>
+
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.tj720.model.IntroduceManager.LocalIntroduce">
+    update local_introduce
+    <set>
+      <if test="videoName != null">
+        video_name = #{videoName,jdbcType=VARCHAR},
+      </if>
+      <if test="introducePlace != null">
+        introduce_place = #{introducePlace,jdbcType=VARCHAR},
+      </if>
+      <if test="videoId != null">
+        video_id = #{videoId,jdbcType=VARCHAR},
+      </if>
+      <if test="pageRecommend != null">
+        page_recommend = #{pageRecommend,jdbcType=VARCHAR},
+      </if>
+      <if test="dataState != null">
+        data_state = #{dataState,jdbcType=VARCHAR},
+      </if>
+      <if test="province != null">
+        province = #{province,jdbcType=VARCHAR},
+      </if>
+      <if test="city != null">
+        city = #{city,jdbcType=VARCHAR},
+      </if>
+      <if test="area != null">
+        area = #{area,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null">
+        address = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null">
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null">
+        update_by = #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null">
+        content = #{content,jdbcType=LONGVARCHAR},
+      </if>
+      <if test="museumId != null">
+        museum_id = #{museumId,jdbcType=VARCHAR},
+      </if>
+      <if test="updateDate != null">
+        update_date = #{updateDate,jdbcType=TIMESTAMP}
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.tj720.model.IntroduceManager.LocalIntroduce">
+    update local_introduce
+    set video_name = #{videoName,jdbcType=VARCHAR},
+      introduce_place = #{introducePlace,jdbcType=VARCHAR},
+      video_id = #{videoId,jdbcType=VARCHAR},
+      update_by = #{updateBy,jdbcType=VARCHAR},
+      update_date = #{updateDate,jdbcType=TIMESTAMP},
+      content = #{content,jdbcType=LONGVARCHAR},
+      museum_id = #{museumId,jdbcType=VARCHAR},
+      province = #{province,jdbcType=VARCHAR},
+      city = #{city,jdbcType=VARCHAR},
+      area = #{area,jdbcType=VARCHAR},
+      address = #{address,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+
+  <select id="countIntroduceList" resultType="java.lang.Integer" parameterType="java.util.Map">
+    select count(a.id)
+    from local_introduce a
+    where 1 = 1 and a.data_state ='1'
+    <if test="key != null and key != ''" >
+      and (a.video_name like concat('%',#{key},'%')
+      or  a.introduce_place like concat('%',#{key},'%'))
+    </if>
+    <if test="recommend == 1">
+      and a.page_recommend = '1'
+    </if>
+    <if test="startDate != null and startDate != ''" >
+      and a.create_date <![CDATA[ >= ]]> #{startDate}
+    </if>
+    <if test="endDate != null and endDate != ''" >
+      and a.create_date <![CDATA[ <= ]]> #{endDate}
+    </if>
+    <if test="orderBy == 1" >
+      order by a.update_date desc
+    </if>
+    <if test="orderBy == 2" >
+      order by a.create_date desc
+    </if>
+  </select>
+
+
+  <select id="selectIntroduceList" resultType="com.tj720.model.IntroduceManager.LocalIntroduce" parameterType="java.util.Map">
+    select
+    a.id,
+    a.video_name  as "videoName" ,
+    a.introduce_place as "introducePlace",
+    a.video_id    as "videoId",
+    b.att_path    as "videoUrl",
+    a.page_recommend  as "pageRecommend",
+    case when a.page_recommend = '1'
+    then 'checked'
+    else '' end "pageRecommendCheck",
+    a.data_state  as "dataState",
+    a.content,
+    a.province,
+    (select b.name from mip_area b where b.id = a.province) as "provinceDes",
+    a.city,
+    (select b.name from mip_area b where b.id = a.city) as "cityDes",
+    a.area,
+    (select b.name from mip_area b where b.id = a.area) as "areaDes",
+    a.address,
+    a.museum_id as "museumId",
+    m.museum_name as "museumName",
+    a.create_by as "createBy",
+    a.create_date as "createDate",
+    a.update_by as "updateBy",
+    a.update_date as "updateDate"
+    from local_introduce a
+    inner join esale_museum m on a.museum_id=m.id
+    left join mip_attachment b on(b.att_id = a.video_id)
+    where 1 = 1 and a.data_state ='1'
+    <if test="key != null and key != ''" >
+      and (a.video_name like concat('%',#{key},'%')
+      or  a.introduce_place like concat('%',#{key},'%'))
+    </if>
+    <if test="recommend == 1">
+      and a.page_recommend = '1'
+    </if>
+    <if test="startDate != null and startDate != ''" >
+      and a.create_date <![CDATA[ >= ]]> #{startDate}
+    </if>
+    <if test="endDate != null and endDate != ''" >
+      and a.create_date <![CDATA[ <= ]]> #{endDate}
+    </if>
+    <if test="orderBy == 1" >
+      order by a.update_date desc
+    </if>
+    <if test="orderBy == 2" >
+      order by a.create_date desc
+    </if>
+    limit #{start},#{end}
+  </select>
+
+  <select id="countPageRecommend" resultType="java.lang.Integer">
+    select count(a.id)
+    from local_introduce a
+    where a.page_recommend = '1'
+    and a.data_state = '1'
+  </select>
+
+</mapper>

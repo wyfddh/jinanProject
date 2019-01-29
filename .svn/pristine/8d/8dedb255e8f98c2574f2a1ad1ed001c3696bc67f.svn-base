@@ -1,0 +1,431 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tj720.dao.PostVideosMapper">
+  <!--<resultMap id="BaseResultMap" type="com.tj720.model.PostVideo">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="video_code" jdbcType="VARCHAR" property="videoCode" />
+    <result column="video_name" jdbcType="VARCHAR" property="videoName" />
+    <result column="video_type" jdbcType="VARCHAR" property="videoType" />
+    <result column="relative_object" jdbcType="VARCHAR" property="relativeObject" />
+    <result column="relative_collection_name" jdbcType="VARCHAR" property="relativeCollectionName" />
+    <result column="source" jdbcType="VARCHAR" property="source" />
+    <result column="attachment" jdbcType="VARCHAR" property="attachment" />
+    <result column="upload_org" jdbcType="VARCHAR" property="uploadOrg" />
+    <result column="status" jdbcType="VARCHAR" property="status" />
+    <result column="auth_setting" jdbcType="VARCHAR" property="authSetting" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="creator" jdbcType="VARCHAR" property="creator" />
+    <result column="updater" jdbcType="VARCHAR" property="updater" />
+    <result column="content" jdbcType="VARCHAR" property="content" />
+    <result column="make_time" jdbcType="TIMESTAMP" property="makeTime" />
+    <result column="remarks" jdbcType="VARCHAR" property="remarks" />
+    <result column="save_type" jdbcType="VARCHAR" property="saveType" />
+    <result column="sequence" jdbcType="INTEGER" property="sequence" />
+    <result column="video_mark" jdbcType="VARCHAR" property="videoMark" />
+    <result column="keywords" jdbcType="VARCHAR" property="keywords" />
+    <result column="video_time" jdbcType="VARCHAR" property="videoTime" />
+    <result column="video_size" jdbcType="VARCHAR" property="videoSize" />
+    <result column="approval" jdbcType="VARCHAR" property="approval" />
+    <result column="other1" jdbcType="VARCHAR" property="other1" />
+    <result column="other2" jdbcType="VARCHAR" property="other2" />
+    <result column="other3" jdbcType="VARCHAR" property="other3" />
+  </resultMap>-->
+  <!--<resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.tj720.model.PostVideo">
+    <result column="relative_collection" jdbcType="LONGVARCHAR" property="relativeCollection" />
+  </resultMap>-->
+ <!-- <sql id="Base_Column_List">
+    id, video_code, video_name, video_type, relative_object, relative_collection_name,
+    source, attachment, upload_org, status, auth_setting, create_time, update_time, creator,
+    updater, content, make_time, remarks, save_type, sequence, video_mark, keywords,
+    video_time, video_size, approval, other1, other2, other3
+  </sql>
+  <sql id="Blob_Column_List">
+    relative_collection
+  </sql>-->
+  <!--<select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="ResultMapWithBLOBs">
+    select
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from post_video
+    where id = #{id,jdbcType=VARCHAR}
+  </select>-->
+  <!--<delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from post_video
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.tj720.model.PostVideo">
+    insert into post_video (id, video_code, video_name,
+      video_type, relative_object, relative_collection_name,
+      source, attachment, upload_org,
+      status, auth_setting, create_time,
+      update_time, creator, updater,
+      content, make_time, remarks,
+      save_type, sequence, video_mark,
+      keywords, video_time, video_size,
+      approval, other1, other2,
+      other3, relative_collection)
+    values (#{id,jdbcType=VARCHAR}, #{videoCode,jdbcType=VARCHAR}, #{videoName,jdbcType=VARCHAR},
+      #{videoType,jdbcType=VARCHAR}, #{relativeObject,jdbcType=VARCHAR}, #{relativeCollectionName,jdbcType=VARCHAR},
+      #{source,jdbcType=VARCHAR}, #{attachment,jdbcType=VARCHAR}, #{uploadOrg,jdbcType=VARCHAR},
+      #{status,jdbcType=VARCHAR}, #{authSetting,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP},
+      #{updateTime,jdbcType=TIMESTAMP}, #{creator,jdbcType=VARCHAR}, #{updater,jdbcType=VARCHAR},
+      #{content,jdbcType=VARCHAR}, #{makeTime,jdbcType=TIMESTAMP}, #{remarks,jdbcType=VARCHAR},
+      #{saveType,jdbcType=VARCHAR}, #{sequence,jdbcType=INTEGER}, #{videoMark,jdbcType=VARCHAR},
+      #{keywords,jdbcType=VARCHAR}, #{videoTime,jdbcType=VARCHAR}, #{videoSize,jdbcType=VARCHAR},
+      #{approval,jdbcType=VARCHAR}, #{other1,jdbcType=VARCHAR}, #{other2,jdbcType=VARCHAR},
+      #{other3,jdbcType=VARCHAR}, #{relativeCollection,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.tj720.model.PostVideo">
+    insert into post_video
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="videoCode != null">
+        video_code,
+      </if>
+      <if test="videoName != null">
+        video_name,
+      </if>
+      <if test="videoType != null">
+        video_type,
+      </if>
+      <if test="relativeObject != null">
+        relative_object,
+      </if>
+      <if test="relativeCollectionName != null">
+        relative_collection_name,
+      </if>
+      <if test="source != null">
+        source,
+      </if>
+      <if test="attachment != null">
+        attachment,
+      </if>
+      <if test="uploadOrg != null">
+        upload_org,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="authSetting != null">
+        auth_setting,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="creator != null">
+        creator,
+      </if>
+      <if test="updater != null">
+        updater,
+      </if>
+      <if test="content != null">
+        content,
+      </if>
+      <if test="makeTime != null">
+        make_time,
+      </if>
+      <if test="remarks != null">
+        remarks,
+      </if>
+      <if test="saveType != null">
+        save_type,
+      </if>
+      <if test="sequence != null">
+        sequence,
+      </if>
+      <if test="videoMark != null">
+        video_mark,
+      </if>
+      <if test="keywords != null">
+        keywords,
+      </if>
+      <if test="videoTime != null">
+        video_time,
+      </if>
+      <if test="videoSize != null">
+        video_size,
+      </if>
+      <if test="approval != null">
+        approval,
+      </if>
+      <if test="other1 != null">
+        other1,
+      </if>
+      <if test="other2 != null">
+        other2,
+      </if>
+      <if test="other3 != null">
+        other3,
+      </if>
+      <if test="relativeCollection != null">
+        relative_collection,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="videoCode != null">
+        #{videoCode,jdbcType=VARCHAR},
+      </if>
+      <if test="videoName != null">
+        #{videoName,jdbcType=VARCHAR},
+      </if>
+      <if test="videoType != null">
+        #{videoType,jdbcType=VARCHAR},
+      </if>
+      <if test="relativeObject != null">
+        #{relativeObject,jdbcType=VARCHAR},
+      </if>
+      <if test="relativeCollectionName != null">
+        #{relativeCollectionName,jdbcType=VARCHAR},
+      </if>
+      <if test="source != null">
+        #{source,jdbcType=VARCHAR},
+      </if>
+      <if test="attachment != null">
+        #{attachment,jdbcType=VARCHAR},
+      </if>
+      <if test="uploadOrg != null">
+        #{uploadOrg,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="authSetting != null">
+        #{authSetting,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="creator != null">
+        #{creator,jdbcType=VARCHAR},
+      </if>
+      <if test="updater != null">
+        #{updater,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null">
+        #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="makeTime != null">
+        #{makeTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remarks != null">
+        #{remarks,jdbcType=VARCHAR},
+      </if>
+      <if test="saveType != null">
+        #{saveType,jdbcType=VARCHAR},
+      </if>
+      <if test="sequence != null">
+        #{sequence,jdbcType=INTEGER},
+      </if>
+      <if test="videoMark != null">
+        #{videoMark,jdbcType=VARCHAR},
+      </if>
+      <if test="keywords != null">
+        #{keywords,jdbcType=VARCHAR},
+      </if>
+      <if test="videoTime != null">
+        #{videoTime,jdbcType=VARCHAR},
+      </if>
+      <if test="videoSize != null">
+        #{videoSize,jdbcType=VARCHAR},
+      </if>
+      <if test="approval != null">
+        #{approval,jdbcType=VARCHAR},
+      </if>
+      <if test="other1 != null">
+        #{other1,jdbcType=VARCHAR},
+      </if>
+      <if test="other2 != null">
+        #{other2,jdbcType=VARCHAR},
+      </if>
+      <if test="other3 != null">
+        #{other3,jdbcType=VARCHAR},
+      </if>
+      <if test="relativeCollection != null">
+        #{relativeCollection,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.tj720.model.PostVideo">
+    update post_video
+    <set>
+      <if test="videoCode != null">
+        video_code = #{videoCode,jdbcType=VARCHAR},
+      </if>
+      <if test="videoName != null">
+        video_name = #{videoName,jdbcType=VARCHAR},
+      </if>
+      <if test="videoType != null">
+        video_type = #{videoType,jdbcType=VARCHAR},
+      </if>
+      <if test="relativeObject != null">
+        relative_object = #{relativeObject,jdbcType=VARCHAR},
+      </if>
+      <if test="relativeCollectionName != null">
+        relative_collection_name = #{relativeCollectionName,jdbcType=VARCHAR},
+      </if>
+      <if test="source != null">
+        source = #{source,jdbcType=VARCHAR},
+      </if>
+      <if test="attachment != null">
+        attachment = #{attachment,jdbcType=VARCHAR},
+      </if>
+      <if test="uploadOrg != null">
+        upload_org = #{uploadOrg,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null">
+        status = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="authSetting != null">
+        auth_setting = #{authSetting,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="creator != null">
+        creator = #{creator,jdbcType=VARCHAR},
+      </if>
+      <if test="updater != null">
+        updater = #{updater,jdbcType=VARCHAR},
+      </if>
+      <if test="content != null">
+        content = #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="makeTime != null">
+        make_time = #{makeTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remarks != null">
+        remarks = #{remarks,jdbcType=VARCHAR},
+      </if>
+      <if test="saveType != null">
+        save_type = #{saveType,jdbcType=VARCHAR},
+      </if>
+      <if test="sequence != null">
+        sequence = #{sequence,jdbcType=INTEGER},
+      </if>
+      <if test="videoMark != null">
+        video_mark = #{videoMark,jdbcType=VARCHAR},
+      </if>
+      <if test="keywords != null">
+        keywords = #{keywords,jdbcType=VARCHAR},
+      </if>
+      <if test="videoTime != null">
+        video_time = #{videoTime,jdbcType=VARCHAR},
+      </if>
+      <if test="videoSize != null">
+        video_size = #{videoSize,jdbcType=VARCHAR},
+      </if>
+      <if test="approval != null">
+        approval = #{approval,jdbcType=VARCHAR},
+      </if>
+      <if test="other1 != null">
+        other1 = #{other1,jdbcType=VARCHAR},
+      </if>
+      <if test="other2 != null">
+        other2 = #{other2,jdbcType=VARCHAR},
+      </if>
+      <if test="other3 != null">
+        other3 = #{other3,jdbcType=VARCHAR},
+      </if>
+      <if test="relativeCollection != null">
+        relative_collection = #{relativeCollection,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.tj720.model.PostVideo">
+    update post_video
+    set video_code = #{videoCode,jdbcType=VARCHAR},
+      video_name = #{videoName,jdbcType=VARCHAR},
+      video_type = #{videoType,jdbcType=VARCHAR},
+      relative_object = #{relativeObject,jdbcType=VARCHAR},
+      relative_collection_name = #{relativeCollectionName,jdbcType=VARCHAR},
+      source = #{source,jdbcType=VARCHAR},
+      attachment = #{attachment,jdbcType=VARCHAR},
+      upload_org = #{uploadOrg,jdbcType=VARCHAR},
+      status = #{status,jdbcType=VARCHAR},
+      auth_setting = #{authSetting,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      creator = #{creator,jdbcType=VARCHAR},
+      updater = #{updater,jdbcType=VARCHAR},
+      content = #{content,jdbcType=VARCHAR},
+      make_time = #{makeTime,jdbcType=TIMESTAMP},
+      remarks = #{remarks,jdbcType=VARCHAR},
+      save_type = #{saveType,jdbcType=VARCHAR},
+      sequence = #{sequence,jdbcType=INTEGER},
+      video_mark = #{videoMark,jdbcType=VARCHAR},
+      keywords = #{keywords,jdbcType=VARCHAR},
+      video_time = #{videoTime,jdbcType=VARCHAR},
+      video_size = #{videoSize,jdbcType=VARCHAR},
+      approval = #{approval,jdbcType=VARCHAR},
+      other1 = #{other1,jdbcType=VARCHAR},
+      other2 = #{other2,jdbcType=VARCHAR},
+      other3 = #{other3,jdbcType=VARCHAR},
+      relative_collection = #{relativeCollection,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.tj720.model.PostVideo">
+    update post_video
+    set video_code = #{videoCode,jdbcType=VARCHAR},
+      video_name = #{videoName,jdbcType=VARCHAR},
+      video_type = #{videoType,jdbcType=VARCHAR},
+      relative_object = #{relativeObject,jdbcType=VARCHAR},
+      relative_collection_name = #{relativeCollectionName,jdbcType=VARCHAR},
+      source = #{source,jdbcType=VARCHAR},
+      attachment = #{attachment,jdbcType=VARCHAR},
+      upload_org = #{uploadOrg,jdbcType=VARCHAR},
+      status = #{status,jdbcType=VARCHAR},
+      auth_setting = #{authSetting,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      creator = #{creator,jdbcType=VARCHAR},
+      updater = #{updater,jdbcType=VARCHAR},
+      content = #{content,jdbcType=VARCHAR},
+      make_time = #{makeTime,jdbcType=TIMESTAMP},
+      remarks = #{remarks,jdbcType=VARCHAR},
+      save_type = #{saveType,jdbcType=VARCHAR},
+      sequence = #{sequence,jdbcType=INTEGER},
+      video_mark = #{videoMark,jdbcType=VARCHAR},
+      keywords = #{keywords,jdbcType=VARCHAR},
+      video_time = #{videoTime,jdbcType=VARCHAR},
+      video_size = #{videoSize,jdbcType=VARCHAR},
+      approval = #{approval,jdbcType=VARCHAR},
+      other1 = #{other1,jdbcType=VARCHAR},
+      other2 = #{other2,jdbcType=VARCHAR},
+      other3 = #{other3,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>-->
+
+  <select id="queryPostVideoByLabelId" parameterType="java.util.Map" resultType="com.tj720.model.PostVideo">
+    select pv.video_code as videoCode,pv.video_name as videoName,
+    pv.video_type as videoType,pv.relative_collection as relativeCollection,
+    el.label_name as labelName,pv.upload_org as uploadOrg,pv.`status`,pv.auth_setting as authSetting
+    from esale_lable_video elv,post_video pv,esale_label el
+    where elv.video_id = pv.id and elv.label_id=el.id and elv.data_state = 1
+    and elv.label_id = #{labelId} limit #{start},#{end};
+
+  </select>
+  <select id="countPostVideoByLabelId" parameterType="java.util.Map" resultType="java.lang.Integer">
+    select count(*)
+    from esale_lable_video elv,post_video pv,esale_label el
+    where elv.video_id = pv.id and elv.label_id=el.id and elv.data_state = 1
+    and elv.label_id = #{labelId};
+  </select>
+
+</mapper>

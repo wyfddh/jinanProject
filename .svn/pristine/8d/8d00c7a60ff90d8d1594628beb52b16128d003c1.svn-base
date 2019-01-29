@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tj720.dao.AssetEsaleLableVideoMapper">
+  <resultMap id="BaseResultMap" type="com.tj720.model.AssetEsaleLableVideo">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="label_id" jdbcType="VARCHAR" property="labelId" />
+    <result column="video_id" jdbcType="VARCHAR" property="videoId" />
+    <result column="create_by" jdbcType="VARCHAR" property="createBy" />
+    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="update_by" jdbcType="VARCHAR" property="updateBy" />
+    <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
+    <result column="data_state" jdbcType="VARCHAR" property="dataState" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, label_id, video_id, create_by, create_date, update_by, update_date, data_state
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from esale_lable_video
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from esale_lable_video
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.tj720.model.AssetEsaleLableVideo">
+    insert into esale_lable_video (id, label_id, video_id, 
+      create_by, create_date, update_by, 
+      update_date, data_state)
+    values (#{id,jdbcType=VARCHAR}, #{labelId,jdbcType=VARCHAR}, #{videoId,jdbcType=VARCHAR}, 
+      #{createBy,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, 
+      #{updateDate,jdbcType=TIMESTAMP}, #{dataState,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.tj720.model.AssetEsaleLableVideo">
+    insert into esale_lable_video
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="labelId != null">
+        label_id,
+      </if>
+      <if test="videoId != null">
+        video_id,
+      </if>
+      <if test="createBy != null">
+        create_by,
+      </if>
+      <if test="createDate != null">
+        create_date,
+      </if>
+      <if test="updateBy != null">
+        update_by,
+      </if>
+      <if test="updateDate != null">
+        update_date,
+      </if>
+      <if test="dataState != null">
+        data_state,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="labelId != null">
+        #{labelId,jdbcType=VARCHAR},
+      </if>
+      <if test="videoId != null">
+        #{videoId,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null">
+        #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null">
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null">
+        #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateDate != null">
+        #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="dataState != null">
+        #{dataState,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.tj720.model.AssetEsaleLableVideo">
+    update esale_lable_video
+    <set>
+      <if test="labelId != null">
+        label_id = #{labelId,jdbcType=VARCHAR},
+      </if>
+      <if test="videoId != null">
+        video_id = #{videoId,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null">
+        create_by = #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null">
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null">
+        update_by = #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateDate != null">
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="dataState != null">
+        data_state = #{dataState,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.tj720.model.AssetEsaleLableVideo">
+    update esale_lable_video
+    set label_id = #{labelId,jdbcType=VARCHAR},
+      video_id = #{videoId,jdbcType=VARCHAR},
+      create_by = #{createBy,jdbcType=VARCHAR},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      update_by = #{updateBy,jdbcType=VARCHAR},
+      update_date = #{updateDate,jdbcType=TIMESTAMP},
+      data_state = #{dataState,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+
+  <insert id="teachInsert" parameterType="java.util.List">
+    insert into esale_lable_video (id, label_id, video_id,
+    create_by, create_date, update_by,
+    update_date, data_state)
+    values
+    <foreach collection="list" item="item" separator="," >
+      (#{item.id,jdbcType=VARCHAR}, #{item.labelId,jdbcType=VARCHAR}, #{item.videoId,jdbcType=VARCHAR},
+      #{item.createBy,jdbcType=VARCHAR}, #{item.createDate,jdbcType=TIMESTAMP}, #{item.updateBy,jdbcType=VARCHAR},
+      #{item.updateDate,jdbcType=TIMESTAMP}, #{item.dataState,jdbcType=VARCHAR})
+    </foreach>
+  </insert>
+
+  <delete id="deleteByVideoId" parameterType="java.lang.String">
+    delete from esale_lable_video
+    where video_id = #{videoId,jdbcType=VARCHAR}
+  </delete>
+</mapper>

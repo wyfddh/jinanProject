@@ -1,0 +1,131 @@
+
+<html>
+<head>
+    <script src="../../statics/libs/jquery-1.10.2.min.js"></script>
+    <link rel="stylesheet" href="../../statics/css/font-awesome.min.css">
+    <!--layui ztree样式-->
+    <link rel="stylesheet" href="../../statics/plugins/layui/css/layui.css" media="all">
+    <script src="../../statics/plugins/layer/layer.js"></script>
+    <script src="../../statics/plugins/layui/layui.js"></script>
+    <!--样式-->
+    <link rel="stylesheet" href="../../common/css/cyStyle.css">
+    <link rel="stylesheet" href="../../common/css/cyType.css">
+    <link rel="stylesheet" href="../../statics/css/tjEchart.css">
+    <script src="../../statics/plugins/editgrid/plugin/My97DatePicker/WdatePicker.js" type="text/javascript" charset="utf-8"></script>
+
+    <script src="../../statics/plugins/echarts/echarts.js"></script>
+    <script src="../../statics/js/echartsModel.js"></script>
+</head>
+<style>
+    .layui-card-body {
+        padding: 10px 15px;
+    }
+    p {
+        margin-left: 15px;
+        margin-bottom: 10px;
+        color: #ffffff;
+    }
+    .layui-icon {
+        font-size: 40px;
+    }
+</style>
+<body>
+
+<div class="layui-card">
+    <div class="layui-card-header">
+        <div class="flexLeft">
+            <span class="carFont">汇总数据</span>
+        </div>
+        <div class=" flexRight ">
+            <button class="layui-btn searchBtn myBtn active" id="last30_1">
+                最近30天
+            </button>
+            <button class="layui-btn searchBtn myBtn" id="last90_1">
+                最近90天
+            </button>
+            <div class="layui-inline" style="height: 32px">
+                <input type="text" id="time1" class="layui-input" value="">
+            </div>
+        </div>
+    </div>
+
+    <div class="layui-card-body">
+        <div class="layui-row">
+            <div class="layui-col-xs3 container">
+                <div class="layui-card" style="margin: 20px; height: 112px; width: 300px">
+                    <div class="layui-card-body" style="background-color: #999999;height: 100%;border-radius: 10px">
+                        <p style="font-size:28px; margin-top: 30px"><span style="font-family:'微软雅黑 Bold', '微软雅黑 Regular', '微软雅黑';font-weight:700;" id="activityCount"></span></p>
+                        <p style="font-size:14px;"><span style="font-family:'微软雅黑';font-weight:400;">开展活动次数</span><img src="../../images/balloon.png" style="float: right"/></p>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-xs3 container">
+                <div class="layui-card" style="margin: 20px; height: 112px; width: 300px">
+                    <div class="layui-card-body" style="background-color: #999999;height: 100%;border-radius: 10px">
+                        <p style="font-size:28px; margin-top: 30px"><span style="font-family:'微软雅黑 Bold', '微软雅黑 Regular', '微软雅黑';font-weight:700;" id="signCount"></span></p>
+                        <p style="font-size:14px;"><span style="font-family:'微软雅黑';font-weight:400;">总报名人次</span><img src="../../images/calendar.png" style="float: right"/></p>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-xs3 container">
+                <div class="layui-card" style="margin: 20px; height: 112px; width: 300px">
+                    <div class="layui-card-body" style="background-color: #999999;height: 100%;border-radius: 10px">
+                        <p style="font-size:28px; margin-top: 30px"><span style="font-family:'微软雅黑 Bold', '微软雅黑 Regular', '微软雅黑';font-weight:700;" id="realJoin"></span></p>
+                        <p style="font-size:14px;"><span style="font-family:'微软雅黑';font-weight:400;">实际参加人次</span><img src="../../images/people.png" style="float: right"/></p>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-col-xs3 container">
+                <div class="layui-card" style="margin: 20px; height: 112px; width: 300px">
+                    <div class="layui-card-body" style="background-color: #999999;height: 100%;border-radius: 10px">
+                        <p style="font-size:28px; margin-top: 30px"><span style="font-family:'微软雅黑 Bold', '微软雅黑 Regular', '微软雅黑';font-weight:700;" id="commentCount"></span></p>
+                        <p style="font-size:14px;"><span style="font-family:'微软雅黑';font-weight:400;">总评论人次</span><img src="../../images/note.png" style="float: right"/></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="layui-card">
+        <div class="layui-card-header">
+            <div class="flexLeft">
+                <span class="carFont">活动分类统计</span>
+            </div>
+            <div class="flexRight">
+                <button class="layui-btn layui-btn-green myBtn" id="report2">
+                    导出数据
+                </button>
+                <button class="layui-btn searchBtn1 myBtn active" id="last30_2">
+                    最近30天
+                </button>
+                <button class="layui-btn searchBtn1 myBtn" id="last90_2">
+                    最近90天
+                </button>
+                <div class="layui-inline" style="height: 32px">
+                    <input type="text" id="time2" class="layui-input">
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-card-body">
+            <div class="layui-row">
+                <div class="layui-col-md6 layui-col-sm6">
+                    <table class="layui-hide" id="test1"></table>
+                </div>
+                <div class="layui-col-md6 layui-col-sm6">
+                    <div id="mainPie"></div>
+                </div>
+                <div class="layui-col-md12 layui-col-sm12">
+                    <div id="mainLine"></div>
+                </div>
+            </div>
+
+        </div>
+</div>
+
+<script src="../../statics/js/common.js"></script>
+<script src="../../js/esaleSocialEducationStatistics/esaleSocialEducationStatistics.js"></script>
+</body>
+</html>

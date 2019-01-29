@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tj720.dao.PCEsaleVideoMapper">
+
+
+
+
+  <select id="selectVideoList" resultType="com.tj720.dto.EsaleVideoDto">
+    select
+    a.id,
+    a.video_name  as "videoName" ,
+    a.introduce_place as "introducePlace",
+    a.video_id    as "videoId",
+    b.att_path    as "videoUrl",
+    a.page_recommend  as "pageRecommend",
+    a.play_num as "playNum",
+    case when a.page_recommend = '1'
+    then 'checked'
+    else '' end "pageRecommendCheck",
+    a.data_state  as "dataState",
+    a.content,
+    a.province,
+    (select b.name from mip_area b where b.id = a.province) as "provinceDes",
+    a.city,
+    (select b.name from mip_area b where b.id = a.city) as "cityDes",
+    a.area,
+    (select b.name from mip_area b where b.id = a.area) as "areaDes",
+    a.address,
+    a.museum_id as "museumId",
+    m.museum_name as "museumName",
+    a.create_by as "createBy",
+    a.create_date as "createDate",
+    a.update_by as "updateBy",
+    a.update_date as "updateDate"
+    from local_introduce a
+    inner join esale_museum m on a.museum_id=m.id
+    left join mip_attachment b on(b.att_id = a.video_id)
+    where 1 = 1 and a.data_state ='1'
+    <if test="recommend == 1">
+      and a.page_recommend = '1'
+    </if>
+      order by a.update_date desc
+
+  </select>
+  
+  <update id="updatePlayNum" >
+    update local_introduce t
+    set t.play_num = IFNULL(if(t.play_num='',0,t.play_num), 0) + 1
+    where t.id = #{videoId}
+  </update>
+
+</mapper>

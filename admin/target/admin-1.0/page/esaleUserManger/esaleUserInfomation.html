@@ -1,0 +1,155 @@
+
+<html>
+<head>
+    <script src="../../statics/libs/jquery-1.10.2.min.js"></script>
+    <link rel="stylesheet" href="../../statics/css/font-awesome.min.css">
+    <!--layui ztree样式-->
+  <link rel="stylesheet" href="../../statics/plugins/layui/css/layui.css" media="all">
+    <script src="../../statics/plugins/layer/layer.js"></script>
+    <script src="../../statics/plugins/layui/layui.js"></script>
+    <!--样式-->
+   <link rel="stylesheet" href="../../common/css/cyStyle.css">
+    <link rel="stylesheet" href="../../common/css/cyType.css">
+    <link rel="stylesheet" href="../../statics/css/public/user/detail_one.css">
+    <script src="../../statics/plugins/editgrid/plugin/My97DatePicker/WdatePicker.js" type="text/javascript" charset="utf-8"></script>
+
+    <script src="../../statics/plugins/echarts/echarts.js"></script>
+
+    <link rel="stylesheet" href="../../css/esaleUsers/esaleUserInfomation.css" media="all" />
+<!--    <link rel="stylesheet" href="../../layui/css/layui.css" media="all" />
+    <link rel="stylesheet" href="../../css/public.css" media="all" />
+    <link rel="stylesheet" href="../../lib/lightbox2/2.8.1/css/lightbox.css" type="text/css">-->
+
+    <style type="text/css">
+         .sname{
+             padding-top: 50px;
+             margin-left: -422px;
+             width:804px;
+         }
+        .nameshow{
+            text-align:center;
+            width:804px;
+            margin-left: 20px;
+        }
+    </style>
+
+</head>
+<body>
+<div class="layui-card">
+    <form action="" id="pubUserForm" class="layui-form">
+        <div class="layui-card-body">
+            <div class="cardOne mt24">
+                <div class="OneBody mt24 mb24">
+                    <div class="oneBody">
+                        <div class="one myTabl" id="picUpload">
+                            <!--<img src="" alt="">-->
+                            <!--<p class="myfont" id="nickName1"></p>-->
+                        </div>
+                        <ul class="two myTabl">
+                           <li class="layui-row">
+                               <div class="layui-inline layui-col-md6 layui-col-sm6 tableTR">用户ID</div>
+                               <div class="layui-inline layui-col-md6 layui-col-sm6 pl10" id="id"  name="id" type="div">
+                               </div>
+                           </li>
+                            <li class="layui-row">
+                                <div class="layui-inline layui-col-md6 layui-col-sm6 tableTR">真实姓名</div>
+                                <div class="layui-inline layui-col-md6 layui-col-sm6 pl10" id="realName"
+                                     name="realName" type="div"></div>
+                            </li>
+                            <li class="layui-row">
+                            <div class="layui-inline layui-col-md6 layui-col-sm6 tableTR">手机号码</div>
+                            <div class="layui-inline layui-col-md6 layui-col-sm6 pl10" id="phone" name="phone" type="div"></div>
+                        </li>
+                            <li class="layui-row">
+                                <div class="layui-inline layui-col-md6 layui-col-sm6 tableTR">身份证</div>
+                                <div class="layui-inline layui-col-md6 layui-col-sm6 pl10" id="idCard" name="idCard" type="div"></div>
+                            </li>
+                            <li class="layui-row">
+                                <div class="layui-inline layui-col-md6 layui-col-sm6 tableTR">学校名称</div>
+                                <div class="layui-inline layui-col-md6 layui-col-sm6 pl10" id="schoolName" name="schoolName" type="div"></div>
+                            </li>
+
+                            <li class="layui-row">
+                                <div class="layui-inline layui-col-md6 layui-col-sm6 tableTR">个人介绍</div>
+                                <div class="layui-inline layui-col-md6 layui-col-sm6 pl10" id="description" name="description" type="div"></div>
+                            </li>
+
+                        </ul>
+                        <div class="three myTabl">
+                            <li class="layui-row">
+                                <div class="layui-inline layui-col-md6 layui-col-sm6 tableTR">性别</div>
+                                <div class="layui-inline layui-col-md6 layui-col-sm6 pl10"  name="sex" id="sex" type="div">
+                                </div>
+                            </li>
+                           <!-- <li class="layui-row">
+                                <div class="layui-inline layui-col-md6 layui-col-sm6 tableTR">城市</div>
+                                <div class="layui-inline layui-col-md6 layui-col-sm6 pl10"  id="cityId" name="cityId"
+                                     type="div" ></div>
+                            </li>
+                            <li class="layui-row">
+                                <div class="layui-inline layui-col-md6 layui-col-sm6 tableTR">职业</div>
+                                <div class="layui-inline layui-col-md6 layui-col-sm6 pl10" id="job" name="job" type="div">
+                            </div>
+                            </li>-->
+                          <!-- <li class="layui-row">
+                                <div class="layui-inline layui-col-md6 layui-col-sm6 tableTR bt">家长姓名</div>
+                                <div class="layui-inline layui-col-md6 layui-col-sm6 pl10" id="parentName"
+                                     name="parentName" type="div"  style="overflow:scroll;"></div>
+                            </li>
+                            <li class="layui-row">
+                                <div class="layui-inline layui-col-md6 layui-col-sm6 tableTR bt">家长电话</div>
+                                <div class="layui-inline layui-col-md6 layui-col-sm6 pl10" id="parentTelphone"
+                                     name="parentTelphone" type="div"  style="overflow:scroll;"></div>
+                            </li>-->
+                            <li class="layui-row">
+                                <div class="layui-inline layui-col-md6 layui-col-sm6 tableTR bt">生日</div>
+                                <div class="layui-inline layui-col-md6 layui-col-sm6 pl10" name="birthday"
+                                     id="birthday" type="div"></div>
+                            </li>
+                            <li class="layui-row">
+                                <div class="layui-inline layui-col-md6 layui-col-sm6 tableTR">常用邮箱</div>
+                                <div class="layui-inline layui-col-md6 layui-col-sm6 pl10" id="email" name="email" type="div"></div>
+                            </li>
+                            <!--<li class="layui-row">
+                                <div class="layui-inline layui-col-md6 layui-col-sm6 tableTR">家长姓名</div>
+                                <div class="layui-inline layui-col-md6 layui-col-sm6 pl10" id="parentName" name="parentName" type="div"></div>
+                            </li>-->
+                            <li class="layui-row">
+                                <div class="layui-inline layui-col-md6 layui-col-sm6 tableTR">家长姓名</div>
+                                <div class="layui-inline layui-col-md6 layui-col-sm6 pl10" id="parentName" name="parentName" type="div"></div>
+                            </li>
+                            <li class="layui-row">
+                                <div class="layui-inline layui-col-md6 layui-col-sm6 tableTR">家长电话</div>
+                                <div class="layui-inline layui-col-md6 layui-col-sm6 pl10" id="parentTelphone" name="parentTelphone" type="div"></div>
+                            </li>
+
+                           <!-- <li class="layui-row sname" style="height:370px;">
+                                <div class="layui-inline layui-col-md6 layui-col-sm6 tableTR bt nameshow">个性签名</div>
+                                <div class="layui-form-item m0 layui-col-md10 layui-col-sm10"
+                                     style="height: 300px;width:804px;" lay-verify="edit-required">
+                                    <textarea id="singleName" name="singleName"></textarea>
+                                </div>
+                            </li>-->
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script src="../../statics/js/component.js"></script>
+<script src="../../statics/js/common.js"></script>
+<!--<script src="../../statics/js/public/esaleUser/esaleUserInfomation.js"></script>-->
+<script type="text/javascript" src="../../js/esaleUser/esaleUserInfomation.js"></script>
+<script src="../../common/js/whole/utils.js"></script>
+
+<!--<script type="text/javascript" src="../../lib/lightbox2/2.8.1/js/lightbox-plus-jquery.min.js"></script>
+<script type="text/javascript" src="../../layui/layui.js"></script>
+
+<script type="text/javascript" src="../../js/jquery.min.js"></script>
+<script type="text/javascript" src="../../js/common.js"></script>-->
+</body>
+</html>

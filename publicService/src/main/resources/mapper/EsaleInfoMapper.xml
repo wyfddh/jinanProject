@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tj720.dao.EsaleInfoMapper">
+  <resultMap id="BaseResultMap" type="com.tj720.model.EsaleInfo">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="info_topic" jdbcType="VARCHAR" property="infoTopic" />
+    <result column="museum_id" jdbcType="VARCHAR" property="museumId" />
+    <result column="type" jdbcType="VARCHAR" property="type" />
+    <result column="page_id" jdbcType="VARCHAR" property="pageId" />
+    <result column="data_state" jdbcType="VARCHAR" property="dataState" />
+    <result column="create_by" jdbcType="VARCHAR" property="createBy" />
+    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="update_by" jdbcType="VARCHAR" property="updateBy" />
+    <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.tj720.model.EsaleInfo">
+    <result column="content" jdbcType="LONGVARCHAR" property="content" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, info_topic, museum_id, type, page_id, data_state, create_by, create_date, update_by, 
+    update_date
+  </sql>
+  <sql id="Blob_Column_List">
+    content
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from esale_info
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from esale_info
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.tj720.model.EsaleInfo">
+    insert into esale_info (id,info_topic, museum_id, type, 
+      page_id, data_state, create_by, 
+      create_date, update_by, update_date, 
+      content)
+    values (#{id,jdbcType=VARCHAR},#{infoTopic,jdbcType=VARCHAR}, #{museumId,jdbcType=VARCHAR}, #{type,jdbcType=VARCHAR}, 
+      #{pageId,jdbcType=VARCHAR}, #{dataState,jdbcType=VARCHAR}, #{createBy,jdbcType=VARCHAR}, 
+      #{createDate,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, #{updateDate,jdbcType=TIMESTAMP}, 
+      #{content,jdbcType=LONGVARCHAR})
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.tj720.model.EsaleInfo">
+    update esale_info
+    <set>
+      <if test="infoTopic != null">
+        info_topic = #{infoTopic,jdbcType=VARCHAR},
+      </if>
+      <if test="museumId != null">
+        museum_id = #{museumId,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        type = #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="pageId != null">
+        page_id = #{pageId,jdbcType=VARCHAR},
+      </if>
+      <if test="dataState != null">
+        data_state = #{dataState,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null">
+        create_by = #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null">
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null">
+        update_by = #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateDate != null">
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="content != null">
+        content = #{content,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <select id="countInfo" resultType="java.lang.Integer" parameterType="java.util.Map">
+    select count(a.id)
+    from esale_info a
+    LEFT JOIN esale_museum b on (a.museum_id = b.id and b.data_state = '1')
+    where 1 = 1 and a.data_state ='1'
+    <if test="type != null and type != ''" >
+      and a.type = #{type}
+    </if>
+    <if test="createDate != null and createDate != ''" >
+      and a.create_date like concat('%',#{createDate},'%')
+    </if>
+    <if test="orderBy == 1" >
+      order by a.update_date desc
+    </if>
+    <if test="orderBy == 2" >
+      order by a.create_date desc
+    </if>
+  </select>
+  <select id="selectInfoList" resultType="com.tj720.model.EsaleInfo" parameterType="java.util.Map">
+    select
+    a.id,
+    a.info_topic as "infoTopic",
+    a.museum_id as "museumId",
+    b.museum_name as "museumName",
+    a.type as "type",
+    a.page_id as "pageId",
+    a.content as "content",
+    a.data_state as "dataState",
+    a.create_by as "createBy",
+    a.create_date as "createDate",
+    a.update_by as "updateBy",
+    a.update_date as "updateDate"
+    from esale_info a
+    LEFT JOIN esale_museum b on (a.museum_id = b.id and b.data_state = '1')
+    where 1 = 1 and a.data_state ='1'
+    <if test="type != null and type != ''" >
+      and a.type = #{type}
+    </if>
+    <if test="createDate != null and createDate != ''" >
+      and a.create_date like concat('%',#{createDate},'%')
+    </if>
+    <if test="orderBy == 1" >
+      order by a.update_date desc
+    </if>
+    <if test="orderBy == 2" >
+      order by a.create_date desc
+    </if>
+    limit #{start},#{end}
+  </select>
+</mapper>

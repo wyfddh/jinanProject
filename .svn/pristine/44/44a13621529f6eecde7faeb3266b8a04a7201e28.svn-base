@@ -1,0 +1,265 @@
+layui.use(['form','layer','laydate','table'],function(){
+    var form = layui.form,
+        layer = parent.layer === undefined ? layui.layer : top.layer,
+        $ = layui.jquery,
+        laydate = layui.laydate,
+        table = layui.table;
+
+    var pathName=window.document.location.pathname;
+    var projectName=pathName.substring(0,pathName.substr(1).indexOf('/')+1);
+
+    //活动列表
+    var tableIns = table.render({
+        elem: '#esaleDigitalshow',
+        url : projectName + '/esaleDigitalshow/getDigitalshowList.do',
+        request:{
+            pageName: 'currentPage',
+            limitName: 'size'
+        },
+        cellMinWidth : 95,
+        page : true,
+        limits : [10,15,20,25],
+        limit : 10,
+        id : "esaleDigitalshowTable",
+        cols : [[
+            {type:"numbers",title: '序号', width:70, align:"center"},
+            {field: 'pageUrl', title: '封面图片',width:110,style:'height:88px;',  align:'center',templet:"#pageUrl"},
+            {field: 'digitalName', title: '展厅名称', align:"center"},
+            {field: 'museumName', title: '所属博物馆',  align:'center'},
+            {field: 'browseNum', title: '浏览次数', width:150, align:"center",templet:function(d){
+                    if(d.browseNum == null){
+                        return 0;
+                    }else{
+                        return d.browseNum;
+                    }
+                }},
+            {field: 'updateDate', title: '更新时间', align:'center', templet:function(d){
+                    if(d.updateDate == null){
+                        return "-";
+                    }else{
+                        return timestampToDate(d.updateDate);
+                    }
+                }},
+            {title: '操作',width:200,  toolbar:'#esaleDigitalshowBar',align:"left"}
+        ]],
+        done:function(d){
+            $(".layui-table-body [data-field = 'pageUrl']").children(".layui-table-cell").css({"height":"100%","max-width":"100%","position":"relative"});
+            $(".layui-table-body [data-field = 'pageUrl']").find("img").css({"max-width":"100%","max-height":"100%","position":"absolute","top":"50%","left":"50%","transform":"translate(-50%, -50%)"});
+        }
+    });
+
+
+    $('.searchVal').bind('keydown', function (event) {
+        var event = window.event || arguments.callee.caller.arguments[0];
+        if (event.keyCode == 13){
+            searKeywordCache = $('.search-data-input').val();
+            reloadTable();
+        }
+    });
+
+
+    $(".search_btn").on("click",function(){
+        reloadTable();
+    });
+    $("#resetBtn").on("click",function(){
+        table.reload("esaleDigitalshowTable",{
+            page: {
+                curr: 1 //重新从第 1 页开始
+            },
+            where: {
+                key:"",
+                museumId:"",
+                orderBy:""
+            }
+        })
+    });
+
+    function reloadTable() {
+        table.reload("esaleDigitalshowTable",{
+            page: {
+                curr: 1 //重新从第 1 页开始
+            },
+            where: {
+                key:$("#key").val(),
+                museumId:$("#museumId").val(),
+                orderBy:$("#orderBy").val()
+            }
+        });
+    }
+
+
+    //添加
+    function addDigitalshowInfo(edit){
+        var title;
+        var content;
+        if (edit) {
+            if(edit.operationStatus == '1'){
+                title = "编辑数字展厅";
+            }else if(edit.operationStatus == '2'){
+                title = "查看数字展厅";
+            }
+            localStorage["digitalshowData"]=JSON.stringify(edit);
+        } else {
+            title = "添加数字展厅";
+            localStorage["digitalshowData"]=JSON.stringify("");
+        }
+        var index = layui.layer.open({
+            title : title,
+            type : 2,
+            area: ['80%', '700px'],
+            content : "../../page/esaleDigitalshow/esaleDigitalshowAdd.html",
+            success : function(layero, index){
+                var body = layui.layer.getChildFrame('body', index);
+            },
+            end :function() {
+                reloadTable();
+            }
+        });
+        layui.layer.full(index);
+        // window.sessionStorage.setItem("index",index);
+        // //改变窗口大小时，重置弹窗的宽高，防止超出可视区域（如F12调出debug的操作）
+        // $(window).on("resize",function(){
+        //     layui.layer.full(window.sessionStorage.getItem("index"));
+        // });
+    }
+
+    $(".addNews_btn").click(function(){
+        addDigitalshowInfo();
+    })
+
+
+   /* function getSelectData() {
+        var data = {arr:['order_by']};
+        $.ajax({
+            type:"post",
+            url:projectName + '/esaleMuseum/getSelectData.do',
+            data:data,
+            success:function(result) {
+                if (result.success == 1) {
+                    var map = result.data;
+                    var museumList = map.museumList;
+                    var museumStr = "";
+                    for(var k = 0;k < museumList.length;k++) {
+                        museumStr +="<option value='"+museumList[k].id+"' >"+museumList[k].museumName+"</option>"
+                    }
+                    $("#museumId").append(museumStr);
+                    var order_by = map.order_by;
+                    var orderStr = "";
+                    for(var k = 0;k < order_by.length;k++) {
+                        orderStr +="<option value='"+order_by[k].dictCode+"' >"+order_by[k].dictName+"</option>"
+                    }
+                    $("#orderBy").append(orderStr);
+                    form.render();
+                }
+            }
+        })
+    }
+    var initForm = function() {
+        $(".hide").hide();
+        getSelectData();
+    }
+
+    initForm();*/
+    function getSelectData() {
+        var data = {arr:['info_type_es','order_by']};
+        $.ajax({
+            type:"post",
+            url:projectName + '/esaleMuseum/getSelectData.do',
+            data:data,
+            success:function(result) {
+                if (result.success == 1) {
+                    var map = result.data;
+                    var info_type_es = map.info_type_es;
+                    var typeStr = "";
+                    for(var k = 0;k < info_type_es.length;k++) {
+                        typeStr +="<option value='"+info_type_es[k].dictCode+"' >"+info_type_es[k].dictName+"</option>"
+                    }
+                    $("#type").append(typeStr);
+                    var order_by = map.order_by;
+                    var orderStr = "";
+                    for(var k = 0;k < order_by.length;k++) {
+                        orderStr +="<option value='"+order_by[k].dictCode+"' >"+order_by[k].dictName+"</option>"
+                    }
+                    $("#orderBy").append(orderStr);
+                    form.render();
+                }
+            }
+        })
+    }
+    var initForm = function() {
+        $(".hide").hide();
+        getSelectData();
+    }
+
+    initForm();
+
+    //列表操作
+    table.on('tool(esaleDigitalshow)', function(obj){
+        var layEvent = obj.event,
+            data = obj.data;
+
+        if(layEvent === 'edit'){ //编辑
+            data.operationStatus = "1";
+            addDigitalshowInfo(data);
+        }else if(layEvent === 'del'){ //删除
+            layer.confirm('是否确定删除该展厅？',{icon:3, title:'提示信息'},function(index){
+                $.get(projectName + '/esaleDigitalshow/deleteDigitalshow.do',{
+                    id : data.id,
+                },function(result){
+                    if (result.success == 1) {
+                        layer.open({
+                            type: 1,
+                            title: false, //不显示标题
+                            closeBtn: 0,
+                            time:1000,
+                            shadeClose: true,
+                            skin: "msg",
+                            content: "<div class='msg successMsg'><div class='msg-icon'></div><div class='msg-title'>删除成功！</div><div class='msg-txt'></div></div>"
+                        });
+                    } else {
+                        layer.open({
+                            type: 1,
+                            title: false, //不显示标题
+                            closeBtn: 0,
+                            shadeClose: true,
+                            skin: "msg",
+                            content: "<div class='msg errorMsg'><div class='msg-icon'></div><div class='msg-title'>删除失败</div><div class='msg-txt'>"+result.data+"</div></div>"
+                        });
+                    }
+                    tableIns.reload();
+                    layer.close(index);
+                })
+            });
+        }else if(layEvent === 'show'){//查看
+            data.operationStatus = "2";
+            addDigitalshowInfo(data);
+        }
+    });
+
+    form.on('select(orderBy)',function(){
+        reloadTable();
+    });
+
+//时间戳转时间格式
+    function timestampToDateTime(obj) {
+        var date =  new Date(obj);
+        var y = 1900+date.getYear();
+        var m = "0"+(date.getMonth()+1);
+        var d = "0"+date.getDate();
+        var h = date.getHours() + ':';
+        var mi = date.getMinutes();
+        var s = date.getSeconds();
+        return y+"-"+m.substring(m.length-2,m.length)+"-"+d.substring(d.length-2,d.length)+" "+h+mi + ':'+s;
+    };
+
+    function timestampToDate(obj) {
+        var date =  new Date(obj);
+        var y = 1900+date.getYear();
+        var m = "0"+(date.getMonth()+1);
+        var d = "0"+date.getDate();
+        var h = date.getHours() + ':';
+        var mi = date.getMinutes();
+        var s = date.getSeconds();
+        return y+"-"+m.substring(m.length-2,m.length)+"-"+d.substring(d.length-2,d.length);
+    };
+})

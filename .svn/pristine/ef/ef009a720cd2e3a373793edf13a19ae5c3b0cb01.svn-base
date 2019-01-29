@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tj720.dao.EsalePersonDiaryMapper">
+  <resultMap id="BaseResultMap" type="com.tj720.model.EsalePersonDiary">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="orgId" jdbcType="VARCHAR" property="orgid" />
+    <result column="creator" jdbcType="VARCHAR" property="creator" />
+    <result column="creatTime" jdbcType="TIMESTAMP" property="creattime" />
+    <result column="updateTime" jdbcType="TIMESTAMP" property="updatetime" />
+    <result column="isSupply" jdbcType="SMALLINT" property="issupply" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.tj720.model.EsalePersonDiary">
+    <result column="content" jdbcType="LONGVARCHAR" property="content" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, orgId, creator, creatTime, updateTime, isSupply
+  </sql>
+  <sql id="Blob_Column_List">
+    content
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from esale_person_diary
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from esale_person_diary
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.tj720.model.EsalePersonDiary">
+    insert into esale_person_diary (id, orgId, creator, 
+      creatTime, updateTime, isSupply, 
+      content)
+    values (#{id,jdbcType=VARCHAR}, #{orgid,jdbcType=VARCHAR}, #{creator,jdbcType=VARCHAR}, 
+      #{creattime,jdbcType=TIMESTAMP}, #{updatetime,jdbcType=TIMESTAMP}, #{issupply,jdbcType=SMALLINT}, 
+      #{content,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.tj720.model.EsalePersonDiary">
+    insert into esale_person_diary
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="orgid != null">
+        orgId,
+      </if>
+      <if test="creator != null">
+        creator,
+      </if>
+      <if test="creattime != null">
+        creatTime,
+      </if>
+      <if test="updatetime != null">
+        updateTime,
+      </if>
+      <if test="issupply != null">
+        isSupply,
+      </if>
+      <if test="content != null">
+        content,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="orgid != null">
+        #{orgid,jdbcType=VARCHAR},
+      </if>
+      <if test="creator != null">
+        #{creator,jdbcType=VARCHAR},
+      </if>
+      <if test="creattime != null">
+        #{creattime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatetime != null">
+        #{updatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="issupply != null">
+        #{issupply,jdbcType=SMALLINT},
+      </if>
+      <if test="content != null">
+        #{content,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.tj720.model.EsalePersonDiary">
+    update esale_person_diary
+    <set>
+      <if test="orgid != null">
+        orgId = #{orgid,jdbcType=VARCHAR},
+      </if>
+      <if test="creator != null">
+        creator = #{creator,jdbcType=VARCHAR},
+      </if>
+      <if test="creattime != null">
+        creatTime = #{creattime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updatetime != null">
+        updateTime = #{updatetime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="issupply != null">
+        isSupply = #{issupply,jdbcType=SMALLINT},
+      </if>
+      <if test="content != null">
+        content = #{content,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.tj720.model.EsalePersonDiary">
+    update esale_person_diary
+    set orgId = #{orgid,jdbcType=VARCHAR},
+      creator = #{creator,jdbcType=VARCHAR},
+      creatTime = #{creattime,jdbcType=TIMESTAMP},
+      updateTime = #{updatetime,jdbcType=TIMESTAMP},
+      isSupply = #{issupply,jdbcType=SMALLINT},
+      content = #{content,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.tj720.model.EsalePersonDiary">
+    update esale_person_diary
+    set orgId = #{orgid,jdbcType=VARCHAR},
+      creator = #{creator,jdbcType=VARCHAR},
+      creatTime = #{creattime,jdbcType=TIMESTAMP},
+      updateTime = #{updatetime,jdbcType=TIMESTAMP},
+      isSupply = #{issupply,jdbcType=SMALLINT}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+
+  <select id="getList" resultType="com.tj720.model.EsalePersonDiary">
+    select t.id, t.creatTime, t.creator, a.`name` as creatorName,
+      t.content, t.orgId, c.department_name
+    from esale_person_diary t
+    left join sys_user a on(t.creator = a.id)
+    left join sys_department c on(a.depart_id = c.department_id)
+    where 1=1
+    <if test="record.creatorName != null and record.creatorName != ''">
+      and a.name like concat('%',#{record.creatorName},'%')
+    </if>
+    <if test="record.content != null and record.content != ''">
+      and t.content like concat('%',#{record.content},'%')
+    </if>
+    <if test="record.creator != null and record.creator != ''">
+      and t.creator = #{record.creator}
+    </if>
+    <if test="record.orgid != null and record.orgid != ''">
+      and c.department_id = #{record.orgid}
+    </if>
+    <if test="record.startDate != null and record.startDate != ''">
+      <![CDATA[and t.creatTime >= #{record.startDate}]]>
+    </if>
+    <if test="record.endDate != null and record.endDate != ''">
+      <![CDATA[and t.creatTime <= #{record.endDate}]]>
+    </if>
+    order by t.creatTime desc
+    <if test="start != null and start == 0">
+      limit #{size}
+    </if>
+    <if test="start != null and start != 0">
+      limit #{start}, #{size}
+    </if>
+
+  </select>
+  <select id="countList" resultType="java.lang.Integer">
+    select count(1)
+    from esale_person_diary t
+    left join sys_user a on(t.creator = a.id)
+    left join sys_department c on(a.depart_id = c.department_id)
+    where 1=1
+    <if test="record.creatorName != null and record.creatorName != ''">
+      and a.name like concat('%',#{record.creatorName},'%')
+    </if>
+    <if test="record.content != null and record.content != ''">
+      and t.content like concat('%',#{record.content},'%')
+    </if>
+    <if test="record.creator != null and record.creator != ''">
+      and t.creator = #{record.creator}
+    </if>
+    <if test="record.orgid != null and record.orgid != ''">
+      and c.department_id = #{record.orgid}
+    </if>
+    <if test="record.startDate != null and record.startDate != ''">
+      <![CDATA[and t.creatTime >= #{record.startDate}]]>
+    </if>
+    <if test="record.endDate != null and record.endDate != ''">
+      <![CDATA[and t.creatTime <= #{record.endDate}]]>
+    </if>
+  </select>
+
+  <select id="getPersonTodayData" resultType="com.tj720.model.EsalePersonDiary">
+    select t.id,t.content from esale_person_diary t
+    where TO_DAYS(t.creatTime) = TO_DAYS(SYSDATE())
+    and t.creator = #{userId}
+  </select>
+</mapper>

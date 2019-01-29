@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tj720.dao.IInformationManageMapper">
+
+  <select id="getInformationList" resultType="com.tj720.dto.InformationManagerDto">
+    select a.id, a.theme, a.description, DATE_FORMAT(a.update_date,'%Y-%d-%m') as showDate, c.att_path as pictureUrl, b.museum_name as museumeName
+    from information_manage a
+    left join museum_base_info b on(a.museum_id=b.id)
+    left join mip_attachment c on(a.pictureid = c.att_id)
+    where b.data_state = '2'
+    ORDER BY a.page_recommend desc, a.update_date desc
+    LIMIT ${size}
+  </select>
+
+</mapper>

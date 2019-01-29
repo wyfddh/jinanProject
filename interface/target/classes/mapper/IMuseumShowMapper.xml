@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tj720.dao.IMuseumShowMapper">
+
+  <select id="getMuseumShowList" resultType="com.tj720.dto.MuseumShowDto" >
+    select a.id, a.show_name as showName, b.museum_name as museumName,
+      concat(DATE_FORMAT(a.start_date, '%Y/%m/%d'), '-', DATE_FORMAT(a.end_date, '%Y/%m/%d')) as showDate,
+      b.open_time as museumOpenTime, b.address as museumDress, b.ticket as museumTicket, a.pictureids as pictureUrl
+    from museum_show a
+    left join museum_base_info b on(a.host_org = b.id)
+    where b.data_state = '2'
+    and a.data_state = '1'
+    ORDER BY a.page_recommend desc, a.update_date desc
+    LIMIT ${size}
+  </select>
+
+  <select id="getMainPictureUrl" resultType="java.lang.String">
+    select a.att_path
+    from mip_attachment a
+    where a.att_id in
+    <foreach collection="pictures" item="item" open="(" close=")" separator="," >
+      #{item}
+    </foreach>
+    and a.is_main = '1'
+  </select>
+
+  <select id="getPictureUrl" resultType="java.util.Map">
+    select a.att_path as url, a.is_main as isMain
+    from mip_attachment a
+    where a.att_id in
+    <foreach collection="pictures" item="item" open="(" close=")" separator="," >
+      #{item}
+    </foreach>
+    order by a.is_main desc
+  </select>
+
+  <select id="getMuseumShowListByProvice" resultType="com.tj720.dto.MuseumShowDto">
+    select a.id, a.show_name as showName, b.museum_name as museumName,
+      concat(DATE_FORMAT(a.start_date, '%Y/%m/%d'), '-', DATE_FORMAT(a.end_date, '%Y/%m/%d')) as showDate,
+      b.open_time as museumOpenTime, b.address as museumDress, b.ticket as museumTicket, a.pictureids as pictureUrl
+    from museum_show a
+    left join museum_base_info b on(a.host_org = b.id)
+    left join mip_area c on(c.id = b.province)
+    where b.data_state = '2'
+    and a.data_state = '1'
+    and c.pinyin = #{provice}
+    ORDER BY a.provice_hot desc, a.update_date desc
+    LIMIT ${size}
+  </select>
+
+  <select id="getMuseumShowListByMuseumId" resultType="com.tj720.dto.MuseumShowDto">
+    select a.id, a.show_name as showName, b.museum_name as museumName,
+      concat(DATE_FORMAT(a.start_date, '%Y/%m/%d'), '-', DATE_FORMAT(a.end_date, '%Y/%m/%d')) as showDate,
+      b.open_time as museumOpenTime, b.address as museumDress, b.ticket as museumTicket, a.pictureids as pictureUrl
+    from museum_show a
+    left join museum_base_info b on(a.host_org = b.id)
+    where b.data_state = '2'
+    and a.data_state = '1'
+    and a.host_org = #{museumId}
+    ORDER BY a.museum_recommend desc, a.update_date desc, a.create_date desc
+    <if test="start == 0">
+        LIMIT ${size}
+    </if>
+    <if test="start != 0">
+        LIMIT ${start}, ${size}
+    </if>
+  </select>
+
+
+  <select id="countMuseumShowListByMuseumId" resultType="java.lang.Integer">
+    select count(*)
+    from museum_show a
+    left join museum_base_info b on(a.host_org = b.id)
+    where b.data_state = '2'
+    and a.museum_recommend = '1'
+    and a.data_state = '1'
+    and a.host_org = #{museumId}
+  </select>
+
+  <select id="getMuseumShowListBySearch" resultType="com.tj720.dto.MuseumShowDto">
+    select a.id, a.show_name as showName, b.museum_name as museumName,
+    concat(DATE_FORMAT(a.start_date, '%Y/%m/%d'), '-', DATE_FORMAT(a.end_date, '%Y/%m/%d')) as showDate,
+    b.open_time as museumOpenTime, b.address as museumDress, b.ticket as museumTicket, a.pictureids as pictureUrl,
+    a.show_description as showDescription
+    from museum_show a
+    left join museum_base_info b on(a.host_org = b.id)
+    where b.data_state = '2'
+    and a.data_state = '1'
+    <if test="museumId != null and museumId != ''">
+      and a.host_org = #{museumId}
+    </if>
+    <if test="key != null and key != ''">
+      and (a.show_name like '%${key}%'
+      OR  b.museum_name like '%${key}%')
+    </if>
+    <if test="type != null and type == 2">
+      <![CDATA[
+          and a.start_date <= SYSDATE()
+          and a.end_date >= SYSDATE()
+      ]]>
+    </if>
+    ORDER BY a.update_date desc, a.create_date desc
+    <if test="start == 0">
+      LIMIT ${size}
+    </if>
+    <if test="start != 0">
+      LIMIT ${start}, ${size}
+    </if>
+  </select>
+
+  <select id="countMuseumShowListBySearch" resultType="java.lang.Integer">
+    select count(*)
+    from museum_show a
+    left join museum_base_info b on(a.host_org = b.id)
+    where b.data_state = '2'
+    and a.data_state = '1'
+    <if test="museumId != null and museumId != ''">
+      and a.host_org = #{museumId}
+    </if>
+    <if test="key != null and key != ''">
+      and (a.show_name like '%${key}%'
+      OR  b.museum_name like '%${key}%')
+    </if>
+    <if test="type != null and type == 2">
+      <![CDATA[
+          and a.start_date <= SYSDATE()
+          and a.end_date >= SYSDATE()
+      ]]>
+    </if>
+  </select>
+
+  <select id="getMuseumShow" resultType="com.tj720.dto.MuseumShowDto">
+    select a.id, a.show_name as showName, b.museum_name as museumName,
+    concat(DATE_FORMAT(a.start_date, '%Y/%m/%d'), '-', DATE_FORMAT(a.end_date, '%Y/%m/%d')) as showDate,
+    b.open_time as museumOpenTime, b.address as museumDress, b.ticket as museumTicket, a.pictureids as pictureUrl,
+    a.show_description as showDescription
+    from museum_show a
+    left join museum_base_info b on(a.host_org = b.id)
+    where b.data_state = '2'
+    and a.data_state = '1'
+    and a.id = #{id}
+  </select>
+</mapper>

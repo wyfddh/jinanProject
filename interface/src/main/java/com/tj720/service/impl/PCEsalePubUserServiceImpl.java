@@ -1,0 +1,683 @@
+package com.tj720.service.impl;
+
+import com.tj720.common.redis.JedisDao;
+import com.tj720.controller.framework.JsonResult;
+import com.tj720.controller.springbeans.Config;
+import com.tj720.dao.MipAttachmentMapper;
+import com.tj720.dao.PCEsalePubUserMapper;
+import com.tj720.dto.*;
+import com.tj720.model.common.FileType;
+import com.tj720.model.common.MipAttachment;
+import com.tj720.service.PCEsaleMuseumService;
+import com.tj720.service.PCEsalePubUserService;
+import com.tj720.utils.*;
+import com.tj720.utils.common.IdUtils;
+import net.sf.json.JSONArray;
+import org.apache.commons.lang3.StringUtils;
+import org.jsoup.helper.StringUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.stream.Collectors;
+
+@Service
+public class PCEsalePubUserServiceImpl implements PCEsalePubUserService{
+    @Autowired
+    private PCEsalePubUserMapper esaleUser;
+
+    @Autowired
+    private MipAttachmentMapper mipAttachmentMapmper;
+
+    @Autowired
+    private PCEsaleMuseumService museumService;
+
+    @Autowired
+    private Config config;
+    private FtpUtil ftpUtil;
+
+
+    /**
+     * 编辑用户个人信息
+     * @param esalePubUser
+     */
+    @Override
+    public void updateUser(PCEsalePubUserDto esalePubUser) {
+        esaleUser.updateByPrimaryKeySelective(esalePubUser);
+    }
+
+    @Override
+    public JsonResult updateUserInfo(PCEsalePubUserDto model) {
+        JsonResult jsonResult = null;
+        try {
+            PCEsalePubUserDto user = esaleUser.selectByPrimaryKey(model.getId());
+            user.setSex(model.getSex());
+
+            if(model.getMyBirthday()!=null&&!model.getMyBirthday().equals("")){
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                Date date = sdf.parse(model.getMyBirthday());
+                user.setBirthday(date);
+            }
+            user.setAvatarUrl(model.getAvatarUrl());
+            user.setIdCard(model.getIdCard());
+            user.setDescription(model.getDescription());
+            user.setEmail(model.getEmail());
+            user.setParentName(model.getParentName());
+            user.setParentTelphone(model.getParentTelphone());
+            user.setRealName(model.getRealName());
+            user.setSchoolName(model.getSchoolName());
+            esaleUser.updateByPrimaryKeySelective(user);
+            jsonResult = new JsonResult(1);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new JsonResult("111116");
+        }
+        return  jsonResult;
+
+    }
+
+
+
+   @Override
+    public List<PCEsalePubUserDto> getListByPhone(String phone) {
+
+        if(StringUtils.isBlank(phone)) {
+            return new ArrayList<>();
+        }else {
+            List<PCEsalePubUserDto> user = esaleUser.selectUserByPhones(phone);
+            return user;
+        }
+    }
+
+    @Override
+    public PCEsalePubUserDto getListByUserPhone(String phone) {
+           PCEsalePubUserDto user = esaleUser.selectUserByPhone(phone);
+            return user;
+    }
+
+
+    @Override
+    public void login(PCEsalePubUserDto model, PCEsalePubUserDto user, HttpServletRequest request, HttpServletResponse response) {
+        String token = Aes.encrypt(user.getId());
+        MyCookie.addCookie(Const.COOKIE_TOKEN, token, response);
+        MyCookie.addCookie(Const.COOKIE_USERID, user.getId(), response);
+        model.setId(user.getId());
+        if (!MyString.isEmpty(model.getPhone())) {
+            MyCookie.addCookie(Const.COOKIE_PHONE, model.getPhone(), response);
+        }
+        MyCookie.addCookie("sessionAdminName", user.getUserName()==null?"":user.getUserName(), response);
+
+        MyCookie.deleteCookie(Const.COOKIE_PASSWORD, request, response);
+        model.setSessionAdminName(user.getRealName());
+        model.setAvatarUrl(user.getAvatarUrl());
+    }
+
+
+    @Override
+    public JsonResult updateUserPhone(PCEsalePubUserDto model) {
+        JsonResult jsonResult = null;
+        try {
+            PCEsalePubUserDto user = esaleUser.selectByPrimaryKey(model.getId());
+            user.setPhone(model.getPhone());
+            esaleUser.updateByPrimaryKeySelective(user);
+            jsonResult = new JsonResult(1);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new JsonResult("111116");
+        }
+        return  jsonResult;
+    }
+
+    /**
+     * 注册
+     * @param model
+     * @param
+     * @return
+     */
+    @Override
+    public JsonResult userRegiste(PCEsalePubUserDto model) {
+        PCEsalePubUserDto user = new PCEsalePubUserDto();
+        try {
+            user.setId(IdUtils.nextId(user));
+            user.setPhone(model.getPhone());
+            user.setUserName(model.getUserName());
+            String encrytMD5 = MD5.encrytMD5(model.getPassword());
+            user.setPassword(encrytMD5);
+            user.setDataState("1");
+            user.setSex("1");
+            user.setCreateDate(new Date());
+            esaleUser.insertSelective(user);
+            return new JsonResult(1);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new JsonResult("111116");
+        }
+
+    }
+
+    /**
+     * 忘记密码
+      * @param model
+     * @param
+     * @return
+     */
+    @Override
+    public JsonResult forgetPassword(PCEsalePubUserDto model) {
+        try {
+            PCEsalePubUserDto user = getListByUserPhone(model.getPhone());
+            String encrytMD5 = MD5.encrytMD5(model.getPassword());
+            user.setPassword(encrytMD5);
+            esaleUser.updateByPrimaryKey(user);
+            return  new JsonResult(1);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new JsonResult("111116");
+        }
+    }
+
+
+    @Override
+    public JsonResult queryUserById(String id) {
+        PCEsalePubUserDto user = esaleUser.selectByPrimaryKey(id);
+       /* for(PCEsaleShowDto esaleShowDto : esaleShowDtoList){
+            esaleShowDto.setPageUrl(config.getRootUrl() + esaleShowDto.getPageUrl());
+            List<MipAttachment> picList = pictureService.getPicList(esaleShowDto.getPagePictureid());
+            esaleShowDto.setPicList(picList);
+        }*/
+      /* if (user.getAvatarUrl()!=null) {
+           user.setAvatarUrl(config.getRootUrl() + user.getAvatarUrl());
+           System.out.println("config.getRootUrl() + user.getAvatarUrl() ===== "+config.getRootUrl() + user.getAvatarUrl());
+       }*/
+        if(user != null && user.getBirthday()!=null){
+            System.out.println("getBirthday ========"+user.getBirthday());
+            String s = dateCase(user.getBirthday());
+            user.setMyBirthday(s);
+            System.out.println("ssssss ========"+s);
+        }
+        return new JsonResult(1,user);
+    }
+
+
+
+    @Override
+    public JsonResult queryUserByIds(String id) {
+        PCEsalePubUserDto user = esaleUser.selectByPrimaryKey(id);
+        return new JsonResult(1,user);
+    }
+
+    @Override
+    public PCEsalePubUserDto queryUserById02(String id) {
+        PCEsalePubUserDto user = esaleUser.selectByPrimaryKey(id);
+        return user;
+    }
+
+    @Override
+    public String userExist(String phone,String id) {
+        PCEsalePubUserDto user = esaleUser.selectByPrimaryKey(id);
+
+
+        return null;
+    }
+
+
+    public String dateCase(Date d){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        return  sdf.format(d);
+    }
+
+    /**
+     * 根据文件扩展名，返回文件类型
+     * @param fileSuffix
+     * @return	文件类型
+     * 			img：图片
+     * 			doc：文档
+     * 			audio：音频
+     * 			video：视频
+     * 			other：其他
+     */
+    @SuppressWarnings("unused")
+    private int getFileTypeByAttachSuffix(String fileSuffix) {
+        int fileType = -1;
+        if(config.getImageType().indexOf(fileSuffix)>-1) {
+            fileType = 1;
+        }else if(config.getDocType().indexOf(fileSuffix)>-1) {
+            fileType = 2;
+        }else if(config.getAudioType().indexOf(fileSuffix)>-1) {
+            fileType = 3;
+        }else if(config.getVideoType().indexOf(fileSuffix)>-1) {
+            fileType = 4;
+        }else if(config.getFileType().indexOf(fileSuffix)>-1) {
+            fileType = 5;
+        }else {
+            fileType = -1;
+        }
+        return fileType;
+    }
+
+    @Override
+    public JsonResult saveAttachment(CommonsMultipartFile file, String tableName, String tableid, String source) {
+        JsonResult result = new JsonResult(0);
+        int errorCode = 0;		//错误代码
+        String msg = "";		//提示信息
+        MipAttachment resultFile = null;		//成功的文件对象
+
+        String realFileName = file.getOriginalFilename();		//获取上传文件名称
+        String destDir = config.getRootPath();		//获取配置的上传路径
+        String suffix = realFileName.substring(realFileName.lastIndexOf(".") + 1).toLowerCase();		//获取文件扩展名，并统一大写
+        int typeCode = this.getFileTypeByAttachSuffix(suffix);
+        String typeUrl = FileType.getName(typeCode);
+        String saveUrl = "";		//保存的相对路径
+        String resultPath = "";			//文件保存到服务器后，的相对路径
+
+        if(StringUtil.isBlank(Tools.getUserId())) {
+            //判断是否登录
+            errorCode = 1001;
+            msg = "还未登录";
+        }else if(StringUtil.isBlank(typeUrl)) {
+            //文件类型判断
+            errorCode = 1002;
+            msg = "文件类型为非法类型";
+        }else if(file.getSize() > 1024 * 1024 * config.getFileSize()) {
+            //文件大小判断
+            errorCode = 1003;
+            msg = "文件大小超出限制，限制为"+config.getFileSize()+"M";
+        }else {
+            saveUrl += typeUrl + "/" + DateFormartUtil.getDateByFormat(DateFormartUtil.YYYY_MM_DD) + "/";
+            String uuidStr = UUID.randomUUID().toString().replace("-", "");
+            String targetFileName = uuidStr + "." + suffix;
+            // 保存
+            try {
+				/*if (!new File(destDir + saveUrl).exists()) {
+					new File(destDir + saveUrl).mkdirs();
+				}
+				File targetFile = new File(destDir + saveUrl, targetFileName);*/
+                //原来版本：上传到本地
+//				file.transferTo(targetFile);
+                //现在版本：上传到ftp
+                ftpUtil = new FtpUtil(config.getFtpUrl(), Integer.valueOf(config.getFtpPort()), config.getFtpUserName(), config.getFtpPassWord());
+                boolean uploadFtpFile = ftpUtil.uploadFtpFile(destDir + saveUrl, targetFileName, file.getInputStream());
+                if(uploadFtpFile) {
+                    resultPath = saveUrl + targetFileName;
+
+                    //保存附件
+                    resultFile = new MipAttachment();
+                    resultFile.setAttId(IdUtils.nextId(resultFile));
+                    resultFile.setAttName(realFileName);
+                    resultFile.setAttSize(file.getSize());
+                    resultFile.setAttPath(resultPath);
+                    resultFile.setAttIsjunk("0");		//0：正常
+                    resultFile.setAttDate(new Date());
+                    resultFile.setAttType(tableName);		//业务表名称
+                    resultFile.setAttrUser(Tools.getUserId());
+                    resultFile.setAttFkId(tableid);		//业务表主键
+                    resultFile.setAttFileType(typeCode);
+                    resultFile.setAttSource(source);
+                    int insert = mipAttachmentMapmper.insert(resultFile);
+                    if(insert > 0) {
+                        errorCode = 1;
+                        msg = "文件上传成功";
+                    }else {
+                        errorCode = 1004;
+                        msg = "文件保存失败";
+                    }
+                }else {
+                    errorCode = 1005;
+                    msg = "文件上传失败";
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                errorCode = 1005;
+                msg = "系统错误";
+            }
+        }
+        result.setCode(errorCode);
+        result.setMsg(msg);
+        resultFile.setAttPath(config.getRootUrl()+resultPath);
+        result.setData(resultFile);
+        return result;
+    }
+
+    /**
+     * 浏览足迹
+     * @param uid
+     * @param size
+     * @param currentPage
+     * @return
+     */
+    @Override
+    public JsonResult queryFootprintBrowsing(String uid, Integer size, Integer currentPage) {
+         /* byte[] bytes = JedisDao.get(SerializeUtil.serialize(uid));
+             List<JsonDate> jsonDateList = (List<JsonDate>) SerializeUtil.unserialize(bytes);*/
+        Page page  = new Page();
+        page.setCurrentPage(currentPage);
+        page.setSize(size);
+        //list的大小
+        int count = 0;
+        String arrayStr = JedisDao.get(uid);
+        if(StringUtils.isEmpty(arrayStr)){
+            List<ListResult> resultsList = new ArrayList<>();
+            page.setAllRow(count);
+            return new JsonResult(1,resultsList,page);
+        }
+        List<JsonDate> jsonDateList =(List<JsonDate>)JSONArray.toCollection(JSONArray.fromObject(arrayStr), JsonDate.class);
+        //排序
+        if (null != jsonDateList && jsonDateList.size() != 0) {
+            Collections.sort(jsonDateList, new Comparator<JsonDate>() {
+                @Override
+                public int compare(JsonDate json, JsonDate jsonDate) {
+                    long bmillis1 = DateFormartUtil.getCurrentTimeMillis(json.getCreateTime(),"YYYY-MM-DD");
+                    long amillis1 = DateFormartUtil.getCurrentTimeMillis(json.getCreateTime(),"YYYY-MM-DD");
+                    System.out.println("bmillis1======"+bmillis1);
+                    System.out.println("amillis1======"+amillis1);
+                    if (bmillis1>amillis1){
+                        return  1;
+                    }
+                    if (amillis1==amillis1){
+                        return 0;
+                    }
+                    return -1;
+                }
+            });
+        }
+        //list的大小
+        count = jsonDateList.size();
+        //设置总条数
+        page.setAllRow(count);
+        if(jsonDateList.size() == 0){
+            List<ListResult> resultsList = new ArrayList<>();
+            return new JsonResult(1,resultsList,page);
+        }
+        //对list进行截取
+        //  page.setDataList(jsonDateList.subList(page.getStar(),count-page.getStar()>page.getPageSize()?page.getStar()+page.getPageSize():count));
+        List<JsonDate> dateList = jsonDateList.subList(page.getStart(), count - page.getStart() > page.getSize() ? page.getStart() + page.getSize() : count);
+//        System.out.println("dateList ======= "+dateList);
+        // 将10条数据进行分组
+        Map<String,List<JsonDate>> stringObjectMap = new HashMap<>();
+
+
+        if(dateList!=null&&dateList.size()>=2){
+            //将同一天进行分组  返回一个map<时间，List<JsonDate>>
+            stringObjectMap = subTime(dateList);
+
+            Set<String> keySet = stringObjectMap.keySet();
+            Iterator<String> iterator = keySet.iterator();
+
+            List<ListResult> resultsList = new ArrayList<>();
+
+            while (iterator.hasNext()){
+                String key = iterator.next();
+                //2018-11-30
+                String replace = key.replace("-", "");
+                //20181130  -->  2018
+                String substring = replace.substring(0, 4);
+                //20181130  --> 11/30
+                String s = replace.substring(4, 6) + "/" + replace.substring(6,8);
+                List<JsonDate> list = stringObjectMap.get(key);
+                System.out.println("substring === "+substring+" s====  "+s+"  value  ====  "+list);
+                ListResult listResult = new ListResult();
+                listResult.setList(list);
+                listResult.setKeyYear(substring);
+                listResult.setKeyDay(s);
+                resultsList.add(listResult);
+            }
+
+            //动态将map集合转换为二维数组；
+          /*  Object[][] obj = new Object[stringObjectMap.keySet().size()][2];
+            int a = 0;
+            for (String key : stringObjectMap.keySet()) {
+                System.out.println("key = " + key + " and value = " + stringObjectMap.get(key));
+                List<JsonDate> list = (List<JsonDate>) stringObjectMap.get(key);
+                obj[a][0] = key;
+                obj[a][1] = list;
+                a++;
+            }
+            System.out.println("obj   ======= "+obj);
+            return new JsonResult(1,obj,page);*/
+          return new JsonResult(1,resultsList,page);
+        }else if(dateList!=null&&dateList.size()==1) {
+          /*  Object[][] obj = new Object[stringObjectMap.keySet().size()][2];
+            obj[0][0]=jsonDateList.get(0).getCreateTime();
+            obj[0][1]=jsonDateList;*/
+            List<ListResult> resultsList = new ArrayList<>();
+            ListResult listResult = new ListResult();
+            String key= dateList.get(0).getCreateTime();
+            //2018-11-30
+            String replace = key.replace("-", "");
+            //20181130  -->  2018
+            String substring = replace.substring(0, 4);
+            //20181130  --> 11/30
+            String s = replace.substring(4, 6) + "/" + replace.substring(6,8);
+            listResult.setKeyYear(substring);
+            listResult.setKeyDay(s);
+            listResult.setList(jsonDateList);
+            resultsList.add(listResult);
+            return new JsonResult(1,resultsList,page);
+        }else {
+            return new JsonResult(1,dateList,page);
+        }
+
+      /*  System.out.println("queryFootprintBrowsing jsonDateList ======= "+jsonDateList);
+        System.out.println("queryFootprintBrowsing jsonDateList ======= "+jsonDateList.get(1).getId());
+        Map<Long, Object> stringObjectMap = new HashMap<>();
+        Map<Long, Object> sortMap = new TreeMap<>();
+        if(jsonDateList!=null&&jsonDateList.size()>=2){
+            //将同一天进行分组
+            stringObjectMap = subTime(jsonDateList);
+        }else if(jsonDateList!=null&&jsonDateList.size()==1) {
+            return new JsonResult(1,jsonDateList);
+        }else {
+            return new JsonResult(1,"无数据");
+        }
+
+        if (stringObjectMap!=null&&jsonDateList.size()>=2) {
+            //对map进行排序  倒序
+            sortMap = sortMap(stringObjectMap);
+        }
+        Set<Long> longs = sortMap.keySet();
+        Iterator<Long> iterator = longs.iterator();
+        while (iterator.hasNext()){
+            Long next = iterator.next();
+            List<JsonDate> list = (List<JsonDate>) sortMap.get(next);
+            System.out.println("list ======= "+list);
+        }*/
+
+    }
+
+    /**   type
+     *
+     *      * 0:活动 1：藏品 2:陈列展览  4：资讯
+    */
+
+
+    @Override
+    public void addInfomation(String type,String uid,Object obj){
+        System.out.println("uid =========   "+uid);
+           /* byte[] bytes = JedisDao.get(SerializeUtil.serialize(uid));
+            List<JsonDate> jsonDateList = (List<JsonDate>) SerializeUtil.unserialize(bytes);*/
+          String arrayStr = JedisDao.get(uid);
+        List<JsonDate> jsonDateList =new ArrayList<>();
+          if(arrayStr!=null){
+              JSONArray jsonArray=JSONArray.fromObject(arrayStr);
+              jsonDateList =(List<JsonDate>)JSONArray.toCollection(jsonArray,JsonDate.class);
+          }
+         System.out.println("jsonDateList01 =========   "+jsonDateList);
+            if (null == jsonDateList) {
+                jsonDateList = new ArrayList<>();
+            }
+            JsonDate jsonDate = new JsonDate();
+
+            //活动
+            if (type.equals("0")) {
+
+                PCesaleActivity activity = (PCesaleActivity) obj;
+                System.out.println("activity =========   "+activity.getId());
+                //活动主键
+                jsonDate.setId(activity.getId());
+                //类型
+                jsonDate.setType("0");
+                //活动地点
+                jsonDate.setAddress(activity.getActivityAddr());
+                //浏览时间
+                jsonDate.setCreateTime(DateFormartUtil.getDateByFormat());
+                //活动时间
+                jsonDate.setShowTime(activity.getActivityTime());
+                jsonDate.setPictureUrl(activity.getPicUrl());
+                //活动类型
+                jsonDate.setShowType(activity.getTypeDes());
+                //活动名称
+                jsonDate.setTitle(activity.getActivityName());
+            }
+            //藏品
+            if (type.equals("1")) {
+                PCEsaleCollectionInfoDto collection = (PCEsaleCollectionInfoDto) obj;
+                jsonDate.setId(collection.getId());
+                jsonDate.setType("1");
+                //浏览时间
+                jsonDate.setCreateTime(DateFormartUtil.getDateByFormat());
+                //入藏时间
+                jsonDate.setShowTime(collection.getEnterTime());
+                jsonDate.setPictureUrl(collection.getPicUrl());
+                //藏品类别
+                jsonDate.setShowType(collection.getCollectionTypeDes());
+
+                if(collection.getMuseumId()!=null){
+                    //所属博物馆
+                    PCEsaleMuseumDto esaleMuseumById = museumService.getEsaleMuseumById(collection.getMuseumId());
+                    jsonDate.setMuseumName(esaleMuseumById.getMuseumName());
+                }
+                //jsonDate.setPictureUrlList(collection.getPictureids());
+
+            }
+            //陈列展览
+            if (type.equals("2")) {
+                PCEsaleShowDto museumShowDto = (PCEsaleShowDto) obj;
+                jsonDate.setId(museumShowDto.getId());
+                jsonDate.setType("2");
+                //浏览时间
+                jsonDate.setCreateTime(DateFormartUtil.getDateByFormat());
+                //展览时间
+                jsonDate.setShowTime(museumShowDto.getShowDate());
+                //展览图片
+                jsonDate.setPictureUrl(museumShowDto.getPageUrl());
+
+                jsonDate.setTitle(museumShowDto.getShowName());
+                //所属博物馆
+                if(museumShowDto.getMuseumId()!=null) {
+                    PCEsaleMuseumDto esaleMuseumById = museumService.getEsaleMuseumById(museumShowDto.getMuseumId());
+
+                    jsonDate.setMuseumName(esaleMuseumById.getMuseumName());
+                }
+                //展览地点
+                jsonDate.setAddress(museumShowDto.getAddress());
+
+            }
+            //数字展厅
+           /* if (type.equals("3")) {
+                PCEsaleDigitalShowDto digitalShowDto = (PCEsaleDigitalShowDto) obj;
+                jsonDate.setId(digitalShowDto.getId());
+                jsonDate.setType("3");
+                jsonDate.setCreateTime(DateFormartUtil.getDateByFormat());
+
+                jsonDate.setPictureUrl(config.getRootPath() + digitalShowDto.getPageUrl());
+
+                jsonDate.setTitle(digitalShowDto.getDigitalName());
+                PCEsaleMuseumDto esaleMuseumById = museumService.getEsaleMuseumById(digitalShowDto.getMuseumId());
+                //所属博物馆
+                jsonDate.setMuseumName(esaleMuseumById.getMuseumName());
+            }*/
+            //资讯
+            if (type.equals("4")) {
+                PCEsaleInfoDto informationManagerDto = (PCEsaleInfoDto) obj;
+                jsonDate.setId(informationManagerDto.getId());
+                jsonDate.setType("4");
+                jsonDate.setCreateTime(DateFormartUtil.getDateByFormat());
+                jsonDate.setShowTime(informationManagerDto.getCreateDate());
+
+                jsonDate.setPictureUrl(informationManagerDto.getPageUrl());
+
+                jsonDate.setTitle(informationManagerDto.getInfoTopic());
+                //所属博物馆
+                if(informationManagerDto.getMuseumId()!=null) {
+                    PCEsaleMuseumDto esaleMuseumById = museumService.getEsaleMuseumById(informationManagerDto.getMuseumId());
+                jsonDate.setMuseumName(esaleMuseumById.getMuseumName());
+                }
+                jsonDate.setShowType(informationManagerDto.getTypeDes());
+
+                jsonDate.setDescription(informationManagerDto.getContent());
+
+            }
+            if(jsonDate!=null){
+                jsonDateList.add(0,jsonDate);
+            }
+            System.out.println("jsonDateList =========   "+jsonDateList.size());
+            JSONArray listArray=JSONArray.fromObject(jsonDateList);
+            //JedisDao.set(SerializeUtil.serialize(uid), SerializeUtil.serialize(jsonDateList), 2592000);
+            JedisDao.set(uid,listArray.toString(),2592000);
+    }
+
+
+
+    /**
+     * 对时间进行截取
+     * @param
+     * @return
+     */
+   public Map<String,List<JsonDate>> subTime(List<JsonDate> dateList){
+       Map<String, List<JsonDate>> groupBy = dateList.stream().collect(Collectors.groupingBy(JsonDate::getCreateTime));
+       System.out.println("groupBy  ====  "+groupBy);
+        return groupBy;
+    }
+    /**
+     * 对map进行排序   按照key进行降序
+     */
+    public Map<Long,Object> sortMap(Map<Long,Object> map){
+        map = new TreeMap<>(new Comparator<Long>() {
+            @Override
+            public int compare(Long o1, Long o2) {
+                return o1.compareTo(o2);
+            }
+        });
+        return map;
+
+    }
+
+
+    @Override
+        public boolean mobileUserSave (PCEsalePubUserDto model){
+            int i = esaleUser.insert(model);
+            if (i == 1) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+
+    @Override
+    public JsonResult delFootprintBrowsing(String uid) {
+        try {
+            JedisDao.removeByKey(uid);
+        }catch (Exception e){
+            return new JsonResult(0,"清空失败");
+        }
+        return new JsonResult(1,"清空成功");
+    }
+
+    @Override
+    public String isCanSignActivity(String id){
+        return esaleUser.isCanSignActivity(id);
+    };
+
+
+
+
+
+
+
+
+
+}

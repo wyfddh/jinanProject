@@ -1,0 +1,303 @@
+var tableDatas = new Array();
+
+layui.use(['form','layer','table'],function(){
+    var form = layui.form,
+        layer = parent.layer === undefined ? layui.layer : top.layer,
+        $ = layui.jquery,
+        table = layui.table;
+
+
+    var pathName=window.document.location.pathname;
+    var projectName=pathName.substring(0,pathName.substr(1).indexOf('/')+1);
+
+    //用户列表
+    var tableIns = table.render({
+        elem: '#productManager',
+        url : projectName + '/interceptKeyWord/queryInterceptWords.do',
+        request:{
+            pageName: 'currentPage',
+            limitName: 'size'
+        },
+        cellMinWidth : 95,
+        page : true,
+      loading:false,
+        limits : [10,15,20,25],
+        limit : 10,
+        id : "productManagerTable",
+        cols : [[
+            {type:'checkbox', fixed:"left"},
+            {type:"numbers",title: '序号', width:200, align:"center"},
+            {field:'interceptName', title: '敏感词',width:200, align:'center'},
+            {field: 'interceptNum', title: '拦截次数',width:200, align:"center"},
+            {field: 'viewDate', title: '更新时间' ,align:'center',align:"center"},
+            {title: '操作',width:200,  toolbar:'#productManagerBar',align:"center"}
+        ]],
+        done:function(d){
+            $("[data-field = 'mainPicUrl']").children(".layui-table-cell").css({"height":"100%","max-width":"100%","position":"relative"});
+            $("[data-field = 'mainPicUrl']").find("img").css({"max-width":"100%","max-height":"100%","position":"absolute","top":"50%","left":"50%","transform":"translate(-50%, -50%)"});
+            tableDatas = tableIns.config.data;
+        }
+    });
+
+    $('.searchVal').bind('keydown', function (event) {
+        var event = window.event || arguments.callee.caller.arguments[0];
+        if (event.keyCode == 13){
+            searKeywordCache = $('.search-data-input').val();
+            reloadTable();
+        }
+    });
+
+    $(".search_btn").on("click",function(){
+        reloadTable();
+    });
+
+
+    $("#resetBtn").on("click",function(){
+        table.reload("productManagerTable",{
+            page: {
+                curr: 1 //重新从第 1 页开始
+            },
+            where: {
+
+            }
+        })
+        window.location.reload();
+    })
+
+    function reloadTable() {
+        table.reload("productManagerTable",{
+            page: {
+                curr: 1 //重新从第 1 页开始
+            },
+            where: {
+                interceptName:$("#interceptName").val(),
+                state:$("#state").val(),
+                recommend:$("#recommend").val(),
+                orderBy:$("#orderBy").val()
+            }
+        })
+    }
+
+
+    //添加
+    function addMuseumInfo(edit){
+        var title;
+        if (edit) {
+            if(edit.operationStatus == '1'){
+                title = "修改敏感词";
+            }else{
+                title = "查看敏感词";
+            }
+            localStorage["productData"]=JSON.stringify(edit);
+        } else {
+            title = "添加敏感词";
+            localStorage["productData"]=JSON.stringify("");
+        }
+        var index = layui.layer.open({
+            title : title,
+            type : 2,
+            area: ['80%', '700px'],
+            content : "../../page/esaleInterceptManager/interceptUpdate.html",
+            success : function(layero, index){
+                var body = layui.layer.getChildFrame('body', index);
+            },
+            end :function() {
+                tableIns.reload();
+            }
+        })
+        window.sessionStorage.setItem("index",index);
+        //改变窗口大小时，重置弹窗的宽高，防止超出可视区域（如F12调出debug的操作）
+        $(window).on("resize",function(){
+            layui.layer.full(window.sessionStorage.getItem("index"));
+        })
+    }
+    $(".addNews_btn").click(function(){
+        addMuseumInfo();
+    })
+
+
+    //列表操作
+    table.on('tool(productManager)', function(obj){
+        var layEvent = obj.event,
+            data = obj.data;
+
+        if(layEvent === 'edit'){ //编辑
+            data.operationStatus = "1";
+            localStorage.pubUserType = "edit";
+            localStorage.id = data.id;
+            addMuseumInfo(data);
+        }else if(layEvent === 'del'){ //删除
+            layer.confirm('是否确定删除？',{icon:3, title:'提示信息'},function(index){
+                $.get(projectName + '/interceptKeyWord/delInterceptWords.do',{
+                    id : data.id,
+                },function(result){
+                    if (result.success == 1) {
+                        layer.open({
+                            type: 1,
+                            title: false, //不显示标题
+                            closeBtn: 0,
+                            time:1000,
+                            shadeClose: true,
+                            skin: "msg",
+                            content: "<div class='msg successMsg'><div class='msg-icon'></div><div class='msg-title'>删除成功！</div><div class='msg-txt'></div></div>"
+                        });
+                    } else {
+                        layer.open({
+                            type: 1,
+                            title: false, //不显示标题
+                            closeBtn: 0,
+                            shadeClose: true,
+                            skin: "msg",
+                            content: "<div class='msg errorMsg'><div class='msg-icon'></div><div class='msg-title'>删除失败</div><div class='msg-txt'>"+result.data+"</div></div>"
+                        });
+                    }
+                    tableIns.reload();
+                    layer.close(index);
+                })
+            });
+        }else if(layEvent === 'show'){//查看
+            data.operationStatus = "2";
+            addMuseumInfo(data);
+        }
+    });
+
+    window.openLink = function(linkUrl){
+        if(linkUrl === "undefined" || linkUrl == "" || linkUrl == null){
+            return false;
+        }else{
+            window.open(linkUrl);
+        }
+    }
+
+    form.on('select(orderBy)',function(){
+        reloadTable();
+    })
+
+    //时间戳的处理
+    layui.laytpl.toDateString = function(d, format){
+        var date = new Date(d || new Date())
+            ,ymd = [
+            this.digit(date.getFullYear(), 4)
+            ,this.digit(date.getMonth() + 1)
+            ,this.digit(date.getDate())
+        ]
+            ,hms = [
+            this.digit(date.getHours())
+            ,this.digit(date.getMinutes())
+            ,this.digit(date.getSeconds())
+        ];
+
+        format = format || 'yyyy-MM-dd HH:mm:ss';
+
+        return format.replace(/yyyy/g, ymd[0])
+            .replace(/MM/g, ymd[1])
+            .replace(/dd/g, ymd[2])
+            .replace(/HH/g, hms[0])
+            .replace(/mm/g, hms[1])
+            .replace(/ss/g, hms[2]);
+    };
+//数字前置补零
+    layui.laytpl.digit = function(num, length, end){
+        var str = '';
+        num = String(num);
+        length = length || 2;
+        for(var i = num.length; i < length; i++){
+            str += '0';
+        }
+        return num < Math.pow(10, length) ? str + (num|0) : num;
+    };
+
+    //批量删除
+    $(".delAll_btn").click(function(){
+        //得到当前表格里面的checkbox的选中对象集合
+        var checkStatus = table.checkStatus('productManagerTable'),//选中状态
+            data = checkStatus.data;//选中的对象集
+        var ids="a=1";
+        if(data.length > 0) {
+            for (var i in data) {
+                ids+="&ids="+data[i].id;
+            }
+            layer.confirm('确定删除？', {icon: 3, title: '提示信息'}, function (index) {
+                $.post(projectName + "/interceptKeyWord/delAllInterceptWords.do?"+ids,function(data){
+                    //刷新table
+                    tableIns.reload();
+                    //关闭提示框
+                    layer.close(index);
+                })
+            })
+        }else{
+            layer.msg("请选择! ");
+        }
+    })
+
+    $(".exportData_btn").click(function(){
+        exportData();
+    })
+
+    $(".downLoadData_btn").click(function(){
+        downLoadData();
+    })
+    function downLoadData(){
+        window.location.href = projectName + "/interceptKeyWord/downloadTemp.do"
+    }
+
+
+    //数据导出
+    function exportData() {
+       /* alert(JSON.stringify(table.cache))*/
+        //得到当前表格里面的checkbox的选中对象集合
+
+        var checkStatus = table.checkStatus('productManagerTable'),//选中状态
+            data = checkStatus.data;//选中的对象集
+        var ids="a=1";
+        if(data.length > 0) {
+            for (var i in data) {
+                ids+="&ids="+data[i].id;
+            }
+           window.location.href = projectName + "/interceptKeyWord/exportData.do?"+ids;
+
+        }else{
+            data = table.cache.productManagerTable;
+            for (var i in data) {
+                ids+="&ids="+data[i].id;
+            }
+            window.location.href = projectName + "/interceptKeyWord/exportData.do?"+ids;
+        }
+
+    }
+
+
+    layui.use('upload', function () {
+        var $ = layui.jquery
+            , upload = layui.upload;
+        //文件上传   已关闭
+        upload.render({
+            elem: '#fileForm'
+            , url:  projectName +'interceptKeyWord/uploadTemp.do'
+            , accept: 'file'
+            , auto: false
+            // , bindAction: '#upfile' //关闭的上传按钮   html中此id所在元素也被注释
+            ,multiple: true
+            , done: function (res) {
+            }
+        });
+    })
+
+    layui.use('upload', function() {
+        var $ = layui.jquery
+            , upload = layui.upload;
+
+        upload.render({
+            elem: '#test3'
+            ,url: projectName +'/interceptKeyWord/uploadTemp.do'
+            ,accept: 'file' //普通文件
+            ,done: function(res){
+
+                window.location.reload();
+            }
+        });
+
+    });
+
+
+})

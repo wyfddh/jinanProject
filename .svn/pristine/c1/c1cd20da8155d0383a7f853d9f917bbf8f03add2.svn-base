@@ -1,0 +1,201 @@
+package com.tj720.controller;
+
+import com.tj720.controller.framework.JsonResult;
+import com.tj720.controller.framework.auth.AuthPassport;
+import com.tj720.model.EsaleActivity;
+import com.tj720.service.EsaleActivityService;
+import com.tj720.service.EsaleAssessActivityService;
+import com.tj720.service.EsaleFiledataActivityService;
+import com.tj720.service.EsaleUserActivityService;
+import com.tj720.utils.Tools;
+import net.sf.json.JSONObject;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
+
+@Controller
+@RequestMapping("/esaleActivity")
+public class EsaleActivityController  {
+	@Autowired
+	private EsaleActivityService esaleActivityservice;
+
+	@Autowired
+	private EsaleUserActivityService esaleUserActivityService;
+
+	@Autowired
+	private EsaleAssessActivityService esaleAssessActivityService;
+
+	@Autowired
+	private EsaleFiledataActivityService esaleFiledataActivityService;
+
+	/**
+	 * @Author 刘修
+	 * @Description 查询活动列表
+	 * @return
+	 */
+	@RequestMapping("getActivityList")
+	@ResponseBody
+	@AuthPassport
+	public JSONObject getActivityList(String key , String type , String status, String orderBy,
+									   @RequestParam(defaultValue = "1") Integer currentPage, @RequestParam(defaultValue = "10") Integer size) throws Exception {
+		return esaleActivityservice.getActivityList(key,type,status,orderBy,size,currentPage);
+	}
+
+	/**
+	 * 新增或者修改活动信息
+	 * @param info
+	 * @return
+	 * @throws Exception
+	 */
+	@RequestMapping("saveActivity")
+	@ResponseBody
+	@AuthPassport
+	public JsonResult saveActivity(EsaleActivity info, String picids, String delpicids) throws Exception{
+		return esaleActivityservice.saveActivity(info,picids,delpicids);
+	}
+
+	@RequestMapping("deleteActivity")
+	@ResponseBody
+	@AuthPassport
+	public JsonResult deleteActivity(String id) throws Exception{
+		return esaleActivityservice.deleteActivity(id);
+	}
+
+    /**
+     * @Author 刘修
+     * @Description 查询活动报名列表
+     * @return
+     */
+    @RequestMapping("getSignListById")
+    @ResponseBody
+    @AuthPassport
+    public JSONObject getSignListById(String key , String activityStates,@RequestParam(defaultValue = "1") Integer currentPage, @RequestParam(defaultValue = "10") Integer size) throws Exception {
+        return esaleUserActivityService.getSignListById(key,activityStates,currentPage,size);
+    }
+
+	@RequestMapping("operationUserActivity")
+	@ResponseBody
+	@AuthPassport
+	public JsonResult operationUserActivity(String id,int operate) throws Exception{
+		return esaleUserActivityService.operationUserActivity(id,operate);
+	}
+
+	/**
+	 * @Author 刘修
+	 * @Description 查询评论列表
+	 * @return
+	 */
+	@RequestMapping("getAssessListById")
+	@ResponseBody
+	@AuthPassport
+	public JSONObject getAssessListById(String key , @RequestParam(defaultValue = "1") Integer currentPage, @RequestParam(defaultValue = "10") Integer size) throws Exception {
+		return esaleAssessActivityService.getAssessListById(key,currentPage,size);
+	}
+
+	@RequestMapping("deleteAssessActivity")
+	@ResponseBody
+	@AuthPassport
+	public JsonResult deleteAssessActivity(String id) throws Exception{
+		return esaleAssessActivityService.deleteAssessActivity(id);
+	}
+
+	/**
+	 * @Author 刘修
+	 * @Description 查询资源列表
+	 * @return
+	 */
+	@RequestMapping("getFileListById")
+	@ResponseBody
+	@AuthPassport
+	public JSONObject getFileListById(String key , @RequestParam(defaultValue = "1") Integer currentPage, @RequestParam(defaultValue = "10") Integer size) throws Exception {
+		return esaleFiledataActivityService.getFileListById(key,currentPage,size);
+	}
+
+	@RequestMapping(value="getActivityRecordByUserId")
+	@ResponseBody
+	@AuthPassport
+	public JSONObject getActivityRecordByUserId(String userId,@RequestParam(defaultValue = "1") Integer currentPage, @RequestParam(defaultValue = "10") Integer size) throws Exception{
+		return esaleUserActivityService.getActivityRecordByUserId(userId,currentPage,size);
+	}
+
+	@RequestMapping(value="adminActivitySign")
+	@ResponseBody
+	@AuthPassport
+	public JsonResult adminActivitySign(String realName, String activityId, String parentName, String phone){
+		Map<String , String> map = new HashMap<>();
+		if (StringUtils.isBlank(Tools.getUserId())) {
+			return new JsonResult(0,"登录异常");
+		}
+		if (StringUtils.isBlank(realName)|| StringUtils.isBlank(realName)|| StringUtils.isBlank(parentName)||StringUtils.isBlank(phone)) {
+			return new JsonResult(0,"参数错误");
+		}
+		if (StringUtils.isNotBlank(realName)) {
+			map.put("realName",realName);
+		}
+		if (StringUtils.isNotBlank(activityId)) {
+			map.put("activityId",activityId);
+		}
+		if (StringUtils.isNotBlank(parentName)) {
+			//SJQ
+			if(parentName.equals("0")){
+				map.put("parentName","");
+			}
+			map.put("parentName",parentName);
+		}
+		if (StringUtils.isNotBlank(phone)) {
+			map.put("phone",phone);
+		}
+		return esaleUserActivityService.adminActivitySign(map);
+	}
+
+	/**
+	 * @Author 刘修
+	 * @Description 查询活动报名列表
+	 * @return
+	 */
+	@RequestMapping("printSignListById")
+	@ResponseBody
+	@AuthPassport
+	public JSONObject printSignListById(String key , String activityStates,@RequestParam(defaultValue = "1") Integer currentPage, @RequestParam(defaultValue = "10") Integer size) throws Exception {
+		return esaleUserActivityService.getSignListById(key,activityStates,currentPage,size);
+	}
+
+	/**
+	 * 数据导出
+	 *
+	 * @throws Exception
+	 */
+	@RequestMapping("/exportData")
+	public void exportData(String key , String activityStates, HttpServletRequest request, HttpServletResponse response)
+			throws Exception {
+		try {
+			// 下载文件的默认名称
+			response.setHeader("Content-disposition",
+					"attachment;filename=" + URLEncoder.encode("数据导出.xls", "UTF-8"));// 默认Excel名称
+			// 创建Excel对象
+			Workbook wb = esaleUserActivityService.export(key,activityStates);
+			if(null == wb){
+				throw new Exception("空数据");
+			}
+			// 写出流
+			System.out.println("response.getOutputStream() ========"+response.getOutputStream());
+			wb.write(response.getOutputStream());
+			/*return  new JsonResult(1);*/
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new Exception("文件下载失败");
+			/*return new JsonResult(0,"导出失败");*/
+		}
+	}
+
+}

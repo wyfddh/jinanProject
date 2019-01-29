@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.tj720.dao.EsaleSysMenuMapper">
+    <select id="getMenuByUser" parameterType="java.util.Map" resultType="com.tj720.model.EsaleSysMenu">
+      select distinct
+        m.id              id,
+        m.parent_id       parentId,
+        m.title           title,
+        m.icon            icon,
+        m.spread          spread,
+        m.href            href,
+        m.type            type,
+        m.sort            sort
+		from sys_menu m
+			 left join sys_menu_role mr on m.id = mr.menu_id
+			 left join sys_role_auth ua on mr.role_id = ua.role_id
+			 LEFT JOIN sys_role ro on ua.role_id = ro.id
+		where ua.party_id = #{userId} AND ro.status = 1 and m.status = 1 and m.page_type in (3 <if test="null != pageType">, #{pageType}</if>)
+		order by m.sort
+    </select>
+
+    <select id="getMenuListByPid" parameterType="java.lang.String" resultType="com.tj720.model.EsaleSysMenu">
+        select
+            id, parent_id parentId, title, icon, spread, href, type, sort
+        from sys_menu where parent_id = #{parentId} and status = 1
+    </select>
+
+    <select id="getMenuList" resultType="com.tj720.model.EsaleSysMenu">
+        select
+            id, parent_id parentId, title, icon, spread, href, type, sort
+        from sys_menu where status = 1 order by  parentId, sort asc
+    </select>
+
+    <select id="getMenuListPlus" resultType="com.tj720.model.EsaleSysMenu">
+        select
+            id, parent_id parentId, title, icon, spread, href, type, sort
+        from sys_menu where status = 1
+        <if test="functionName != null and functionName!=''">
+            and title like concat('%',#{functionName},'%')
+        </if>
+        <if test="type != null and type!=''">
+            and type = #{type}
+        </if>
+        order by  parentId, sort asc
+    </select>
+
+    <select id="getMenuById" parameterType="java.lang.String" resultType="com.tj720.model.EsaleSysMenu">
+        select id, parent_id parentId, title, icon, spread, href, type, is_quick isQuick, quick_icon quickIcon, sort, page_type pageType
+        from sys_menu where status = 1 and id = #{id}
+    </select>
+
+    <select id="insertSysMenu" parameterType="com.tj720.model.EsaleSysMenu">
+        insert into sys_menu(parent_id, id, title, icon, spread, href, type, is_quick, page_type, quick_icon, sort, creator, updater, create_time, update_time) values
+        (#{parentId}, #{id}, #{title}, #{icon}, #{spread}, #{href}, #{type}, #{isQuick}, #{pageType}, #{quickIcon}, #{sort}, #{creator}, #{updater}, now(), now())
+    </select>
+
+    <update id="updateSysMenu" parameterType="com.tj720.model.EsaleSysMenu">
+        update sys_menu set parent_id = #{parentId}, title = #{title}, icon = #{icon}, spread = #{spread}, href = #{href}, type = #{type}, is_quick = #{isQuick}, page_type = #{pageType},
+        quick_icon = #{quickIcon}, sort = #{sort}, updater = #{updater}, update_time = now() where id = #{id}
+    </update>
+
+    <select id="getMenuPermissionList" parameterType="java.util.Map" resultType="com.tj720.model.EsaleUserMenu">
+        select
+            a.title               label,
+            a.id                  `key`,
+            0                     spread,
+            (CASE WHEN b.role_id is null or (a.parent_id = '-1' and a.type = 1) THEN 0 ELSE 1 END) checked
+        from sys_menu a
+        left join sys_menu_role b on (a.id = b.menu_id and b.role_id = #{roleId} and a.status = 1 and b.page_type = #{pageType})
+        where a.parent_id = #{parentId} and a.page_type in (3 <if test="null != pageType">, #{pageType}</if>)
+    </select>
+
+    <delete id="deleteMenuRole" parameterType="java.util.Map">
+        delete from sys_menu_role where role_id = #{roleId} and page_type = #{pageType}
+    </delete>
+
+    <insert id="insertMenuRole" parameterType="java.util.Map">
+        insert into sys_menu_role (role_id, menu_id, page_type, creator, updater, create_time, update_time) values
+        <foreach collection="menuIds" separator="," item="item">
+            (#{roleId}, #{item}, #{pageType}, 'sysadmin', 'sysadmin', now(), now())
+        </foreach>
+    </insert>
+
+    <select id="getAllMenuByUser" parameterType="java.util.Map" resultType="com.tj720.model.EsaleSysMenu">
+        select distinct
+        m.id              id,
+        m.parent_id       parentId,
+        m.title           title,
+        m.icon            icon,
+        m.spread          spread,
+        m.href            href,
+        m.type            type,
+        m.sort            sort
+        from sys_menu m
+        left join sys_menu_role mr on m.id = mr.menu_id
+        left join sys_role_auth ua on mr.role_id = ua.role_id
+        LEFT JOIN sys_role ro on ua.role_id = ro.id
+        where ua.party_id = #{userId} AND ro.status = 1 and m.status = 1 and m.page_type in (3, 1, 2) and m.is_quick = 1 and m.parent_id &lt;&gt; '-1'
+        order by m.sort
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+        delete from sys_menu
+        where id = #{id,jdbcType=VARCHAR}
+    </delete>
+</mapper>

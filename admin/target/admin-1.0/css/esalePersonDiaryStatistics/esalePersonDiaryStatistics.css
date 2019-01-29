@@ -1,0 +1,100 @@
+/*p,ul,li{*/
+    /*margin: 0;padding: 0;list-style: none;*/
+/*}*/
+.wrapper{
+    width:500px;
+    margin: 50px auto;
+}
+#d-box{
+    width: 100%;
+    text-align: center;
+}
+#d-box .d-title{
+    width: 100%;
+    text-align: center;
+    overflow: hidden;
+    height: 40px;
+    line-height: 40px;
+}
+#d-box .d-name{
+    float: left;
+}
+#d-box .d-date{
+    float: right;
+}
+#d-box .d-form{
+    width: 90%;
+    margin: 0 auto
+}
+#d-box .d-form{
+    width: 90%;
+    margin: 0 auto
+}
+#d-box ul{
+    overflow: hidden;
+}
+#d-box li{
+    float: left;
+    width: 14.2%;
+    height: 40px;
+    line-height: 40px;
+    cursor: pointer;
+    box-sizing: border-box;
+    margin: 2px 0;
+}
+#d-box li p{
+    width: 90%;
+    height: 40px;
+    line-height: 40px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+#d-box li.disday,#d-box li.weekday{
+    pointer-events: none;
+    color: #c9c9c9
+}
+#d-box li.weekday p{
+    background-color: #f2f2f2;
+}
+#d-box li.disday p{
+    background-color: #f2f2f2;
+}
+#d-box li.undone p{
+    background-color: #74e9c0;
+    color: #fff;
+    /*opacity: 0.6;*/
+}
+#d-box li.has-done p{
+    background-color: #45C2F9;
+    color: #fff;
+    /*opacity: 0.6;*/
+}
+#d-box li.d-active p{
+    /*background-color: #ff5722;
+    color: #fff;*/
+    opacity: 0.6;
+}
+#d-box .d-content{
+    margin-top: 20px;
+    padding: 10px;
+    text-align: left;
+    border: 1px solid #ccc;
+    min-height: 42px;
+}
+#d-box .d-content p {
+    color: #666;
+}
+.contentDiv{
+    display: inline-block;
+    white-space: nowrap;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: 50px;
+}
+.d1{
+    color: green !important;
+}
+.d2{
+    color: red !important;
+}

@@ -1,0 +1,498 @@
+package com.tj720.service.impl;
+
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.tj720.controller.framework.JsonResult;
+import com.tj720.dao.EsaleStatisticsMapper;
+import com.tj720.dao.SysDepartmentMapper;
+import com.tj720.dao.SysDictMapper;
+import com.tj720.dao.SysUserMapper;
+import com.tj720.model.EsaleInterfaceDict;
+import com.tj720.model.common.SysDict;
+import com.tj720.service.EsaleInterfaceCollectService;
+import com.tj720.service.EsaleStatisticsService;
+import com.tj720.utils.CalendarUtil;
+import com.tj720.utils.Tools;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+/**
+ * 统计图相关service 实现
+ * @author 杜昶
+ */
+@Service
+public class EsaleStatisticsServiceImpl implements EsaleStatisticsService {
+
+    @Autowired
+    private EsaleStatisticsMapper esaleStatisticsMapper;
+
+    @Autowired
+    private EsaleInterfaceCollectService esaleInterfaceCollectService;
+
+    @Autowired
+    private SysDictMapper sysDictMapper;
+
+    @Autowired
+    private SysUserMapper sysUserMapper;
+
+    @Autowired
+    private SysDepartmentMapper sysDepartmentMapper;
+
+    @Override
+    public JsonResult colletStatistics() {
+        Integer count = esaleStatisticsMapper.collectCount();
+        List<EsaleInterfaceDict> typeList = (List<EsaleInterfaceDict>) esaleInterfaceCollectService.getInterfaceCollectSelectType("A0211").getData();
+        BigDecimal all = null;
+        if (null != count) {
+            all = new BigDecimal(count);
+        } else {
+            all = BigDecimal.ZERO;
+        }
+        Map<String, String> head = new HashMap<String, String>(typeList.size());
+        List<Map<String, Object>> column = new ArrayList<Map<String, Object>>(2);
+        Map<String, Object> columnCount = new HashMap<String, Object>();
+        Map<String, Object> columnPercentage = new HashMap<String, Object>();
+        columnCount.put("title", "数量");
+        columnPercentage.put("title", "占比");
+        for (EsaleInterfaceDict dict : typeList) {
+            head.put(dict.getTypecode(), dict.getTypename());
+            Integer collectCount = esaleStatisticsMapper.getCollectCountByType(dict.getTypecode());
+            columnCount.put(dict.getTypecode(), null == collectCount ? 0 : collectCount);
+            BigDecimal lineCount = null;
+            if (null != collectCount) {
+                lineCount = new BigDecimal(collectCount);
+            } else {
+                lineCount = BigDecimal.ZERO;
+            }
+            columnPercentage.put(dict.getTypecode(), lineCount.divide(all, 4, BigDecimal.ROUND_HALF_UP).doubleValue() * 100 + "%" );
+        }
+        column.add(columnCount);
+        column.add(columnPercentage);
+        Map<String, Object> table = new HashMap<String, Object>();
+        table.put("head", head);
+        table.put("column", column);
+        List<Map<String, Object>> pie = esaleStatisticsMapper.collectTableStatistics();
+        if (CollectionUtils.isEmpty(pie)) {
+            Map<String, Object> map = new HashMap<String, Object>(2);
+            map.put("value", 0);
+            map.put("name", "无数据");
+            pie.add(map);
+        }
+        Map<String, Object> result = new HashMap<String, Object>(2);
+        result.put("table", table);
+        result.put("pie", pie);
+        return new JsonResult(1, result);
+    }
+
+    @Override
+    public JsonResult collectViewStatistics(Map<String, Object> param) {
+        List<Map<String, Object>> pie = esaleStatisticsMapper.collectViewStatistics(param);
+        if (CollectionUtils.isEmpty(pie)) {
+            Map<String, Object> map = new HashMap<String, Object>(2);
+            map.put("value", 0);
+            map.put("name", "无数据");
+            pie.add(map);
+        }
+        List<Map<String, Object>> histogram = esaleStatisticsMapper.collectViewHistogramStatistics(param);
+        Map<String, Object> result = new HashMap<String, Object>(2);
+        result.put("histogram", histogram);
+        result.put("pie", pie);
+        return new JsonResult(1, result);
+    }
+
+    @Override
+    public JsonResult colectionCollectStatistics(Map<String, Object> param) {
+        List<Map<String, Object>> pie = esaleStatisticsMapper.colectionCollectStatistics(param);
+        if (CollectionUtils.isEmpty(pie)) {
+            Map<String, Object> map = new HashMap<String, Object>(2);
+            map.put("value", 0);
+            map.put("name", "无数据");
+            pie.add(map);
+        }
+        List<Map<String, Object>> histogram = esaleStatisticsMapper.colectionCollectHistogramStatistics(param);
+        Map<String, Object> result = new HashMap<String, Object>(2);
+        result.put("histogram", histogram);
+        result.put("pie", pie);
+        return new JsonResult(1, result);
+    }
+
+    @Override
+    public JsonResult userStatistics(Map<String, Object> param) {
+        List<String> legend = new ArrayList<String>(2);
+        legend.add("PC浏览次数(PV)");
+        legend.add("独立访客(UV)");
+        legend.add("注册用户数");
+        List<Map<String, Object>> lineList = esaleStatisticsMapper.getUserStatisticsLine(param);
+        List<String> xAxis = new ArrayList<String>();
+        for (Map<String, Object> line : lineList){
+            xAxis.add(line.get("updateTime").toString());
+        }
+        List<Map<String,Object>> yAxis = new ArrayList<Map<String,Object>>();
+        for (int i = 0; i < legend.size(); i++) {
+            Map<String,Object> temp = new HashMap<String,Object>(4);
+            temp.put("name",legend.get(i));
+            List<Object> values = new ArrayList<Object>();
+            for (Map<String, Object> map : lineList) {
+                values.add(map.get(legend.get(i)));
+            }
+            temp.put("data",values);
+            temp.put("type","line");
+            yAxis.add(temp);
+        }
+        Map<String,Object> lineData = new HashMap<String,Object>(3);
+        lineData.put("data",yAxis);
+        lineData.put("legend",legend);
+        lineData.put("xAxis",xAxis);
+        return new JsonResult(1, lineData);
+    }
+
+    @Override
+    public JsonResult socialEducationSummaryStatistics(Map<String, Object> param) {
+        Integer activityCount = esaleStatisticsMapper.getActivityCount(param);
+        Integer signCount = esaleStatisticsMapper.signCount(param);
+        Integer realJoin = esaleStatisticsMapper.realJoin(param);
+        Integer commentCount = esaleStatisticsMapper.commentCount(param);
+        Map<String, Object> map = new HashMap<String, Object>(4);
+        map.put("activityCount", activityCount);
+        map.put("signCount", signCount);
+        map.put("realJoin", realJoin);
+        map.put("commentCount", commentCount);
+        return new JsonResult(1, map);
+    }
+
+    @Override
+    public JsonResult socialEducationTypeStatistics(Map<String, Object> param) {
+        List<SysDict> dictList = sysDictMapper.getSysDictListByType("activity_type_es");
+        List<Map<String, Object>> head = new ArrayList<Map<String, Object>>(dictList.size());
+        Map<String, Object> activityTimes = new HashMap<String, Object>(dictList.size());
+        Map<String, Object> signCount = new HashMap<String, Object>(dictList.size());
+        Map<String, Object> realJoin = new HashMap<String, Object>(dictList.size());
+        Map<String, Object> headMap = new HashMap<String, Object>(2);
+        activityTimes.put("title", "活动次数");
+        signCount.put("title", "报名人数");
+        realJoin.put("title", "实际参加");
+        headMap.put("field", "title");
+        headMap.put("title", "");
+        head.add(headMap);
+        for (SysDict dict : dictList) {
+            headMap = new HashMap<String, Object>(2);
+            headMap.put("field", dict.getDictCode());
+            headMap.put("title", dict.getDictName());
+            head.add(headMap);
+            param.put("type", dict.getDictCode());
+            activityTimes.put(dict.getDictCode(), esaleStatisticsMapper.getActivityCount(param));
+            signCount.put(dict.getDictCode(), esaleStatisticsMapper.signCount(param));
+            realJoin.put(dict.getDictCode(), esaleStatisticsMapper.realJoin(param));
+        }
+        List<Map<String, Object>> column = new ArrayList<Map<String, Object>>(3);
+        column.add(activityTimes);
+        column.add(signCount);
+        Map<String, Object> table = new HashMap<String, Object>(2);
+        table.put("head", head);
+        table.put("column", column);
+
+        List<Map<String, Object>> pie = esaleStatisticsMapper.getActivityTypePie(param);
+        if (CollectionUtils.isEmpty(pie)) {
+            Map<String, Object> map = new HashMap<String, Object>(2);
+            map.put("value", 0);
+            map.put("name", "无数据");
+            pie.add(map);
+        }
+        List<String> legend = new ArrayList<String>(2);
+        legend.add("PC端报名");
+        legend.add("移动端报名");
+        List<Map<String, Object>> lineList = esaleStatisticsMapper.getActivityTypeLine(param);
+        List<String> xAxis = new ArrayList<String>();
+        for (Map<String, Object> line : lineList){
+            xAxis.add(line.get("updateTime").toString());
+        }
+        List<Map<String,Object>> yAxis = new ArrayList<Map<String,Object>>();
+        for (int i = 0; i < legend.size(); i++) {
+            Map<String,Object> temp = new HashMap<String,Object>(4);
+            temp.put("name",legend.get(i));
+            List<Object> values = new ArrayList<Object>();
+            for (Map<String, Object> map : lineList) {
+                values.add(map.get(legend.get(i)));
+            }
+            temp.put("data",values);
+            temp.put("type","line");
+            temp.put("stack","总量");
+            yAxis.add(temp);
+        }
+        Map<String,Object> lineData = new HashMap<String,Object>(3);
+        lineData.put("data",yAxis);
+        lineData.put("legend",legend);
+        lineData.put("xAxis",xAxis);
+        Map<String,Object> data = new HashMap<String,Object>();
+        data.put("table", table);
+        data.put("pie", pie);
+        data.put("line",lineData);
+        return new JsonResult(1, data);
+    }
+
+    @Override
+    public JsonResult diaryStatistics(String startTime, String endTime) throws Exception {
+        Map<String, Object> param = new HashMap<String, Object>(2);
+        param.put("startTime", startTime);
+        param.put("endTime", endTime);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Calendar start = Calendar.getInstance();
+        start.setTime(sdf.parse(startTime));
+        Date end = sdf.parse(endTime);
+        Integer workDays = 0;
+        while (true) {
+            start.add(Calendar.DATE, 1);
+            Date date = start.getTime();
+            if (end.equals(date) || end.before(date)) {
+                break;
+            }
+            if (CalendarUtil.checkHoliday(start)) {
+                continue;
+            }
+            workDays ++;
+        }
+        Integer userCount = sysUserMapper.getUserCount();
+        Integer count = workDays * userCount;
+        List<Map<String, Object>> userDiaryCount = esaleStatisticsMapper.userDiaryCount(param);
+        BigDecimal realCount = BigDecimal.ZERO;
+        BigDecimal needCount = new BigDecimal(count);
+        for (Map<String, Object> line : userDiaryCount) {
+            realCount = realCount.add(new BigDecimal((Long) line.get("value")));
+        }
+        BigDecimal noCount = needCount.subtract(realCount);
+        Map<String, Object> need = new HashMap<String, Object>(2);
+        need.put("name", "正常");
+        need.put("value", realCount.intValue());
+        Map<String, Object> no = new HashMap<String, Object>(2);
+        no.put("name", "未提交");
+        no.put("value", noCount.intValue());
+        List<Map<String, Object>> loopData = new ArrayList<Map<String, Object>>(2);
+        loopData.add(need);
+        loopData.add(no);
+        List<Map<String, Object>> subHistogram = new ArrayList<Map<String, Object>>(5);
+        for (int i = 0; i < userDiaryCount.size(); i++) {
+            if (i == 5) {
+                break;
+            }
+            subHistogram.add(0, userDiaryCount.get(i));
+        }
+        List<Map<String, Object>> nosubHistogram = new ArrayList<Map<String, Object>>(5);
+        for (int i = userDiaryCount.size() - 1; i > -1; i--) {
+            if (i == userDiaryCount.size() - 6) {
+                break;
+            }
+            Map<String, Object> user = userDiaryCount.get(i);
+            BigDecimal userSub = new BigDecimal(String.valueOf(user.get("value")));
+            BigDecimal needSub = new BigDecimal(workDays);
+            Map<String, Object> temp = new HashMap<String, Object>(2);
+            temp.put("name", user.get("name"));
+            temp.put("value", needSub.subtract(userSub).intValue());
+            nosubHistogram.add(0, temp);
+        }
+        Map<String, Object> result = new HashMap<String, Object>(3);
+        result.put("loopData", loopData);
+        result.put("subHistogram", subHistogram);
+        result.put("nosubHistogram", nosubHistogram);
+        return new JsonResult(1, result);
+    }
+
+    @Override
+    public JsonResult diaryStatisticsGroupByDate(Map<String, Object> param) throws Exception {
+        List<Map<String, Object>> histogram = esaleStatisticsMapper.diaryStatisticsGroupByDate(param);
+        Map<String, Object> normal = new HashMap<String, Object>(4);
+        Map<String, Object> nosub = new HashMap<String, Object>(4);
+        List<Object> normalData = new ArrayList<Object>(histogram.size());
+        List<Object> nosubData = new ArrayList<Object>(histogram.size());
+        BigDecimal userCount = new BigDecimal(sysUserMapper.getUserCount());
+        List<String> xAxis = new ArrayList<String>(histogram.size());
+        for (Map<String, Object> line : histogram){
+            String date = line.get("updateTime").toString();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            Calendar start = Calendar.getInstance();
+            start.setTime(sdf.parse(date));
+            if (CalendarUtil.checkHoliday(start)) {
+                continue;
+            }
+            normalData.add(line.get("正常"));
+            nosubData.add(userCount.subtract(new BigDecimal(String.valueOf(line.get("正常")))).intValue());
+            xAxis.add(line.get("updateTime").toString());
+        }
+        normal.put("name", "正常");
+        normal.put("type", "bar");
+        normal.put("stack", "总量");
+        normal.put("data", normalData);
+        nosub.put("name", "未提交");
+        nosub.put("type", "bar");
+        nosub.put("stack", "总量");
+        nosub.put("data", nosubData);
+        List<Map<String, Object>> series = new ArrayList<Map<String, Object>>(2);
+        List<String> legend = new ArrayList<String>(2);
+        legend.add("正常");
+        legend.add("未提交");
+        series.add(normal);
+        series.add(nosub);
+        Map<String, Object> result = new HashMap<String, Object>(2);
+        result.put("xAxis", xAxis);
+        result.put("series", series);
+        result.put("legend", legend);
+        return new JsonResult(1, result);
+    }
+
+    @Override
+    public JsonResult diaryStatisticsGroupByPerson(String startTime, String endTime) throws Exception {
+        Map<String, Object> param = new HashMap<String, Object>(2);
+        param.put("startTime", startTime);
+        param.put("endTime", endTime);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Calendar start = Calendar.getInstance();
+        start.setTime(sdf.parse(startTime));
+        Date end = sdf.parse(endTime);
+        Integer workDays = 0;
+        while (true) {
+            start.add(Calendar.DATE, 1);
+            Date date = start.getTime();
+            if (end.equals(date) || end.before(date)) {
+                break;
+            }
+            if (CalendarUtil.checkHoliday(start)) {
+                continue;
+            }
+            workDays ++;
+        }
+
+        List<Map<String, Object>> histogram = esaleStatisticsMapper.diaryStatisticsGroupByPerson(param);
+        List<String> xAxis = new ArrayList<String>(histogram.size());
+        List<Object> normalData = new ArrayList<Object>(histogram.size());
+        List<Object> nosubData = new ArrayList<Object>(histogram.size());
+        BigDecimal workDay = new BigDecimal(workDays);
+        for (Map<String, Object> line : histogram) {
+            xAxis.add((String) line.get("用户名"));
+            normalData.add(line.get("正常"));
+            nosubData.add(workDay.subtract(new BigDecimal(String.valueOf(line.get("正常")))).intValue());
+        }
+        Map<String, Object> normal = new HashMap<String, Object>(4);
+        Map<String, Object> nosub = new HashMap<String, Object>(4);
+        normal.put("name", "正常");
+        normal.put("type", "bar");
+        normal.put("stack", "总量");
+        normal.put("data", normalData);
+        nosub.put("name", "未提交");
+        nosub.put("type", "bar");
+        nosub.put("stack", "总量");
+        nosub.put("data", nosubData);
+        List<Map<String, Object>> series = new ArrayList<Map<String, Object>>(2);
+        series.add(normal);
+        series.add(nosub);
+        List<String> legend = new ArrayList<String>(2);
+        legend.add("正常");
+        legend.add("未提交");
+        Map<String, Object> result = new HashMap<String, Object>(2);
+        result.put("xAxis", xAxis);
+        result.put("series", series);
+        result.put("legend", legend);
+        return new JsonResult(1, result);
+    }
+
+    @Override
+    public JsonResult diaryStatisticsGroupByDept(String startTime, String endTime) throws Exception {
+        Map<String, Object> param = new HashMap<String, Object>(2);
+        param.put("startTime", startTime);
+        param.put("endTime", endTime);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Calendar start = Calendar.getInstance();
+        start.setTime(sdf.parse(startTime));
+        Date end = sdf.parse(endTime);
+        Integer workDays = 0;
+        while (true) {
+            start.add(Calendar.DATE, 1);
+            Date date = start.getTime();
+            if (end.equals(date) || end.before(date)) {
+                break;
+            }
+            if (CalendarUtil.checkHoliday(start)) {
+                continue;
+            }
+            workDays ++;
+        }
+
+        List<Map<String, Object>> histogram = esaleStatisticsMapper.diaryStatisticsGroupByDept(param);
+        List<String> xAxis = new ArrayList<String>(histogram.size());
+        List<Object> normalData = new ArrayList<Object>(histogram.size());
+        List<Object> nosubData = new ArrayList<Object>(histogram.size());
+        BigDecimal workDay = new BigDecimal(workDays);
+        for (Map<String, Object> line : histogram) {
+            xAxis.add((String) line.get("部门"));
+            normalData.add(line.get("正常"));
+            Integer peopleCount = sysUserMapper.getUserCountByDeptId((String) line.get("departmentId"));
+            BigDecimal people = BigDecimal.ZERO;
+            if (null != peopleCount) {
+                people = new BigDecimal(peopleCount);
+            }
+            BigDecimal totalNeed = workDay.multiply(people);
+            nosubData.add(totalNeed.subtract(new BigDecimal(String.valueOf(line.get("正常")))).intValue());
+        }
+        Map<String, Object> normal = new HashMap<String, Object>(4);
+        Map<String, Object> nosub = new HashMap<String, Object>(4);
+        normal.put("name", "正常");
+        normal.put("type", "bar");
+        normal.put("stack", "总量");
+        normal.put("data", normalData);
+        nosub.put("name", "未提交");
+        nosub.put("type", "bar");
+        nosub.put("stack", "总量");
+        nosub.put("data", nosubData);
+        List<String> legend = new ArrayList<String>(2);
+        legend.add("正常");
+        legend.add("未提交");
+        List<Map<String, Object>> series = new ArrayList<Map<String, Object>>(2);
+        series.add(normal);
+        series.add(nosub);
+        Map<String, Object> result = new HashMap<String, Object>(2);
+        result.put("xAxis", xAxis);
+        result.put("series", series);
+        result.put("legend", legend);
+        return new JsonResult(1, result);
+    }
+
+    @Override
+    public JsonResult personLoopStatistics(String startTime, String endTime) throws Exception {
+        Map<String, Object> param = new HashMap<String, Object>(2);
+        param.put("startTime", startTime);
+        param.put("endTime", endTime);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        Calendar start = Calendar.getInstance();
+        start.setTime(sdf.parse(startTime));
+        Date end = sdf.parse(endTime);
+        Integer workDays = 0;
+        while (true) {
+            start.add(Calendar.DATE, 1);
+            Date date = start.getTime();
+            if (end.equals(date) || end.before(date)) {
+                break;
+            }
+            if (CalendarUtil.checkHoliday(start)) {
+                continue;
+            }
+            workDays ++;
+        }
+        param.put("creator", Tools.getUserId());
+        Integer sub = esaleStatisticsMapper.personLoopStatistics(param);
+        List<Map<String, Object>> result = new ArrayList<Map<String, Object>>(2);
+        Map<String, Object> map = new HashMap<String, Object>(2);
+        map.put("name", "正常");
+        map.put("value", sub);
+        result.add(map);
+        map = new HashMap<String, Object>(2);
+        map.put("name", "未提交");
+        map.put("value", workDays - sub);
+        result.add(map);
+        return new JsonResult(1, result);
+    }
+}

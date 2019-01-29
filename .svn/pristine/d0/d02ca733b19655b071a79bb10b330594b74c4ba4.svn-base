@@ -1,0 +1,62 @@
+package com.tj720.service.impl;
+
+import com.tj720.dao.PCEsaleMuseumMapper;
+import com.tj720.dto.PCEsaleMuseumDto;
+import com.tj720.model.common.MipAttachment;
+import com.tj720.service.PCEsaleMuseumService;
+import com.tj720.service.PictureService;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class PCEsaleMuseumServiceImpl implements PCEsaleMuseumService {
+
+    @Autowired
+    private PCEsaleMuseumMapper pcEsaleMuseumMapper;
+    @Autowired
+    private PictureService pictureService;
+
+    @Override
+    public List<PCEsaleMuseumDto> getEsaleMuseumList() {
+
+        List<PCEsaleMuseumDto> esaleMuseumDtoList = pcEsaleMuseumMapper.getMuseumList();
+        for(PCEsaleMuseumDto museum : esaleMuseumDtoList){
+            List<MipAttachment> picList;
+            museum.setMainPicUrl("");
+            if(StringUtils.isNotBlank(museum.getPictureids())){
+                picList = pictureService.getPicList(museum.getPictureids());
+                for (MipAttachment mipAttachment : picList) {
+                    if (mipAttachment.getIsMain().equals("1")) {
+                        museum.setMainPicUrl(mipAttachment.getAttPath());
+                        break;
+                    }
+                }
+                museum.setPicList(picList);
+            }
+
+
+
+        }
+        return esaleMuseumDtoList;
+    }
+
+    public PCEsaleMuseumDto  getEsaleMuseumById(String id){
+        if(null == id || id.equals("")){
+            return null;
+        }
+        PCEsaleMuseumDto museum = pcEsaleMuseumMapper.selectMuseumById(id);
+        List<MipAttachment> picList = pictureService.getPicList(museum.getPictureids());
+        picList = pictureService.getPicList(museum.getPictureids());
+        for (MipAttachment mipAttachment : picList) {
+            if (mipAttachment.getIsMain().equals("1")) {
+                museum.setMainPicUrl(mipAttachment.getAttPath());
+                break;
+            }
+        }
+        museum.setPicList(picList);
+        return museum;
+    }
+}

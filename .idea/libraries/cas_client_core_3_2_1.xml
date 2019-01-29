@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="cas-client-core-3.2.1">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/model/src/main/java/com/tj720/utils/lib/cas-client-core-3.2.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

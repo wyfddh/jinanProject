@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tj720.dao.EsalePubUserMapper">
+  <resultMap id="BaseResultMap" type="com.tj720.model.EsalePubUser">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="user_name" jdbcType="VARCHAR" property="userName" />
+    <result column="sex" jdbcType="VARCHAR" property="sex" />
+    <result column="birthday" jdbcType="DATE" property="birthday" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="email" jdbcType="VARCHAR" property="email" />
+    <result column="real_name" jdbcType="VARCHAR" property="realName" />
+    <result column="id_card" jdbcType="VARCHAR" property="idCard" />
+    <result column="school_name" jdbcType="VARCHAR" property="schoolName" />
+    <result column="parent_name" jdbcType="VARCHAR" property="parentName" />
+    <result column="parent_telphone" jdbcType="VARCHAR" property="parentTelphone" />
+    <result column="avatar_url" jdbcType="VARCHAR" property="avatarUrl" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="operation_date" jdbcType="DATE" property="operationDate" />
+    <result column="is_young" jdbcType="VARCHAR" property="isYoung" />
+    <result column="freez_time" jdbcType="TIMESTAMP" property="freezTime" />
+    <result column="data_state" jdbcType="VARCHAR" property="dataState" />
+    <result column="create_by" jdbcType="VARCHAR" property="createBy" />
+    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="update_by" jdbcType="VARCHAR" property="updateBy" />
+    <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
+  </resultMap>
+
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.tj720.model.EsalePubUser">
+    <result column="description" jdbcType="LONGVARCHAR" property="description" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, user_name, sex, birthday, phone, email, real_name, id_card, school_name, parent_name, 
+    parent_telphone, avatar_url, password, operation_date, is_young, freez_time, data_state, 
+    create_by, create_date, update_by, update_date
+  </sql>
+  <sql id="Blob_Column_List">
+    description
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from esale_pub_user
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from esale_pub_user
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.tj720.model.EsalePubUser">
+    insert into esale_pub_user (id, user_name, sex, 
+      birthday, phone, email, 
+      real_name, id_card, school_name, 
+      parent_name, parent_telphone, avatar_url, 
+      password, operation_date, is_young, 
+      freez_time, data_state, create_by, 
+      create_date, update_by, update_date, 
+      description)
+    values (#{id,jdbcType=VARCHAR}, #{userName,jdbcType=VARCHAR}, #{sex,jdbcType=VARCHAR}, 
+      #{birthday,jdbcType=DATE}, #{phone,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, 
+      #{realName,jdbcType=VARCHAR}, #{idCard,jdbcType=VARCHAR}, #{schoolName,jdbcType=VARCHAR}, 
+      #{parentName,jdbcType=VARCHAR}, #{parentTelphone,jdbcType=VARCHAR}, #{avatarUrl,jdbcType=VARCHAR}, 
+      #{password,jdbcType=VARCHAR}, #{operationDate,jdbcType=DATE}, #{isYoung,jdbcType=VARCHAR}, 
+      #{freezTime,jdbcType=TIMESTAMP}, #{dataState,jdbcType=VARCHAR}, #{createBy,jdbcType=VARCHAR}, 
+      #{createDate,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, #{updateDate,jdbcType=TIMESTAMP}, 
+      #{description,jdbcType=LONGVARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.tj720.model.EsalePubUser">
+    insert into esale_pub_user
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="userName != null">
+        user_name,
+      </if>
+      <if test="sex != null">
+        sex,
+      </if>
+      <if test="birthday != null">
+        birthday,
+      </if>
+      <if test="phone != null">
+        phone,
+      </if>
+      <if test="email != null">
+        email,
+      </if>
+      <if test="realName != null">
+        real_name,
+      </if>
+      <if test="idCard != null">
+        id_card,
+      </if>
+      <if test="schoolName != null">
+        school_name,
+      </if>
+      <if test="parentName != null">
+        parent_name,
+      </if>
+      <if test="parentTelphone != null">
+        parent_telphone,
+      </if>
+      <if test="avatarUrl != null">
+        avatar_url,
+      </if>
+      <if test="password != null">
+        password,
+      </if>
+      <if test="operationDate != null">
+        operation_date,
+      </if>
+      <if test="isYoung != null">
+        is_young,
+      </if>
+      <if test="freezTime != null">
+        freez_time,
+      </if>
+      <if test="dataState != null">
+        data_state,
+      </if>
+      <if test="createBy != null">
+        create_by,
+      </if>
+      <if test="createDate != null">
+        create_date,
+      </if>
+      <if test="updateBy != null">
+        update_by,
+      </if>
+      <if test="updateDate != null">
+        update_date,
+      </if>
+      <if test="description != null">
+        description,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="userName != null">
+        #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="sex != null">
+        #{sex,jdbcType=VARCHAR},
+      </if>
+      <if test="birthday != null">
+        #{birthday,jdbcType=DATE},
+      </if>
+      <if test="phone != null">
+        #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null">
+        #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="realName != null">
+        #{realName,jdbcType=VARCHAR},
+      </if>
+      <if test="idCard != null">
+        #{idCard,jdbcType=VARCHAR},
+      </if>
+      <if test="schoolName != null">
+        #{schoolName,jdbcType=VARCHAR},
+      </if>
+      <if test="parentName != null">
+        #{parentName,jdbcType=VARCHAR},
+      </if>
+      <if test="parentTelphone != null">
+        #{parentTelphone,jdbcType=VARCHAR},
+      </if>
+      <if test="avatarUrl != null">
+        #{avatarUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="operationDate != null">
+        #{operationDate,jdbcType=DATE},
+      </if>
+      <if test="isYoung != null">
+        #{isYoung,jdbcType=VARCHAR},
+      </if>
+      <if test="freezTime != null">
+        #{freezTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="dataState != null">
+        #{dataState,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null">
+        #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null">
+        #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null">
+        #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateDate != null">
+        #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="description != null">
+        #{description,jdbcType=LONGVARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.tj720.model.EsalePubUser">
+    update esale_pub_user
+    <set>
+      <if test="userName != null">
+        user_name = #{userName,jdbcType=VARCHAR},
+      </if>
+      <if test="sex != null">
+        sex = #{sex,jdbcType=VARCHAR},
+      </if>
+      <if test="birthday != null">
+        birthday = #{birthday,jdbcType=DATE},
+      </if>
+      <if test="phone != null">
+        phone = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null">
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="realName != null">
+        real_name = #{realName,jdbcType=VARCHAR},
+      </if>
+      <if test="idCard != null">
+        id_card = #{idCard,jdbcType=VARCHAR},
+      </if>
+      <if test="schoolName != null">
+        school_name = #{schoolName,jdbcType=VARCHAR},
+      </if>
+      <if test="parentName != null">
+        parent_name = #{parentName,jdbcType=VARCHAR},
+      </if>
+      <if test="parentTelphone != null">
+        parent_telphone = #{parentTelphone,jdbcType=VARCHAR},
+      </if>
+      <if test="avatarUrl != null">
+        avatar_url = #{avatarUrl,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        password = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="operationDate != null">
+        operation_date = #{operationDate,jdbcType=DATE},
+      </if>
+      <if test="isYoung != null">
+        is_young = #{isYoung,jdbcType=VARCHAR},
+      </if>
+      <if test="freezTime != null">
+        freez_time = #{freezTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="dataState != null">
+        data_state = #{dataState,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null">
+        create_by = #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null">
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null">
+        update_by = #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateDate != null">
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="description != null">
+        description = #{description,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.tj720.model.EsalePubUser">
+    update esale_pub_user
+    set user_name = #{userName,jdbcType=VARCHAR},
+      sex = #{sex,jdbcType=VARCHAR},
+      birthday = #{birthday,jdbcType=DATE},
+      phone = #{phone,jdbcType=VARCHAR},
+      email = #{email,jdbcType=VARCHAR},
+      real_name = #{realName,jdbcType=VARCHAR},
+      id_card = #{idCard,jdbcType=VARCHAR},
+      school_name = #{schoolName,jdbcType=VARCHAR},
+      parent_name = #{parentName,jdbcType=VARCHAR},
+      parent_telphone = #{parentTelphone,jdbcType=VARCHAR},
+      avatar_url = #{avatarUrl,jdbcType=VARCHAR},
+      password = #{password,jdbcType=VARCHAR},
+      operation_date = #{operationDate,jdbcType=DATE},
+      is_young = #{isYoung,jdbcType=VARCHAR},
+      freez_time = #{freezTime,jdbcType=TIMESTAMP},
+      data_state = #{dataState,jdbcType=VARCHAR},
+      create_by = #{createBy,jdbcType=VARCHAR},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      update_by = #{updateBy,jdbcType=VARCHAR},
+      update_date = #{updateDate,jdbcType=TIMESTAMP},
+      description = #{description,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.tj720.model.EsalePubUser">
+    update esale_pub_user
+    set user_name = #{userName,jdbcType=VARCHAR},
+      sex = #{sex,jdbcType=VARCHAR},
+      birthday = #{birthday,jdbcType=DATE},
+      phone = #{phone,jdbcType=VARCHAR},
+      email = #{email,jdbcType=VARCHAR},
+      real_name = #{realName,jdbcType=VARCHAR},
+      id_card = #{idCard,jdbcType=VARCHAR},
+      school_name = #{schoolName,jdbcType=VARCHAR},
+      parent_name = #{parentName,jdbcType=VARCHAR},
+      parent_telphone = #{parentTelphone,jdbcType=VARCHAR},
+      avatar_url = #{avatarUrl,jdbcType=VARCHAR},
+      password = #{password,jdbcType=VARCHAR},
+      operation_date = #{operationDate,jdbcType=DATE},
+      is_young = #{isYoung,jdbcType=VARCHAR},
+      freez_time = #{freezTime,jdbcType=TIMESTAMP},
+      data_state = #{dataState,jdbcType=VARCHAR},
+      create_by = #{createBy,jdbcType=VARCHAR},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      update_by = #{updateBy,jdbcType=VARCHAR},
+      update_date = #{updateDate,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+
+  <select id="getEsalePubUserList" parameterType="java.util.Map" resultType="com.tj720.model.EsalePubUserVo">
+    select
+    id , user_name as userName, phone, is_young as isYoung
+    from esale_pub_user
+    where data_state = '1' and 1=1
+    <if test="key != null and key != ''" >
+      and (id like concat('%',#{key},'%')
+      or  user_name like concat('%',#{key},'%'))
+    </if>
+    <if test="phone != null and phone != ''" >
+      and phone like concat('%',#{phone},'%')
+    </if>
+    <if test="isYoung != null and isYoung    != ''" >
+      and is_young = #{isYoung}
+    </if>
+    <if test="orderBy == 1" >
+      order by create_date desc
+    </if>
+    <if test="orderBy == 2" >
+      order by update_date desc
+    </if>
+    limit #{start},#{end}
+  </select>
+
+<!--数据导出的查询-->
+  <select id="getEsalePubUsers" parameterType="java.lang.String" resultType="com.tj720.model.EsalePubUserVo">
+    select
+    id , user_name as userName, phone, is_young as isYoung
+    from esale_pub_user
+    where data_state = '1'  and id = #{id}
+  </select>
+
+
+  <select id="countEsaleUserList" parameterType="java.util.Map" resultType="java.lang.Integer">
+    select count(1)
+    from esale_pub_user
+    where data_state = '1' and  1=1
+    <if test="key != null and key != ''" >
+      and (id like concat('%',#{key},'%')
+      or  user_name like concat('%',#{key},'%'))
+    </if>
+    <if test="phone != null and phone != ''" >
+      and phone like concat('%',#{phone},'%')
+    </if>
+    <if test="is_young != null and is_young != ''" >
+      and is_young = #{isYoung}
+    </if>
+    <if test="orderBy == 1" >
+      order by create_date desc
+    </if>
+    <if test="orderBy == 2" >
+      order by update_date desc
+    </if>
+  </select>
+
+
+<!--黑名單列表-->
+  <select id="getEsaleUserBlacklist" parameterType="java.util.Map" resultType="com.tj720.model.EsalePubUserVo">
+    select epu.id,epu.real_name as userName,epu.phone,epu.is_young as isYoung,epu.freez_time as freezTime
+    from esale_pub_user epu
+    where epu.data_state = '2' and 1=1
+    <if test="key != null and key != ''" >
+      and (epu.id like concat('%',#{key},'%')
+      or  epu.user_name like concat('%',#{key},'%'))
+    </if>
+    <if test="phone != null and phone != ''" >
+      and epu.phone like concat('%',#{phone},'%')
+    </if>
+    <if test="isYoung != null and isYoung    != ''" >
+      and epu.is_young = #{isYoung}
+    </if>
+    <if test="orderBy == 1" >
+      order by epu.create_date desc
+    </if>
+    <if test="orderBy == 2" >
+      order by epu.update_date desc
+    </if>
+    limit #{start},#{end}
+  </select>
+
+  <!--黑名单数据导出的查询-->
+  <select id="getEsaleUserBlacks" parameterType="java.lang.String" resultType="com.tj720.model.EsalePubUserVo">
+    select epu.id,epu.real_name as userName,epu.phone,epu.is_young as isYoung,epu.freez_time as freezTime
+    from esale_pub_user epu
+    where epu.data_state = '2' and epu.id = #{id}
+  </select>
+
+  <select id="countEsaleUserBlacklist" parameterType="java.util.Map"  resultType="java.lang.Integer">
+    select  count(1) from esale_pub_user epu
+    where epu.data_state = '2' and 1=1
+    <if test="key != null and key != ''" >
+      and (epu.id like concat('%',#{key},'%')
+      or  epu.user_name like concat('%',#{key},'%'))
+    </if>
+    <if test="phone != null and phone != ''" >
+      and epu.phone like concat('%',#{phone},'%')
+    </if>
+    <if test="isYoung != null and isYoung  != ''" >
+      and epu.is_young = #{isYoung}
+    </if>
+    <if test="orderBy == 1" >
+      order by epu.create_date desc
+    </if>
+    <if test="orderBy == 2" >
+      order by epu.update_date desc
+    </if>
+  </select>
+
+  <!--通过用户名查询-->
+  <select id="selectUserByName" parameterType="java.lang.String" resultMap="ResultMapWithBLOBs">
+    select
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from esale_pub_user
+    where user_name = #{userName,jdbcType=VARCHAR}
+  </select>
+
+
+</mapper>

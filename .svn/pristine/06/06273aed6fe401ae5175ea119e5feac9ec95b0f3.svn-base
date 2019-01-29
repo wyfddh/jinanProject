@@ -1,0 +1,163 @@
+package com.tj720.service.impl;
+
+import com.alibaba.fastjson.JSON;
+import com.tj720.controller.framework.JsonResult;
+import com.tj720.dao.EsaleCollectionInfoMapper;
+import com.tj720.model.EsaleCollectionInfo;
+import com.tj720.service.EsaleCollectionInfoService;
+import com.tj720.utils.Page;
+import com.tj720.utils.Tools;
+import net.sf.json.JSONObject;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.*;
+
+@Service
+public class EsaleCollectionInfoServiceImpl implements EsaleCollectionInfoService {
+
+    @Autowired
+    private EsaleCollectionInfoMapper esaleCollectionInfoMapper;
+
+    @Override
+    /**
+     * @Author 刘修
+     * @Description
+     * @Param key  搜索条件
+     * @param collectionType  藏品类型
+     * @param collectionYear  年代
+     * @param orderBy  排序
+     * @param size
+     * @param currentPage
+     * @return net.sf.json.JSONObject
+     **/
+    public JSONObject getCollectionInfoList(String key, String collectionTypeCode, String collectionYearCode, String orderBy, Integer currentPage, Integer size) {
+
+        JSONObject jsonObject = new JSONObject();
+
+        if (StringUtils.isBlank(Tools.getUserId())) {
+            jsonObject.put("code", 1);
+            jsonObject.put("msg", "登录异常");
+            jsonObject.put("count", 0);
+            jsonObject.put("data", null);
+            return jsonObject;
+        }
+
+        Page page = new Page();
+        page.setSize(size);
+        page.setCurrentPage(currentPage);
+
+        Map<String, Object> map = new HashMap<String, Object>();
+        if (StringUtils.isNotBlank(key)) {
+            map.put("key", key);
+        }
+        if (StringUtils.isNotBlank(collectionTypeCode)) {
+            map.put("collectionTypeCode", collectionTypeCode);
+        }
+        if (StringUtils.isNotBlank(collectionYearCode)) {
+            map.put("collectionYearCode", collectionYearCode);
+        }
+        if (StringUtils.isNotBlank(orderBy)) {
+            map.put("orderBy", orderBy);
+        } else {
+            //默认1
+            map.put("orderBy", 1);
+        }
+        //符合条件总数
+        Integer count = esaleCollectionInfoMapper.countCollectionInfoList(map);
+
+        page.setAllRow(count);
+        Integer start = page.getStart();
+        Integer end = start + page.getSize();
+        map.put("start", start);
+        map.put("end", end - start);
+        //查询分页数据
+        List<EsaleCollectionInfo> list = esaleCollectionInfoMapper.getCollectionInfoList(map);
+        for (EsaleCollectionInfo esaleCollectionInfo : list) {
+            if (esaleCollectionInfo.getHotRecommend().equals("1")) {
+                esaleCollectionInfo.setHotRecommendCheck("checked");
+            }
+            if (StringUtils.isNotBlank(esaleCollectionInfo.getPictureids())) {
+                List<String> picList = Arrays.asList(esaleCollectionInfo.getPictureids().split(","));
+                esaleCollectionInfo.setPicList(picList);
+            }
+        }
+        String jsonString = JSON.toJSONString(list);
+        jsonObject.put("code", 0);
+        jsonObject.put("msg", "");
+        jsonObject.put("count", page.getAllRow());
+        jsonObject.put("data", jsonString);
+        return jsonObject;
+    }
+
+    @Override
+    public JsonResult updateRecommend(String id, String recommendStatus) {
+        try {
+            EsaleCollectionInfo esaleCollectionInfo = esaleCollectionInfoMapper.selectByPrimaryKey(id);
+            //所属博物馆上线
+            if (esaleCollectionInfo.getDataState().equals("2")) {
+                int num = esaleCollectionInfoMapper.selectHotCount();
+                if(num>=6){
+                    return  new JsonResult("200015");
+                }
+                esaleCollectionInfo.setHotRecommend(recommendStatus);
+                esaleCollectionInfo.setUpdateBy(Tools.getUserId());
+                esaleCollectionInfo.setUpdateDate(new Date());
+
+                esaleCollectionInfoMapper.updateByPrimaryKeySelective(esaleCollectionInfo);
+                return new JsonResult(1);
+            } else {
+                return new JsonResult("200010");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return  new JsonResult("111116");
+        }
+    }
+
+    @Override
+    public  JsonResult updateStatus(String id, String dataStatus){
+        JsonResult jsonResult = null;
+        try {
+            EsaleCollectionInfo info = esaleCollectionInfoMapper.selectByPrimaryKey(id);
+            info.setDataState(dataStatus);
+            info.setUpdateBy(Tools.getUserId());
+            info.setUpdateDate(new Date());
+            if(!dataStatus.equals("2")){
+                info.setHotRecommend("0");
+            }
+            esaleCollectionInfoMapper.updateByPrimaryKeySelective(info);
+            jsonResult = new JsonResult(1);
+        } catch (Exception e) {
+            e.printStackTrace();
+            jsonResult = new JsonResult("111116");
+        }
+        return jsonResult;
+    }
+
+    /**
+     * 通过藏品id查询藏品名称
+     */
+    @Override
+    public  EsaleCollectionInfo queryColl(String id){
+        return  esaleCollectionInfoMapper.selectByPrimaryKey(id);
+    }
+
+    @Override
+    public JsonResult getCollectionListByType(String type,String curName){
+        try {
+            Map<String,Object> requestMap = new HashMap<>();
+            requestMap.put("type",type);
+            requestMap.put("curName",curName);
+            List<Map<String,Object>> mapList = esaleCollectionInfoMapper.getCollectionListByType(requestMap);
+            JsonResult jsonResult = new JsonResult(1,mapList);
+            jsonResult.setCode(0);
+            return jsonResult;
+        }catch (Exception e){
+            e.printStackTrace();
+            return new JsonResult(0,"系统异常");
+        }
+    };
+
+}

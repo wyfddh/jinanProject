@@ -1,0 +1,237 @@
+layui.use(['form','layer','table','laydate'],function(){
+    var form = layui.form,
+        layer = parent.layer === undefined ? layui.layer : top.layer,
+        $ = layui.jquery,
+        laydate = layui.laydate,
+        table = layui.table;
+
+        laydate.render({
+            elem: '#dateRange',
+            range: '~'
+        });
+
+    var pathName=window.document.location.pathname;
+    var projectName=pathName.substring(0,pathName.substr(1).indexOf('/')+1);
+
+    //用户列表
+    var tableIns = table.render({
+        elem: '#introduceManager',
+        url : projectName + '/introduce/getIntroduceList.do',
+        request:{
+            pageName: 'currentPage',
+            limitName: 'size'
+        },
+        cellMinWidth : 95,
+        page : true,
+        limits : [10,15,20,25],
+        limit : 10,
+        id : "introduceManagerTable",
+        cols : [[
+            {type:"numbers",title: '序号', width:70, align:"center"},
+            {field:'createDateStr', title: '创建时间', width:200,align:'center',templet:"#mumeumImg"},
+            {field: 'videoShowUrl', title: '查看视频', width:120, style:'height:88px;',align:"center",templet:"#videoShowUrl"},
+            {field: 'videoName', title: '视频名称',  align:'center'},
+            {field: 'museumName', title: '所属博物馆',  align:'center'},
+            {field: 'content', title: '内容简介',  align:'center'},
+            {title: '推荐',  align:'center',templet: '#recommendBar'},
+            {title: '操作',width:200,  toolbar:'#introduceManagerBar',align:"center"}
+        ]],
+        done:function(d){
+            $("[data-field = 'mumeumImg']").children(".layui-table-cell").css({"height":"100%","max-width":"100%","position":"relative"});
+            $("[data-field = 'mumeumImg']").find("img").css({"max-width":"100%","max-height":"100%","position":"absolute","top":"50%","left":"50%","transform":"translate(-50%, -50%)"});
+        }
+    });
+
+
+    $(".search_btn").on("click",function(){
+        reloadTable();
+    });
+    $("#resetBtn").on("click",function(){
+        table.reload("introduceManagerTable",{
+            page: {
+                curr: 1 //重新从第 1 页开始
+            },
+            where: {
+
+            }
+        })
+        window.location.reload();
+    })
+
+    function reloadTable() {
+        table.reload("introduceManagerTable",{
+            page: {
+                curr: 1 //重新从第 1 页开始
+            },
+            where: {
+                key:$("#key").val(),
+                /*dateRange:$("#dateRange").val(),*/
+                museumId:$("#museumId").val(),
+                recommend:$("#recommend").val(),
+                orderBy:$("#orderBy").val()
+            }
+        })
+    }
+
+    form.on('switch(recommend)', function(data){
+        var recommendName = data.elem.name;
+        var recommendId = data.elem.value;
+        var recommendStatus;
+        if (data.elem.checked) {
+            recommendStatus = "1";
+        } else {
+            recommendStatus = "0";
+        }
+        $.ajax({
+            type:"post",
+            url:projectName + '/introduce/modifyIntroduceRecommend.do',
+            data:{"recommendStatus":recommendStatus,"recommendId":recommendId,"recommendName":recommendName},
+            success:function(result) {
+                if (result.success == 1) {
+                    reloadTable();
+                    form.render();
+                } else {
+                    var resultMsg = result.data;
+                    layer.open({
+                        type: 1,
+                        title: false,
+                        closeBtn: 0,
+                        time:2000,
+                        shadeClose: true,
+                        skin: "msg",
+                        content: "<div class='msg alertMsg'><div class='msg-icon'></div><div class='msg-title'>"
+                        + resultMsg
+                        + "</div><div class='msg-txt'></div></div>"
+                    });
+                    $(data.elem).attr("checked",false);
+                    form.render();
+                }
+            },
+            error:function(result) {
+
+            }
+        })
+    });
+
+    form.on('select(orderBy)',function(){
+        reloadTable();
+    })
+
+    //添加
+    function addMuseumInfo(edit){
+        debugger
+        var title;
+        if (edit) {
+            if(edit.operationStatus == '1'){
+                title = "修改视频信息"
+            }else{
+                title = "查看视频信息"
+            }
+            localStorage["introduceData"]=JSON.stringify(edit);
+        } else {
+            title = "添加视频信息"
+            localStorage["introduceData"]=JSON.stringify("");
+        }
+        var index = layui.layer.open({
+            title : title,
+            type : 2,
+            area: ['80%', '700px'],
+            content : "../../page/localIntroduce/introduceAdd.html",
+            success : function(layero, index){
+            },
+            end :function() {
+                tableIns.reload();
+            }
+        })
+        layui.layer.full(index);
+        // window.sessionStorage.setItem("index",index);
+        // //改变窗口大小时，重置弹窗的宽高，防止超出可视区域（如F12调出debug的操作）
+        // $(window).on("resize",function(){
+        //     layui.layer.full(window.sessionStorage.getItem("index"));
+        // })
+    }
+    $(".addNews_btn").click(function(){
+        addMuseumInfo();
+    })
+
+
+    function getSelectData() {
+      /*  var data = {arr:['info_type_es','order_by']};*/
+        $.ajax({
+            type:"post",
+            url:projectName + '/esaleMuseum/getMuseumData.do',
+   /*         data:data,*/
+            success:function(result) {
+                if (result.success == 1) {
+                    var map = result.data;
+                    var statusSelect  = component.getSelectSimplePlus(map,null,"musId","museumId","museumName");
+                    $("#musId").append(statusSelect);
+                    form.render();
+                }
+            }
+        })
+    }
+    var initForm = function() {
+        $(".hide").hide();
+
+        getSelectData();
+    }
+
+    initForm();
+
+    //列表操作
+    table.on('tool(introduceManager)', function(obj){
+        var layEvent = obj.event,
+            data = obj.data;
+
+        if(layEvent === 'edit'){ //编辑
+            data.operationStatus = "1";
+            addMuseumInfo(data);
+        }else if(layEvent === 'del'){ //删除
+            layer.confirm('是否确定删除该视频？',{icon:3, title:'提示信息'},function(index){
+                $.get(projectName + '/introduce/deleteIntroduce.do',{
+                    id : data.id,
+                },function(result){
+                    if (result.success == 1) {
+                        layer.open({
+                            type: 1,
+                            title: false, //不显示标题
+                            closeBtn: 0,
+                            time:1000,
+                            shadeClose: true,
+                            skin: "msg",
+                            content: "<div class='msg successMsg'><div class='msg-icon'></div><div class='msg-title'>删除成功！</div><div class='msg-txt'></div></div>"
+                        });
+                    } else {
+                        layer.open({
+                            type: 1,
+                            title: false, //不显示标题
+                            closeBtn: 0,
+                            shadeClose: true,
+                            skin: "msg",
+                            content: "<div class='msg errorMsg'><div class='msg-icon'></div><div class='msg-title'>删除失败</div><div class='msg-txt'>"+result.data+"</div></div>"
+                        });
+                    }
+                    tableIns.reload();
+                    layer.close(index);
+                })
+            });
+        }else if(layEvent === 'show'){//查看
+            data.operationStatus = "2";
+            addMuseumInfo(data);
+        }else if(layEvent === 'videoShow'){
+            var showUrl = data.videoShowUrl;
+            var index = layui.layer.open({
+                title : "视频预览",
+                type : 2,
+                area: ['450px', '370px'],
+                content : "../../page/localIntroduce/lookVideo.html",
+                success : function(layero, index){
+                    var body = layui.layer.getChildFrame('body', index);
+                    body.find("#video").attr("src",showUrl);
+                    console.log(showUrl);
+                },
+            })
+        }
+    });
+})

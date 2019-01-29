@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tj720.dao.EsaleActivityMapper">
+  <resultMap id="BaseResultMap" type="com.tj720.model.EsaleActivity">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="activity_name" jdbcType="VARCHAR" property="activityName" />
+    <result column="activity_addr" jdbcType="VARCHAR" property="activityAddr" />
+    <result column="activity_time" jdbcType="TIMESTAMP" property="activityTime" />
+    <result column="quota" jdbcType="VARCHAR" property="quota" />
+    <result column="cost" jdbcType="VARCHAR" property="cost" />
+    <result column="demand" jdbcType="VARCHAR" property="demand" />
+    <result column="picture_id" jdbcType="VARCHAR" property="pictureId" />
+    <result column="type" jdbcType="VARCHAR" property="type" />
+    <result column="data_state" jdbcType="VARCHAR" property="dataState" />
+    <result column="create_by" jdbcType="VARCHAR" property="createBy" />
+    <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
+    <result column="update_by" jdbcType="VARCHAR" property="updateBy" />
+    <result column="update_date" jdbcType="TIMESTAMP" property="updateDate" />
+  </resultMap>
+  <resultMap extends="BaseResultMap" id="ResultMapWithBLOBs" type="com.tj720.model.EsaleActivity">
+    <result column="description" jdbcType="LONGVARCHAR" property="description" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, activity_name, activity_addr, activity_time, quota, cost, demand, picture_id,
+    type, data_state, create_by, create_date, update_by, update_date
+  </sql>
+  <sql id="Blob_Column_List">
+    description
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="ResultMapWithBLOBs">
+    select 
+    <include refid="Base_Column_List" />
+    ,
+    <include refid="Blob_Column_List" />
+    from esale_activity
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from esale_activity
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.tj720.model.EsaleActivity">
+    insert into esale_activity (id,activity_name, activity_addr, activity_time,
+      quota, cost, demand, 
+      picture_id, type, data_state,
+      create_by, create_date, update_by, 
+      update_date, description)
+    values (#{id,jdbcType=VARCHAR}, #{activityName,jdbcType=VARCHAR}, #{activityAddr,jdbcType=VARCHAR}, #{activityTime,jdbcType=TIMESTAMP},
+      #{quota,jdbcType=VARCHAR}, #{cost,jdbcType=VARCHAR}, #{demand,jdbcType=VARCHAR}, 
+      #{pictureId,jdbcType=VARCHAR}, #{type,jdbcType=VARCHAR}, #{dataState,jdbcType=VARCHAR},
+      #{createBy,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, 
+      #{updateDate,jdbcType=TIMESTAMP}, #{description,jdbcType=LONGVARCHAR})
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.tj720.model.EsaleActivity">
+    update esale_activity
+    <set>
+      <if test="activityName != null">
+        activity_name = #{activityName,jdbcType=VARCHAR},
+      </if>
+      <if test="activityAddr != null">
+        activity_addr = #{activityAddr,jdbcType=VARCHAR},
+      </if>
+      <if test="activityTime != null">
+        activity_time = #{activityTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="quota != null">
+        quota = #{quota,jdbcType=VARCHAR},
+      </if>
+      <if test="cost != null">
+        cost = #{cost,jdbcType=VARCHAR},
+      </if>
+      <if test="demand != null">
+        demand = #{demand,jdbcType=VARCHAR},
+      </if>
+      <if test="pictureId != null">
+        picture_id = #{pictureId,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null">
+        type = #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="dataState != null">
+        data_state = #{dataState,jdbcType=VARCHAR},
+      </if>
+      <if test="createBy != null">
+        create_by = #{createBy,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null">
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateBy != null">
+        update_by = #{updateBy,jdbcType=VARCHAR},
+      </if>
+      <if test="updateDate != null">
+        update_date = #{updateDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="description != null">
+        description = #{description,jdbcType=LONGVARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.tj720.model.EsaleActivity">
+    update esale_activity
+    set activity_name = #{activityName,jdbcType=VARCHAR},
+      activity_addr = #{activityAddr,jdbcType=VARCHAR},
+      activity_time = #{activityTime,jdbcType=TIMESTAMP},
+      quota = #{quota,jdbcType=VARCHAR},
+      cost = #{cost,jdbcType=VARCHAR},
+      demand = #{demand,jdbcType=VARCHAR},
+      picture_id = #{pictureId,jdbcType=VARCHAR},
+      type = #{type,jdbcType=VARCHAR},
+      data_state = #{dataState,jdbcType=VARCHAR},
+      create_by = #{createBy,jdbcType=VARCHAR},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      update_by = #{updateBy,jdbcType=VARCHAR},
+      update_date = #{updateDate,jdbcType=TIMESTAMP},
+      description = #{description,jdbcType=LONGVARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.tj720.model.EsaleActivity">
+    update esale_activity
+    set activity_name = #{activityName,jdbcType=VARCHAR},
+      activity_addr = #{activityAddr,jdbcType=VARCHAR},
+      activity_time = #{activityTime,jdbcType=TIMESTAMP},
+      quota = #{quota,jdbcType=VARCHAR},
+      cost = #{cost,jdbcType=VARCHAR},
+      demand = #{demand,jdbcType=VARCHAR},
+      picture_id = #{pictureId,jdbcType=VARCHAR},
+      type = #{type,jdbcType=VARCHAR},
+      data_state = #{dataState,jdbcType=VARCHAR},
+      create_by = #{createBy,jdbcType=VARCHAR},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      update_by = #{updateBy,jdbcType=VARCHAR},
+      update_date = #{updateDate,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <select id="countActivityList" resultType="java.lang.Integer" parameterType="java.util.Map">
+    select count(a.id)
+    from esale_activity a
+    where 1 = 1 and a.data_state ='1'
+    <if test="key != null and key != ''" >
+      and (a.activity_name like concat('%',#{key},'%') or a.id = #{key})
+    </if>
+    <if test="type != null and type != ''" >
+      and a.type = #{type}
+    </if>
+    <if test="status == 1 " >
+      and a.activity_time <![CDATA[   >  ]]> CURDATE()
+    </if>
+    <if test="status == 2 " >
+      and a.activity_time <![CDATA[   <=  ]]> CURDATE()
+    </if>
+    <if test="orderBy == 1" >
+      order by a.update_date desc
+    </if>
+    <if test="orderBy == 2" >
+      order by a.create_date desc
+    </if>
+  </select>
+  <select id="selectActivityList" resultType="com.tj720.model.EsaleActivity" parameterType="java.util.Map">
+    select
+    a.id,
+    a.activity_name as "activityName",
+    a.activity_addr as "activityAddr",
+    a.activity_time as "activityTime",
+    a.quota as "quota",
+    a.type,
+    a.cost as "cost",
+    a.demand as "demand",
+    a.picture_id as "pictureId",
+    a.description as "description",
+    a.data_state  as "dataState",
+    a.create_by as "createBy",
+    a.create_date as "createDate",
+    a.update_by as "updateBy",
+    a.update_date as "updateDate",
+    (select count(*) from esale_user_activity b where a.id = b.activity_id and b.data_state ='1') as 'signCount',
+    (select count(*) from esale_assess_activity c where a.id = c.activity_id and c.data_state ='1') as 'assessCount',
+    (select count(*) from esale_user_activity d where a.id = d.activity_id and d.data_state ='0') as 'cancelSign',
+    (select count(*) from esale_user_activity e where a.id = e.activity_id and e.data_state ='1' and e.join_state ='1') as 'realJoin'
+    from esale_activity a
+    where 1 = 1 and a.data_state ='1'
+    <if test="key != null and key != ''" >
+      and (a.activity_name like concat('%',#{key},'%') or a.id = #{key})
+    </if>
+    <if test="type != null and type != ''" >
+      and a.type = #{type}
+    </if>
+    <if test="status == 1 " >
+      and a.activity_time <![CDATA[   >  ]]> CURDATE()
+    </if>
+    <if test="status == 2 " >
+      and a.activity_time <![CDATA[   <=  ]]> CURDATE()
+    </if>
+    GROUP BY a.id
+    <if test="orderBy == 1" >
+      order by a.update_date desc
+    </if>
+    <if test="orderBy == 2" >
+      order by a.create_date
+    </if>
+    limit #{start},#{end}
+  </select>
+  
+</mapper>

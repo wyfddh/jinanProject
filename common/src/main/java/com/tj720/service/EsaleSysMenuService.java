@@ -1,0 +1,74 @@
+package com.tj720.service;
+
+import com.tj720.controller.framework.JsonResult;
+import com.tj720.model.EsaleSysMenu;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 系统菜单service
+ * @author 杜昶
+ */
+public interface EsaleSysMenuService {
+
+    /**
+     * 根据用户获取菜单列表
+     * @return
+     */
+    List<EsaleSysMenu> getMenuByUser(String pageType);
+
+
+    /**
+     * 查询菜单列表
+     * @return
+     */
+    Map<String, Object> getMenuList();
+
+    Map<String, Object> getMenuList(String functionName,String type);
+
+    /**
+     * 根据id获取菜单
+     * @param id
+     * @return
+     */
+    JsonResult getMenuById(String id);
+
+    /**
+     * 新增菜单
+     * @param esaleSysMenu
+     * @return
+     */
+    JsonResult addMenu(EsaleSysMenu esaleSysMenu);
+
+    /**
+     * 修改菜单
+     * @param esaleSysMenu
+     * @return
+     */
+    JsonResult updateMenu(EsaleSysMenu esaleSysMenu);
+
+    /**
+     * 根据角色查询菜单列表
+     * @param roleId
+     * @return
+     */
+    JsonResult queryResListTreeByRole(String roleId,String parentId,String pageType);
+
+    /**
+     * 更新用户权限
+     * @param menuIds
+     * @param roleId
+     * @return
+     */
+    JsonResult batchUpdateResAuth(List<String> menuIds, String roleId, String pageType);
+
+    JsonResult getAllMenuByUser();
+
+    /**
+     * 删除功能对象
+     * @param functionId 功能对象id
+     * @return
+     */
+    JsonResult deleteFunctionById(String functionId);
+}

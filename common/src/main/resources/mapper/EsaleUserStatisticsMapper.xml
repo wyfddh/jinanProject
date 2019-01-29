@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tj720.dao.EsaleUserStatisticsMapper">
+
+    <insert id="insertUserStatistics" parameterType="com.tj720.model.EsaleUserStatistics">
+        insert into esale_user_statistics(id, ip_address, type, create_date) values
+        (#{id}, #{ipAddress}, #{type}, now())
+    </insert>
+
+</mapper>

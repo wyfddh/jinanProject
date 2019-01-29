@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tj720.dao.EsaleNewsMapper">
+    <resultMap id="BaseResultMap" type="com.tj720.model.EsaleNews">
+        <id column="id" jdbcType="VARCHAR" property="id"/>
+        <result column="user_id" jdbcType="VARCHAR" property="userId"/>
+        <result column="content" jdbcType="VARCHAR" property="content"/>
+        <result column="pictureids" jdbcType="VARCHAR" property="pictureids"/>
+        <result column="praise_user_id" jdbcType="VARCHAR" property="praiseUserId"/>
+        <result column="data_state" jdbcType="VARCHAR" property="dataState"/>
+        <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+        <result column="create_date" jdbcType="TIMESTAMP" property="createDate"/>
+        <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
+        <result column="update_date" jdbcType="TIMESTAMP" property="updateDate"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id
+        ,
+        user_id,
+        content,
+        pictureids,
+        praise_user_id,
+        data_state,
+        create_by,
+        create_date,
+        update_by,
+        update_date
+    </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from esale_news
+        where id = #{id,jdbcType=VARCHAR}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+        delete
+        from esale_news
+        where id = #{id,jdbcType=VARCHAR}
+    </delete>
+    <insert id="insert" parameterType="com.tj720.model.EsaleNews">
+        insert into esale_news (id, user_id, content, pictureids,
+                                praise_user_id, data_state, create_by,
+                                create_date, update_by, update_date)
+        values (#{id,jdbcType=VARCHAR}, #{userId,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR},
+                #{pictureids,jdbcType=VARCHAR},
+                #{praiseUserId,jdbcType=VARCHAR}, #{dataState,jdbcType=VARCHAR}, #{createBy,jdbcType=VARCHAR},
+                #{createDate,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, #{updateDate,jdbcType=TIMESTAMP})
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.tj720.model.EsaleNews">
+        update esale_news
+        <set>
+            <if test="userId != null">
+                user_id = #{userId,jdbcType=VARCHAR},
+            </if>
+            <if test="content != null">
+                content = #{content,jdbcType=VARCHAR},
+            </if>
+            <if test="pictureids != null">
+                pictureids = #{pictureids,jdbcType=VARCHAR},
+            </if>
+            <if test="praiseUserId != null">
+                praise_user_id = #{praiseUserId,jdbcType=VARCHAR},
+            </if>
+            <if test="dataState != null">
+                data_state = #{dataState,jdbcType=VARCHAR},
+            </if>
+            <if test="createBy != null">
+                create_by = #{createBy,jdbcType=VARCHAR},
+            </if>
+            <if test="createDate != null">
+                create_date = #{createDate,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy,jdbcType=VARCHAR},
+            </if>
+            <if test="updateDate != null">
+                update_date = #{updateDate,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+
+    <select id="countNews" parameterType="java.util.Map" resultType="java.lang.Integer">
+        select count(1)
+        from esale_news a
+        left join sys_user b on a.user_id = b.id
+        where a.data_state = 1
+        <if test="departId != null and departId != ''">
+            and b.depart_id = #{departId}
+        </if>
+    </select>
+
+    <select id="selectNewsList" parameterType="java.util.Map" resultType="com.tj720.model.EsaleNews">
+        select
+        a.id,
+        a.user_id as "userId",
+        a.content,
+        a.pictureids,
+        a.praise_user_id as "praiseUserId",
+        a.data_state as "dataState",
+        a.create_by as "createBy",
+        a.create_date as "createDate",
+        a.update_by as "updateBy",
+        a.update_date as "updateDate",
+        b.name as "userName",
+        c.department_name as "userDepartName"
+        from esale_news a
+        left join sys_user b on a.user_id = b.id
+        left join sys_department c on b.depart_id = c.department_id
+        where a.data_state = 1
+        <if test="departId != null and departId != ''">
+            and b.depart_id = #{departId}
+        </if>
+        order by update_date desc
+        limit #{start},#{end}
+    </select>
+    <resultMap id="percentMap" type="java.util.HashMap">
+        <result property="key" column="name"/>
+        <result property="value" column="value"/>
+    </resultMap>
+    <select id="getPercent" resultMap="percentMap">
+        select c.department_name as "name",count(a.id) as "value"
+        from esale_news a
+                 left join sys_user b on a.user_id = b.id
+                 left join sys_department c on b.depart_id = c.department_id
+        where a.data_state = "1"
+        GROUP BY c.department_id
+    </select>
+    <select id="getDepartList" resultType="java.lang.String">
+        select department_name
+        from sys_department
+        where status = "1"
+    </select>
+</mapper>
